@@ -11,3 +11,5 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.pi-angle-double-left, .pi-angle-double-right, .pi-angle-left, .pi-angle-right { font-size: 24px;}

@@ -1,24 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux'; 
+import AuthNavigation from './Navigation/Auth/AuthNavigation';
+import ScreenNavigation from './Navigation/Screen/ScreenNavigation';
+import { ACTION_LOGIN } from './Redux/Action/AuthAction';
 
-function App() {
+const App = () =>{ 
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  console.log('isLoggedIn', isLoggedIn);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+    isLoggedIn ? (<ScreenNavigation />) : (<AuthNavigation />)
   );
 }
 
