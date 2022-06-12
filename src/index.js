@@ -33,6 +33,9 @@ axios.interceptors.response.use (
         localStorage.setItem ('refresh_token', new_refresh_token);
         return axios (_orgRequest);
       }
+    } else {
+      console.log ('refresh token invalid');
+      return Promise.reject (error);
     }
   }
 );
