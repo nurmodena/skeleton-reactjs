@@ -13,3 +13,24 @@ code {
 }
 
 .pi-angle-double-left, .pi-angle-double-right, .pi-angle-left, .pi-angle-right { font-size: 24px;}
+
+.searchField:focus{ border-color: #ccc; }
+.btn-search:hover {  color: '#6c757d' !important;}
+.hideScrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hideScrollbar {
+  -ms-overflow-style: none;  
+  scrollbar-width: none; 
+}
+.filterContainer {
+  position: absolute;
+  width: 450px;
+  height: 0;
+  border: solid 1px #ccc;
+  border-radius: 4px;
+  background: white;
+  opacity: 0;
+  overflow: hidden;
+  z-index: 10000;
+}
