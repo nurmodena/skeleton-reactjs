@@ -22,4 +22,37 @@ const getById = (id, onSuccess, onError) => {
     });
 };
 
-export {getAll, getById};
+const createLanguage = (payload, onSuccess, onError) => {
+  axios
+    .post (`v1/admin/language/create`, payload)
+    .then (res => {
+      if (onSuccess) onSuccess (res);
+    })
+    .catch (err => {
+      if (onError) onError (err.response);
+    });
+};
+
+const updateLanguage = (payload, onSuccess, onError) => {
+  axios
+    .put (`v1/admin/language/update/${payload.code}`, payload)
+    .then (res => {
+      if (onSuccess) onSuccess (res);
+    })
+    .catch (err => {
+      if (onError) onError (err.response);
+    });
+};
+
+const deleteLanguage = (id, onSuccess, onError) => {
+  axios
+    .delete (`v1/admin/language/delete/${id}`)
+    .then (res => {
+      if (onSuccess) onSuccess (res);
+    })
+    .catch (err => {
+      if (onError) onError (err.response);
+    });
+};
+
+export {getAll, getById, createLanguage, updateLanguage, deleteLanguage};

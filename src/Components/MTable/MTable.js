@@ -7,7 +7,7 @@ const MTableId = `id_mtable_${parseInt (Math.random () * 10000)}`;
 let timeoutId = 0;
 
 const MTable = props => {
-  const {data, columns, totalRows, loadData} = props;
+  const {data, columns, totalRows, loadData, onAddData} = props;
   const [filters, setFilters] = useState ([]);
   const [filter, setFilter] = useState ({field: '', value: '', title: ''});
   const [paginator, setPaginator] = useState ({
@@ -132,6 +132,12 @@ const MTable = props => {
     setPaginator ({...paginator, filter: ''});
     closeFilter ();
   };
+
+  const onAddDataClick = () => {
+    if (onAddData) {
+      onAddData();
+    }
+  }
 
   return (
     <div className="" id={MTableId}>
@@ -339,6 +345,7 @@ const MTable = props => {
               <button
                 type="button"
                 className="btn btn-block btn-outline-warning"
+                onClick={onAddDataClick}
               >
                 <i className="fa fa-plus" /> Add
               </button>
