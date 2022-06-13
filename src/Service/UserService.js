@@ -6,7 +6,7 @@ const logoutUser = () => dispatch => {
 }
 
 const loginUser = (onSuccess, onError) => {
-    const data = { username: 'joshua.jeremy@modena.com', password: 'P@ssw0rd'};
+    const data = { username: 'muhamad.nur@modena.com', password: 'P@ssw0rd'};
     axios.post("v1/login", data).then(res => {
         if(onSuccess) onSuccess(res);
     }).catch(err => {

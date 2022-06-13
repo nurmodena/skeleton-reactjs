@@ -116,6 +116,7 @@ const LanguagesScreen = () => {
       },
     },
   ];
+
   const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
 
   const onAddData = () => {
@@ -131,7 +132,8 @@ const LanguagesScreen = () => {
   const onCloseModal = () => {
     $("#modal-detail").modal('hide');
   }
-  const onSUbmitData = (data) => {
+
+  const onSubmitData = (data) => {
     console.log('form data', data); 
     createLanguage(data, ({data, status}) => {
       if(status == 200 || status == 201) {
@@ -185,7 +187,7 @@ const LanguagesScreen = () => {
                   </h3>
                 </div>
                 <div className="card-body">
-                  <MTable {...propsTable} onAddData={onAddData} />
+                  <MTable {...propsTable} onAddData={onAddData} showAddButton={true}/>
                 </div>
               </div>
             </div>
@@ -195,7 +197,7 @@ const LanguagesScreen = () => {
 
       {/**Modal Detal */}
       <div id="modal-detail" className='modal fade'>
-        <form name="form-detail" onSubmit={handleSubmit(onSUbmitData)}>
+        <form name="form-detail" onSubmit={handleSubmit(onSubmitData)}>
           <div className='modal-dialog modal-dialog-centered'>
             <div className='modal-content'>
               <div className='modal-header'>
