@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const getBrandAll = (params, onSuccess, onError) => {
+const getCategoryAll = (params, onSuccess, onError) => {
   axios
-    .get ('v1/admin/brand/get-all', {params})
+    .get ('v1/admin/category/get-all', {params})
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -11,9 +11,9 @@ const getBrandAll = (params, onSuccess, onError) => {
     });
 };
 
-const getBrandById = (id, onSuccess, onError) => {
+const getCategoryById = (id, onSuccess, onError) => {
   axios
-    .get (`v1/admin/brand/get/${id}`)
+    .get (`v1/admin/category/get/${id}`)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -22,10 +22,10 @@ const getBrandById = (id, onSuccess, onError) => {
     });
 };
 
-const createBrand = (payload, onSuccess, onError) => {
+const createCategory = (payload, onSuccess, onError) => {
   const headers = axios.defaults.headers;
   axios
-    .post (`v1/admin/brand/create`, payload, { headers: {...headers, 'Content-Type': 'multipart/form-data'}})
+    .post (`v1/admin/category/create`, payload, { headers: {...headers, 'Content-Type': 'multipart/form-data'}})
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -34,9 +34,9 @@ const createBrand = (payload, onSuccess, onError) => {
     });
 };
 
-const updateBrand = (payload, onSuccess, onError) => {
+const updateCategory = (payload, onSuccess, onError) => {
   axios
-    .put (`v1/admin/brand/update/${payload.id}`, payload)
+    .put (`v1/admin/category/update/${payload.id}`, payload)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -45,9 +45,9 @@ const updateBrand = (payload, onSuccess, onError) => {
     });
 };
 
-const deleteBrand = (id, onSuccess, onError) => {
+const deleteCategory = (id, onSuccess, onError) => {
   axios
-    .delete (`v1/admin/brand/delete/${id}`)
+    .delete (`v1/admin/category/delete/${id}`)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -56,4 +56,4 @@ const deleteBrand = (id, onSuccess, onError) => {
     });
 };
 
-export {getBrandAll, getBrandById, createBrand, updateBrand, deleteBrand};
+export {getCategoryAll, getCategoryById, createCategory, updateCategory, deleteCategory};

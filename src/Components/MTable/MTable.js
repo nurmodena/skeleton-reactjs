@@ -361,7 +361,7 @@ const MTable = props => {
             {showIndex && (<th style={{ width: 60 }}>No</th>)}
             {columns.map((item, i) => {
               return item.sortable
-                ? <th key={'key-' + i}>
+                ? <th key={'key-' + i} style={item.style || {}}>
                   <div
                     className="d-flex"
                     style={{

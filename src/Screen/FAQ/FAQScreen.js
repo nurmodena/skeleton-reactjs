@@ -1,6 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 
 const FAQScreen = () => {
+
+    useEffect(()=>{
+        window.setupDigitInput();
+    }, []);
+
     return (
         <div className="content-wrapper">
                 <div className="content-header">
@@ -20,7 +25,22 @@ const FAQScreen = () => {
                 </div>
                 <section className="content">
                     <div className="container-fluid">
-                        <div className="row"></div>
+                        <div className="row">
+                            <div className='col-12'>
+                                <div className='card'>
+                                    <div className='card-header'>
+                                        <div className='card-title'>FAQ List</div>
+                                    </div>
+                                    <div className='card-body'>
+                                        <div className='form-group'>
+                                            <label>Number</label>
+                                            <input id='number-field' className='form-control digit' pattern='[0-9]*'/>
+                                        </div>
+                                    </div>
+                                    <div className='card-footer'></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>

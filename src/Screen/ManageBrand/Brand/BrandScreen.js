@@ -1,5 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
-import { getBrandAll } from '../../../Service/BrandService';
+import { createBrand, deleteBrand, getBrandAll, updateBrand } from '../../../Service/BrandService';
+import { getCategoryAll } from '../../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../../Components/MTable/MTable';
@@ -8,11 +9,14 @@ const { $ } = window;
 
 const BrandScreen = () => {
 
-    const {register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const [categories, setCategories] = useState([]);
     const [brand, setBrand] = useState({});
     useEffect(() => {
         console.log('UseEffect invoked');
-         
+        getCategoryAll({perpage: 100}, ({data}) => { 
+            setCategories(data.data);
+        })
     }, []);
 
 
@@ -33,7 +37,7 @@ const BrandScreen = () => {
 
     const onActiveChange = item => e => {
 
-    } 
+    }
 
     const columns = [
         { id: 1, title: 'Brand Code', field: 'code', sortable: true },
@@ -44,12 +48,12 @@ const BrandScreen = () => {
             field: 'is_active',
             sortable: true,
             render: item => {
-              return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)}/>;
+                return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)} />;
             },
-          },
+        },
         {
             id: 4,
-            title: '', 
+            title: '',
             sortable: true,
             render: item => {
                 return (
@@ -69,28 +73,42 @@ const BrandScreen = () => {
 
     const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
 
-    const removeData = item => {
-
+    const removeData = id => {
+        deleteBrand(id, res => {
+            if (res.status == 200 || res.status == 201) {
+              Swal.fire({ 
+                icon: 'success',
+                title: 'Delete data success',
+                text: 'Data has been deleted!'
+              }).then(res => {loadData()}); 
+            }
+          }, error => {
+            Swal.fire({ 
+              icon: 'error',
+              title: 'Delete data fail',
+              text: 'Data can not be deleetd!'
+            });
+          });
     }
 
-    const onEdit = item => () => { 
+    const onEdit = item => () => {
         reset(item);
         setBrand(item);
         console.log('selected ', item);
     }
 
     const onRemove = item => () => {
-        Swal.fire({ 
+        Swal.fire({
             icon: 'question',
             title: 'Are you sure?',
             text: 'Deleted data can not be restored!',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
-          }).then(({isConfirmed}) => {
+        }).then(({ isConfirmed }) => {
             if (isConfirmed) {
-              removeData(item.code);
+                removeData(item.id);
             }
-          });
+        });
     }
 
     const onAddData = () => {
@@ -100,12 +118,50 @@ const BrandScreen = () => {
     const onSubmit = (data) => {
         console.log('submit data', data);
         console.log('brand', brand);
+        data.image = brand.file; 
+        const formData = new FormData();
+        for (var key in data) {
+            formData.append(key, data[key]);
+        }
+        if (brand.id) {
+            updateBrand(formData, res => {
+                if (res.status == 200 || res.status == 201) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Save data success',
+                        text: 'Data has been saved!'
+                    })
+                }
+            }, err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Save data error!'
+                });
+            });
+        } else {
+            createBrand(formData, res => {
+                if (res.status == 200 || res.status == 201) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Save data success',
+                        text: 'Data has been saved!'
+                    })
+                }
+            }, err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Save data error!'
+                });
+            });
+        }
     }
 
     const onBrowseImage = () => {
         console.log('onBrowse invoked!');
         $("#image-name").click();
-        
+
     }
 
     const onReset = () => {
@@ -122,8 +178,8 @@ const BrandScreen = () => {
     const onFileChange = (e) => {
         console.log('e file', e);
         const [file] = e.target.files;
-        if (file) { 
-            setBrand({...brand, image_name: URL.createObjectURL(file), file})
+        if (file) {
+            setBrand({ ...brand, image_name: URL.createObjectURL(file), file })
         }
     }
 
@@ -148,29 +204,43 @@ const BrandScreen = () => {
                 <div className="container-fluid">
                     <div className="row">
                         <div className='col-md-4'>
-                            <form name="form-detail" onSubmit={ handleSubmit(onSubmit) }>
+                            <form name="form-detail" onSubmit={handleSubmit(onSubmit)}>
                                 <div className='card'>
                                     <div className='card-header'>
                                         <h3 className="card-title">
                                             <i className="fas fa-tag mr-1" />
-                                            {brand.id ? 'Edit Brand':'New Brand'}
+                                            {brand.id ? 'Edit Brand' : 'New Brand'}
                                         </h3>
                                     </div>
                                     <div className='card-body'>
                                         <div className='form-group'>
+                                            <label>Category</label>
+                                            <select className='form-control' {...register("category_id", { required: { value: true, message: 'Category is required!' } })}>
+                                                {
+                                                    categories.map((ctg, i) => (<option key={`ctg-`+i} value={ctg.id}>{ctg.name}</option>))
+                                                }
+                                            </select>
+                                        </div>
+                                        <div className='form-group'>
                                             <label htmlFor="brand-code">Brand Code</label>
-                                            <input name="brand-code" {...register("code", {required: {value: true, message: 'Brand code is required!'}})} placeholder='Brand code' className='form-control' />
-                                            {errors.code && (<span className='text-danger' style={{fontSize: 14}}>{errors.code.message}</span>)}
+                                            <input name="brand-code" {...register("code", { required: { value: true, message: 'Brand code is required!' } })} placeholder='Brand code' className='form-control' />
+                                            {errors.code && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.code.message}</span>)}
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor="brand-name">Brand Name</label>
-                                            <input name="brand-name" {...register("name", {required: {value: true, message: 'Brand name is required!'}})} placeholder='Brand name' className='form-control' />
-                                            {errors.name && (<span className='text-danger' style={{fontSize: 14}}>{errors.name.message}</span>)}
+                                            <input name="brand-name" {...register("name", { required: { value: true, message: 'Brand name is required!' } })} placeholder='Brand name' className='form-control' />
+                                            {errors.name && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.name.message}</span>)}
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor="brand-name">Active</label>
+                                            <div>
+                                                <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} />
+                                            </div>
                                         </div>
                                         <div className='form-group'>
                                             <label id="image-name" htmlFor="image_name">Image</label>
-                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange}/>
-                                            <div style={{minHeight: 200}}>
+                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} />
+                                            <div style={{ minHeight: 200 }}>
                                                 {brand.image_name && (<img src={brand.image_name} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />)}
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>

@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HomeScreen from '../../Screen/Home/HomeScreen';
 import LanguagesScreen from '../../Screen/Languages/LanguagesScreen';
 import BrandScreen from '../../Screen/ManageBrand/Brand/BrandScreen';
@@ -14,9 +14,10 @@ import TroubleShootingScreen
   from '../../Screen/TroubleShooting/TroubleShootingScreen';
 import FAQScreen from '../../Screen/FAQ/FAQScreen';
 import LayoutScreen from '../../Screen/Layout/LayoutScreen';
+import ModelDetailScreen from '../../Screen/ManageBrand/Model/ModelDetailScreen';
 
 const ToHome = () => {
-  console.log ('ToHome invoked');
+  console.log('ToHome invoked');
   return <Navigate to="/home" replace={true} />;
 };
 
@@ -32,6 +33,7 @@ const ScreenNavigation = () => {
           <Route path="/category" element={<CategoryScreen />} />
           <Route path="/subcategory" element={<SubCategoryScreen />} />
           <Route path="/model" element={<ModelScreen />} />
+          <Route path="/model/:pageState/:modelid" element={<ModelDetailScreen />} />
           <Route path="/series" element={<SeriesScreen />} />
           <Route path="/user" element={<UserScreen />} />
           <Route path="/roleaccess" element={<RoleAccessScreen />} />

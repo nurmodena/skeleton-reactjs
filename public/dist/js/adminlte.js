@@ -3087,7 +3087,15 @@ window.loadTree = () => {
   if (window.treeLoaded == false) {
      $('[data-widget="treeview"]').Treeview('init'); 
     window.treeLoaded = true;
-  }
-  
-  
+  } 
+}
+
+window.setupDigitInput = () => {
+  $('.digit').on('keypress', evt => {
+    // Only ASCII character in that range allowed
+    var ASCIICode = (evt.which) ? evt.which : evt.keyCode;
+    if (ASCIICode > 31 && (ASCIICode < 46 || ASCIICode > 57))
+        return false;
+    return true;
+  })
 }

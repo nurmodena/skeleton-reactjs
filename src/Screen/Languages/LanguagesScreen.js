@@ -6,6 +6,7 @@ import { createLanguage, deleteLanguage, getAll, updateLanguage } from '../../Se
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 const { $ } = window;
+const shared = {};
 
 const LanguagesScreen = () => {
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
@@ -17,7 +18,8 @@ const LanguagesScreen = () => {
     }
   });
 
-  const loadData = payload => {
+   const loadData = payload => {
+    shared.pagintor = payload;
     getAll(
       payload,
       res => {
@@ -38,7 +40,7 @@ const LanguagesScreen = () => {
           icon: 'success',
           title: 'Delete data success',
           text: 'Data has been deleted!'
-        }).then(res => {loadData()}); 
+        }).then(res => {loadData(shared.pagintor)}); 
       }
     }, error => {
       Swal.fire({ 
@@ -66,12 +68,12 @@ const LanguagesScreen = () => {
   
   const onActiveChange = item => (e) => {
     item.is_active = e.value;
-    updateLanguage(item, res=>{loadData({})});
+    updateLanguage(item, res=>{loadData(shared.pagintor)});
   } 
 
   const onDefaultChange = item => (e) => { 
     item.is_default = e.checked;
-    updateLanguage(item, res=>{loadData({})});
+    updateLanguage(item, res=>{loadData(shared.pagintor)});
   } 
 
   const columns = [

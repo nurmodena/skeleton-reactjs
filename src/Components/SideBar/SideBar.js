@@ -90,6 +90,12 @@ export default class SideBar extends Component {
                                 </NavLink>
                             </li>
                             <li className="nav-item">
+                                <NavLink to="/installation" className={getClassName}>
+                                    <i className="nav-icon fas fa-download" />
+                                    <p>Installation</p>
+                                </NavLink>
+                            </li>
+                            <li className="nav-item">
                                 <NavLink to="/troubleshoot" className={getClassName}>
                                     <i className="nav-icon fas fa-copy" />
                                     <p>Troubleshooting</p>

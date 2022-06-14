@@ -64,3 +64,44 @@ code {
   border-width: 0 !important;
   box-shadow: 0 0 0 2px rgba(235, 189, 41, 0.5) !important;
 }
+
+.login-container {
+  display: flex;
+}
+
+.bg-login {
+  border: solid 0px red;
+  display: inline-block; 
+  flex: 5; 
+}
+
+.login-form {
+  border: solid 0px blue;
+  display: inline-block;
+  flex: 2; 
+}
+
+@media (max-width: 800px) {
+  .login-container {
+    flex-direction: column;
+  }
+  .bg-login {
+    flex: 1; 
+    overflow: hidden;
+  }
+  .login-form {
+    flex: 4; 
+  }
+}
+
+.inputLogin {
+    width: 100%; 
+    border: none !important; 
+    padding: 10px; 
+    flex: 1;   
+}
+
+.inputLogin:focus {
+  border: none !important;
+  border-width: 0;
+}

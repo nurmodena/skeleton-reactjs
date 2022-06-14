@@ -1,36 +1,46 @@
-import React, {Component, useEffect, useState} from 'react';
-import {InputSwitch} from 'primereact/inputswitch';
-import {RadioButton} from 'primereact/radiobutton';
+import React, { Component, useEffect, useState } from 'react';
+import { InputSwitch } from 'primereact/inputswitch';
+import { RadioButton } from 'primereact/radiobutton';
 import MTable from '../../../Components/MTable/MTable';
-import {getModelAll} from '../../../Service/ModelService';
+import { getModelAll } from '../../../Service/ModelService';
+import { useNavigate } from 'react-router-dom';
 
 const ModelScreen = () => {
-  const [data, setData] = useState ([]);
+  let navigate = useNavigate();
 
-  useEffect (() => {}, []);
+  useEffect(() => { }, []);
 
   const loadData = payload => {
-    getModelAll (
+    getModelAll(
       payload,
       res => {
-        console.log ('res', res);
-        const {data, total} = res.data;
-        setPropsTable ({...propsTable, data, totalRows: total});
+        console.log('res', res);
+        const { data, total } = res.data;
+        setPropsTable({ ...propsTable, data, totalRows: total });
       },
-      err => {}
+      err => { }
     );
   };
 
+  const onView = item => () => {
+    navigate("view/" + item.id);
+  };
+
+  const onEdit = item => () => {
+    navigate("edit/" + item.id);
+  };
+
   const onRemove = item => () => {
-    console.log ('You click remove', item);
+    console.log('You click remove', item);
   };
 
   const columns = [
-    {id: 1, title: 'ID', field: 'id', sortable: true},
-    {id: 2, title: 'Modela Name', field: 'name', sortable: true},
-    {id: 4, title: 'Series', field: 'code', sortable: true},
+    { id: 1, title: 'Modela Name', field: 'name', sortable: true },
+    { id: 2, title: 'Description', field: 'description', sortable: true },
+    { id: 4, title: 'Series', field: 'code', sortable: true },
+    { id: 5, title: 'Status', field: 'status', sortable: true },
     {
-      id: 5,
+      id: 6,
       title: 'Active',
       field: 'is_active',
       sortable: true,
@@ -39,27 +49,58 @@ const ModelScreen = () => {
       },
     },
     {
-      id: 6,
+      id: 7,
       title: 'Action',
       render: item => {
         return (
-          <a
-            onClick={onRemove (item)}
-            style={{
-              cursor: 'pointer',
-              color: 'maroon',
-              display: 'inline-block',
-            }}
-          >
-            <i className="fas fa-trash" />
-            <span style={{marginLeft: 10}}>Delete</span>
-          </a>
+          <div>
+            <a
+              onClick={onView(item)}
+              style={{
+                cursor: 'pointer',
+                color: 'orange',
+                display: 'inline-block',
+                marginRight: 20
+              }}
+            >
+              <i className="fas fa-eye" />
+              <span style={{ marginLeft: 10 }}>View</span>
+            </a>
+            <a
+              onClick={onEdit(item)}
+              style={{
+                cursor: 'pointer',
+                color: 'green',
+                display: 'inline-block',
+                marginRight: 20
+              }}
+            >
+              <i className="fas fa-edit" />
+              <span style={{ marginLeft: 10 }}>Edit</span>
+            </a>
+            <a
+              onClick={onRemove(item)}
+              style={{
+                cursor: 'pointer',
+                color: 'maroon',
+                display: 'inline-block',
+                marginRight: 20
+              }}
+            >
+              <i className="fas fa-trash" />
+              <span style={{ marginLeft: 10 }}>Delete</span>
+            </a>
+          </div>
         );
       },
     },
   ];
 
-  const [propsTable, setPropsTable] = useState ({data: [], columns, loadData});
+  const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+
+  const onAddData = () => {
+    navigate("add/new");
+  }
 
   return (
     <div className="content-wrapper">
@@ -72,7 +113,7 @@ const ModelScreen = () => {
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                <li className="breadcrumb-item active">Manage Languages</li>
+                <li className="breadcrumb-item active">Manage Model</li>
               </ol>
             </div>
           </div>
@@ -90,7 +131,7 @@ const ModelScreen = () => {
                   </h3>
                 </div>
                 <div className="card-body">
-                  <MTable {...propsTable} />
+                  <MTable {...propsTable} showIndex={true} showAddButton={true} onAddData={onAddData} />
                 </div>
               </div>
             </div>
