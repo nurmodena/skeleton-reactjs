@@ -7,9 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ModelScreen = () => {
   let navigate = useNavigate();
-
-  useEffect(() => { }, []);
-
+ 
   const loadData = payload => {
     getModelAll(
       payload,
@@ -36,7 +34,11 @@ const ModelScreen = () => {
 
   const columns = [
     { id: 1, title: 'Modela Name', field: 'name', sortable: true },
-    { id: 2, title: 'Description', field: 'description', sortable: true },
+    {
+      id: 2, title: 'Description', field: 'description', sortable: true, style: { width: '40%' }, render: data => {
+        return (<div style={{ maxHeight: 50, overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.description}</div>)
+      }
+    },
     { id: 4, title: 'Series', field: 'code', sortable: true },
     { id: 5, title: 'Status', field: 'status', sortable: true },
     {
@@ -95,12 +97,13 @@ const ModelScreen = () => {
       },
     },
   ];
-
-  const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
-
+  
   const onAddData = () => {
     navigate("add/new");
   }
+
+  const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
+
 
   return (
     <div className="content-wrapper">
@@ -131,7 +134,7 @@ const ModelScreen = () => {
                   </h3>
                 </div>
                 <div className="card-body">
-                  <MTable {...propsTable} showIndex={true} showAddButton={true} onAddData={onAddData} />
+                  <MTable {...propsTable} />
                 </div>
               </div>
             </div>

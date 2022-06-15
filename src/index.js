@@ -33,6 +33,7 @@ axios.interceptors.response.use(
         if (response && response.status == 200) {
           const new_access_token = response.data.access_token;
           const new_refresh_token = response.data.refresh_token;
+          _orgRequest.headers['Authorization'] = `Bearer ${new_access_token}`;
           axios.defaults.headers.common[
             'Authorization'
           ] = `Bearer ${new_access_token}`;

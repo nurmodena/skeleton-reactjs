@@ -7,7 +7,7 @@ const MTableId = `id_mtable_${parseInt(Math.random() * 10000)}`;
 let timeoutId = 0;
 
 const MTable = props => {
-  const { data, columns, totalRows, loadData, onAddData, showIndex, showAddButton } = props;
+  const { data, columns, totalRows, loadData, onAddData, showIndex, showAddButton, order } = props;
   const [filters, setFilters] = useState([]);
   const [filter, setFilter] = useState({ field: '', value: '', title: '' });
   const [paginator, setPaginator] = useState({
@@ -15,7 +15,7 @@ const MTable = props => {
     perpage: 10,
     search: '',
     filter: '',
-    order: 'id',
+    order: order ? order : 'id',
     direction: 'asc',
   });
 
@@ -388,11 +388,11 @@ const MTable = props => {
         </thead>
         <tbody>
           {data.map((item, i) => (
-            <tr key={'key-' + item.id}>
+            <tr key={'key-' + i}>
               {showIndex && (<td>{i + 1}</td>)}
               {columns.map((col, j) => {
                 return (
-                  <td key={'key_col' + col.id}>
+                  <td key={'key_col' + j} style={col.style ? col.style : {}}>
                     {col.render ? col.render(item) : item[col.field]}
                   </td>
                 );

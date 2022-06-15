@@ -85,7 +85,7 @@ export default class SideBar extends Component {
                             </li>
                             <li className="nav-item">
                                 <NavLink to="/faq" className={getClassName}>
-                                    <i className="nav-icon fas fa-th" />
+                                    <i className="nav-icon fa fa-question" />
                                     <p>FAQ</p>
                                 </NavLink>
                             </li>

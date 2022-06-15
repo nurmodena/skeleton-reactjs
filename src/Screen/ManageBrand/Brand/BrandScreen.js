@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import MTable from '../../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 const { $ } = window;
+const localState = {};
 
 const BrandScreen = () => {
 
@@ -14,17 +15,17 @@ const BrandScreen = () => {
     const [brand, setBrand] = useState({});
     useEffect(() => {
         console.log('UseEffect invoked');
-        getCategoryAll({perpage: 100}, ({data}) => { 
+        getCategoryAll({ perpage: 100 }, ({ data }) => {
             setCategories(data.data);
         })
     }, []);
 
 
     const loadData = payload => {
+        localState.paginator = payload;
         getBrandAll(
             payload,
-            res => {
-                console.log('result', res);
+            res => { 
                 const { data, total } = res.data;
                 setPropsTable({ ...propsTable, data, totalRows: total });
             },
@@ -76,19 +77,19 @@ const BrandScreen = () => {
     const removeData = id => {
         deleteBrand(id, res => {
             if (res.status == 200 || res.status == 201) {
-              Swal.fire({ 
-                icon: 'success',
-                title: 'Delete data success',
-                text: 'Data has been deleted!'
-              }).then(res => {loadData()}); 
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Delete data success',
+                    text: 'Data has been deleted!'
+                }).then(res => { loadData(localState.paginator) });
             }
-          }, error => {
-            Swal.fire({ 
-              icon: 'error',
-              title: 'Delete data fail',
-              text: 'Data can not be deleetd!'
+        }, error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Delete data fail',
+                text: 'Data can not be deleetd!'
             });
-          });
+        });
     }
 
     const onEdit = item => () => {
@@ -118,7 +119,7 @@ const BrandScreen = () => {
     const onSubmit = (data) => {
         console.log('submit data', data);
         console.log('brand', brand);
-        data.image = brand.file; 
+        data.image = brand.file;
         const formData = new FormData();
         for (var key in data) {
             formData.append(key, data[key]);
@@ -130,7 +131,7 @@ const BrandScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    })
+                    }).then(r => { loadData(localState.paginator); onReset() })
                 }
             }, err => {
                 Swal.fire({
@@ -146,7 +147,7 @@ const BrandScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    })
+                    }).then(r => { loadData(localState.paginator); })
                 }
             }, err => {
                 Swal.fire({
@@ -217,7 +218,7 @@ const BrandScreen = () => {
                                             <label>Category</label>
                                             <select className='form-control' {...register("category_id", { required: { value: true, message: 'Category is required!' } })}>
                                                 {
-                                                    categories.map((ctg, i) => (<option key={`ctg-`+i} value={ctg.id}>{ctg.name}</option>))
+                                                    categories.map((ctg, i) => (<option key={`ctg-` + i} value={ctg.id}>{ctg.name}</option>))
                                                 }
                                             </select>
                                         </div>
