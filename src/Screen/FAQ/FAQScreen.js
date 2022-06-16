@@ -131,7 +131,7 @@ const FAQScreen = () => {
                         <div className='col-12'>
                             <div className='card'>
                                 <div className='card-header'>
-                                    <div className='card-title'>FAQ List</div>
+                                    <div className='card-title'><i className='fa fa-question-circle' /> FAQ List</div>
                                 </div>
                                 <div className='card-body'>
                                     <MTable {...propsTable} />

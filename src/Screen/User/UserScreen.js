@@ -1,12 +1,10 @@
 import React, { Component, useEffect, useState } from 'react';
-import { getUserAll, getUserById, createUser, updateUser,deleteUser } from '../../Service/UserService'; 
+import { getUserAll, getUserById, createUser, updateUser, deleteUser } from '../../Service/UserService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../Redux/Action/AuthAction';
 
 const { $ } = window;
 const localState = {};
@@ -18,18 +16,10 @@ const UserScreen = () => {
 
     }, []);
 
-    const dispatch = useDispatch();
-
-    const useLogout = () => {
-        dispatch(logout());
-        console.log('userLogout Invoked');
-    }
-
     const loadData = payload => {
         getUserAll(
             payload,
             res => {
-                console.log('res', res);
                 const { data, total } = res.data;
                 setPropsTable({ ...propsTable, data, totalRows: total });
             },
@@ -42,10 +32,11 @@ const UserScreen = () => {
     };
 
     const onEdit = item => () => {
-        navigate("edit/" + item.id);
+        console.log('selected', item);
+        navigate("edit/" + item.username);
     };
 
-    const onRemove = item => () => {
+    const onResetPassword = item => () => {
         console.log('You click remove', item);
     };
 
@@ -69,7 +60,7 @@ const UserScreen = () => {
             title: 'Action',
             render: item => {
                 return (
-                    <div> 
+                    <div>
                         <a
                             onClick={onEdit(item)}
                             style={{
@@ -83,7 +74,7 @@ const UserScreen = () => {
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
                         <a
-                            onClick={onRemove(item)}
+                            onClick={onResetPassword(item)}
                             style={{
                                 cursor: 'pointer',
                                 color: 'maroon',
@@ -91,8 +82,8 @@ const UserScreen = () => {
                                 marginRight: 20
                             }}
                         >
-                            <i className="fas fa-trash" />
-                            <span style={{ marginLeft: 10 }}>Delete</span>
+                            <i className="fas fa-key" />
+                            <span style={{ marginLeft: 10 }}>Reset Password</span>
                         </a>
                     </div>
                 );
@@ -113,12 +104,12 @@ const UserScreen = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">FAQ Screen</h1>
+                            <h1 className="m-0">Manage User</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">FAQ</li>
+                                <li className="breadcrumb-item active">User</li>
                             </ol>
                         </div>
                     </div>
@@ -130,10 +121,10 @@ const UserScreen = () => {
                         <div className='col-12'>
                             <div className='card'>
                                 <div className='card-header'>
-                                    <div className='card-title'>FAQ List</div>
+                                    <div className='card-title'><i className='fa fa-user-tag' /> List User</div>
                                 </div>
                                 <div className='card-body'>
-                                    <MTable {...propsTable} order="nik"/>
+                                    <MTable {...propsTable} order="nik" />
                                 </div>
                                 <div className='card-footer'></div>
                             </div>
@@ -144,5 +135,5 @@ const UserScreen = () => {
         </div>
     );
 }
- 
+
 export default UserScreen;

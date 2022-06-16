@@ -50,7 +50,7 @@ const LoginScreen = () => {
               <div className='form-group'>
                 <label>Password</label>
                 <div style={{border: 'solid 1px #ccc', borderRadius: 4, display: 'flex'}}>
-                  <input className='inputLogin' type={ pswState ? "email": "password" } {...register('password', {required: {value: true, message: 'Password is required'}})}/>
+                  <input className='inputLogin' type={ pswState ? "text": "password" } {...register('password', {required: {value: true, message: 'Password is required'}})}/>
                   <a onClick={onPasswordStateChange} className='btn btn-outline'><i className={pswState ? 'fa fa-eye' : 'fa fa-eye-slash'} /></a>
                 </div>
                 {errors.password && <span className='text-danger'>{errors.password.message}</span>}

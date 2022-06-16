@@ -159,7 +159,7 @@ const MTable = props => {
                   className={
                     search
                       ? 'btn btn-outline-danger btn-search'
-                      : 'btn btn-outline-warning btn-search'
+                      : 'btn btn-outline-dark btn-search'
                   }
                   type="button"
                   style={{
@@ -327,7 +327,7 @@ const MTable = props => {
           <div style={{ width: 120 }}>
             <button
               type="button"
-              className="btn btn-block btn-outline-warning"
+              className="btn btn-block btn-outline-dark"
               onClick={openFilter}
             >
               <i className="fa fa-filter" />
@@ -389,7 +389,7 @@ const MTable = props => {
         <tbody>
           {data.map((item, i) => (
             <tr key={'key-' + i}>
-              {showIndex && (<td>{i + 1}</td>)}
+              {showIndex && (<td>{i + startRow}</td>)}
               {columns.map((col, j) => {
                 return (
                   <td key={'key_col' + j} style={col.style ? col.style : {}}>
@@ -411,7 +411,7 @@ const MTable = props => {
           Rows per page
         </div>
         <div >
-        <Dropdown
+          <Dropdown
             options={[5, 10, 25, 50, 100]}
             value={paginator.perpage}
             onChange={onPerPageChange}
@@ -420,32 +420,51 @@ const MTable = props => {
         <div style={{ lineHeight: 3, width: 100, textAlign: 'center' }}>
           {`${paginator.page} of ${totalPage}`}
         </div>
-        <Button
-          className="p-button-text"
-          icon="pi pi-angle-double-left"
-          style={{ marginLeft: 10 }}
-          onClick={onFirst}
-        />
-        <Button
-          className="p-button-text"
-          icon="pi pi-angle-left"
-          style={{ marginLeft: 10 }}
-          onClick={onPrev}
-          disabled={paginator.page == 1}
-        />
-        <Button
-          className="p-button-text"
-          icon="pi pi-angle-right"
-          style={{ marginLeft: 10 }}
-          onClick={onNext}
-          disabled={paginator.page == lastPage}
-        />
-        <Button
-          className="p-button-text"
-          icon="pi pi-angle-double-right"
-          style={{ marginLeft: 10 }}
-          onClick={onLast}
-        />
+
+        <button type='button' className='btn btn-sm' onClick={onFirst}>
+          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+        </button>
+        <button type='button' className='btn btn-sm ml-2 mr-2' onClick={onPrev} disabled={paginator.page == 1}>
+          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+        </button>
+        <button type='button' className='btn btn-sm mr-2 ml-2' onClick={onNext} disabled={paginator.page == lastPage}>
+          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+        </button>
+        <button type='button' className='btn btn-sm' onClick={onLast}>
+          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+        </button>
+        {
+          /**
+           * <Button
+        className="p-button-text"
+        icon="pi pi-angle-double-left"
+        style={{ marginLeft: 10 }}
+        onClick={onFirst}
+      />
+      <Button
+        className="p-button-text"
+        icon="pi pi-angle-left"
+        style={{ marginLeft: 10 }}
+        onClick={onPrev}
+        disabled={paginator.page == 1}
+      />
+      <Button
+        className="p-button-text"
+        icon="pi pi-angle-right"
+        style={{ marginLeft: 10 }}
+        onClick={onNext}
+        disabled={paginator.page == lastPage}
+      />
+      <Button
+        className="p-button-text"
+        icon="pi pi-angle-double-right"
+        style={{ marginLeft: 10 }}
+        onClick={onLast}
+      />
+           */
+        }
       </div>
     </div>
   );

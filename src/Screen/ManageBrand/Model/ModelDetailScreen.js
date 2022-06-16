@@ -62,14 +62,14 @@ export default function ModelDetailScreen() {
                     <div className='d-flex' style={{ margin: '16px 0', flexFlow: 'wrap', padding: 10 }}>
                       {
                         images.map((item, i) => (
-                          <div style={wrapStyle} key={`image-${i}`}> 
+                          <div style={wrapStyle} key={`image-${i}`}>
                             <div style={{ position: 'absolute', right: -10, top: -10 }}>
                               <Button className='p-button-rounded p-button-danger' icon="pi pi-times" style={{ width: 30, height: 30 }} />
                             </div>
                             <img src={item} style={{ objectFit: 'cover', width: '100%', borderRadius: 4 }} />
                           </div>
                         ))
-                      } 
+                      }
                     </div>
                   </div>
                   <div className='form-group'>
@@ -81,24 +81,24 @@ export default function ModelDetailScreen() {
                     <br />
                     <span>Enter product size to calculate volume weight</span>
                     <div className='d-flex justify-content-beteween mt-3'>
-                      <div className='input-group' style={{flex: 1}}>
+                      <div className='input-group' style={{ flex: 1 }}>
                         <input className='form-control' />
                         <div className='input-group-append'>
                           <span className='input-group-text'>cm</span>
                         </div>
                       </div>
-                      <div className='input-group' style={{flex: 1, margin: '0 20px'}}>
+                      <div className='input-group' style={{ flex: 1, margin: '0 20px' }}>
                         <input className='form-control' />
                         <div className='input-group-append'>
                           <span className='input-group-text'>cm</span>
                         </div>
                       </div>
-                      <div className='input-group' style={{flex: 1}}>
+                      <div className='input-group' style={{ flex: 1 }}>
                         <input className='form-control' />
                         <div className='input-group-append'>
                           <span className='input-group-text'>cm</span>
                         </div>
-                      </div> 
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -112,9 +112,9 @@ export default function ModelDetailScreen() {
                     </select>
                   </div>
                   <div className='form-group d-flex justify-content-center'>
-                    <div style={{marginTop: 40}}>
-                      <button type='button' className='btn btn-outline-dark' style={{width: 120, marginRight: 16}} onClick={onBack}><i className='fa fa-arrow-left'></i> Back</button>
-                      <button type='button' className='btn btn-primary' style={{width: 120}}><i className='fa fa-save'></i> Save</button>
+                    <div style={{ marginTop: 40 }}>
+                      <button type='button' className='btn btn-outline-dark' style={{ width: 120, marginRight: 16 }} onClick={onBack}><i className='fa fa-reply'></i> Back</button>
+                      <button type='button' className='btn btn-dark' style={{ width: 120 }}><i className='fa fa-save'></i> Save</button>
                     </div>
                   </div>
                 </div>

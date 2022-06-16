@@ -43,7 +43,7 @@ const RoleAccessScreen = () => {
     const columns = [
         { id: 1, title: 'Role', field: 'roles_name', sortable: true },
         { id: 2, title: 'Description', field: 'descriptions', sortable: true },
-        { id: 3, title: 'Create Date', field: 'created_on', sortable: true, style: {textAlign: 'center'} },
+        { id: 3, title: 'Create Date', field: 'created_on', sortable: true, style: { textAlign: 'center' } },
         {
             id: 4,
             title: 'Active',
@@ -58,7 +58,7 @@ const RoleAccessScreen = () => {
             title: 'Action',
             render: item => {
                 return (
-                    <div> 
+                    <div>
                         <a
                             onClick={onEdit(item)}
                             style={{
@@ -119,7 +119,7 @@ const RoleAccessScreen = () => {
                         <div className='col-12'>
                             <div className='card'>
                                 <div className='card-header'>
-                                    <div className='card-title'>Role List</div>
+                                    <div className='card-title'><i className='fa fa-address-card' /> Role List</div>
                                 </div>
                                 <div className='card-body'>
                                     <MTable {...propsTable} />
@@ -133,6 +133,6 @@ const RoleAccessScreen = () => {
         </div>
     );
 }
- 
+
 
 export default RoleAccessScreen;

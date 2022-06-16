@@ -15,6 +15,7 @@ import TroubleShootingScreen
 import FAQScreen from '../../Screen/FAQ/FAQScreen';
 import LayoutScreen from '../../Screen/Layout/LayoutScreen';
 import ModelDetailScreen from '../../Screen/ManageBrand/Model/ModelDetailScreen';
+import UserDetailScreen from '../../Screen/User/UserDetailScreen';
 
 const ToHome = () => {
   console.log('ToHome invoked');
@@ -34,8 +35,9 @@ const ScreenNavigation = () => {
           <Route path="/subcategory" element={<SubCategoryScreen />} />
           <Route path="/model" element={<ModelScreen />} />
           <Route path="/model/:pageState/:modelid" element={<ModelDetailScreen />} />
-          <Route path="/series" element={<SeriesScreen />} />
+          { /** <Route path="/series" element={<SeriesScreen />} /> */}
           <Route path="/user" element={<UserScreen />} />
+          <Route path="/user/:pageState/:modelid" element={<UserDetailScreen />} />
           <Route path="/roleaccess" element={<RoleAccessScreen />} />
           <Route path="/installation" element={<InstallationScreen />} />
           <Route path="/troubleshoot" element={<TroubleShootingScreen />} />

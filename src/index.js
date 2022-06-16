@@ -6,10 +6,10 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './Redux/Store/Store';
 import axios from 'axios';
-import { ACTION_LOGIN } from './Redux/Action/AuthAction';
+import { ACTION_LOGIN, ACTION_LOGOUT } from './Redux/Action/AuthAction';
 
 const REFRESH_URL = 'v1/refresh';
-axios.defaults.baseURL = 'http://192.168.0.41:9502/'; 
+axios.defaults.baseURL = 'http://192.168.0.41:9502/';
 axios.interceptors.response.use(
   res => {
     return res;
@@ -26,19 +26,24 @@ axios.interceptors.response.use(
       } else {
         const response = await axios.post(REFRESH_URL, { refreshToken }).catch(errorRefresh => {
           console.log('get refresh token fail', errorRefresh);
-          store.dispatch({ type: ACTION_LOGIN, isLoggedIn: false });
+          store.dispatch({ type: ACTION_LOGOUT });
           return Promise.reject(error);
         });
         console.log('refresh response', response);
         if (response && response.status == 200) {
-          const new_access_token = response.data.access_token;
-          const new_refresh_token = response.data.refresh_token;
+          const { access_token, refresh_token } = response.data;
+          const new_access_token = access_token;
+          const new_refresh_token = refresh_token;
+          const old_access_token = _orgRequest.headers['Authorization'];
+          const [header, payload] = old_access_token.split('.');
+          const { fullname, office, role, email, image_filename } = JSON.parse(atob(payload));
+
           _orgRequest.headers['Authorization'] = `Bearer ${new_access_token}`;
-          axios.defaults.headers.common[
-            'Authorization'
-          ] = `Bearer ${new_access_token}`;
+          axios.defaults.headers.common['Authorization'] = `Bearer ${new_access_token}`;
           localStorage.setItem('access_token', new_access_token);
           localStorage.setItem('refresh_token', new_refresh_token);
+
+          store.dispatch({ type: ACTION_LOGIN, userInfo: { fullname, office, role, email, image_filename } });
           return axios(_orgRequest);
         } else {
           return Promise.reject(error);
@@ -61,7 +66,9 @@ if (access_token) {
     .then(res => {
       console.log('Token valid', res);
       if (res && res.status == 200) {
-        store.dispatch({ type: ACTION_LOGIN, isLoggedIn: true });
+        const [header, payload] = access_token.split('.');
+        const { fullname, office, role, email, image_filename } = JSON.parse(atob(payload));
+        store.dispatch({ type: ACTION_LOGIN, userInfo: { fullname, office, role, email, image_filename } });
       }
     })
     .catch(error => {

@@ -1,24 +1,187 @@
-import React, { Component } from 'react';
-
-const columns = [
-    { id: 1, title: 'Category Name', field: 'name', sortTable: true },
-    { id: 2, title: 'Description', field: 'description', sortTable: true },
-];
-const data = [
-    { id: 1, name: 'Cooking', description: 'Category of Cooking' },
-    { id: 2, name: 'Cleaning', description: 'Category of Cleaning' },
-    { id: 3, name: 'Cooling', description: 'Category of Cooling' },
-    { id: 4, name: 'Professional', description: 'Category of Professional' },
-    { id: 5, name: 'Energy', description: 'Category of Energy' }
-];
+import React, { Component, useEffect, useState } from 'react';
+import { createBrand, deleteBrand, getBrandAll, updateBrand } from '../../../Service/BrandService';
+import { createCategory, deleteCategory, getCategoryAll, updateCategory } from '../../../Service/CategoriesService';
+import { useForm, Controller, handleSubmit } from 'react-hook-form';
+import Swal from 'sweetalert2';
+import MTable from '../../../Components/MTable/MTable';
+import { InputSwitch } from 'primereact/inputswitch';
+const { $ } = window;
+const localState = {};
 
 const CategoryScreen = () => {
+
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const [brands, setBrands] = useState([]);
+    const [category, setCategory] = useState({});
+    useEffect(() => {
+        getBrandAll({ perpage: 100 }, ({ data }) => {
+            setBrands(data.data);
+        })
+    }, []);
+
+
+    const loadData = payload => {
+        localState.paginator = payload;
+        getCategoryAll(
+            payload,
+            res => {
+                const { data, total } = res.data;
+                setPropsTable({ ...propsTable, data, totalRows: total });
+            },
+            err => {
+                setPropsTable({ ...propsTable, data: [], totalRows: 0 });
+
+            }
+        );
+    }
+
+    const onActiveChange = item => e => {
+
+    }
+
+    const columns = [
+        { id: 1, title: 'Category Name', field: 'name', sortable: true },
+        { id: 2, title: 'Description', field: 'description', sortable: true },
+        {
+            id: 3,
+            title: 'Active',
+            field: 'is_active',
+            sortable: true,
+            render: item => {
+                return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)} />;
+            },
+        },
+        {
+            id: 4,
+            title: '',
+            sortable: true,
+            render: item => {
+                return (
+                    <div>
+                        <a onClick={onEdit(item)} style={{ cursor: 'pointer', color: 'green', display: 'inline-block', marginRight: 15 }}>
+                            <i className="fas fa-edit" />
+                            <span style={{ marginLeft: 10 }}>Edit</span>
+                        </a>
+                        <a onClick={onRemove(item)} style={{ cursor: 'pointer', color: 'maroon', display: 'inline-block' }}>
+                            <i className="fas fa-trash" />
+                            <span style={{ marginLeft: 10 }}>Remove</span>
+                        </a>
+                    </div>);
+            },
+        },
+    ];
+
+    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+
+    const removeData = id => {
+        deleteCategory(id, res => {
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Delete data success',
+                    text: 'Data has been deleted!'
+                }).then(res => { loadData(localState.paginator) });
+            }
+        }, error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Delete data fail',
+                text: 'Data can not be deleetd!'
+            });
+        });
+    }
+
     const onEdit = item => () => {
-        console.log('You click edit', item);
+        reset(item);
+        setCategory(item);
+        console.log('selected ', item);
     }
 
     const onRemove = item => () => {
-        console.log('You click remove', item);
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure?',
+            text: 'Deleted data can not be restored!',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+        }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+                removeData(item.id);
+            }
+        });
+    }
+
+    const onAddData = () => {
+        onReset();
+    }
+
+    const onSubmit = (data) => {
+        console.log('submit data', data);
+        console.log('brand', category);
+        data.image = category.file;
+        const formData = new FormData();
+        for (var key in data) {
+            formData.append(key, data[key]);
+        }
+        if (category.id) {
+            updateCategory(formData, res => {
+                if (res.status == 200 || res.status == 201) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Save data success',
+                        text: 'Data has been saved!'
+                    }).then(r => { loadData(localState.paginator); onReset() })
+                }
+            }, err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Save data error!'
+                });
+            });
+        } else {
+            createCategory(formData, res => {
+                if (res.status == 200 || res.status == 201) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Save data success',
+                        text: 'Data has been saved!'
+                    }).then(r => { loadData(localState.paginator); onReset() })
+                }
+            }, err => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Save data error!'
+                });
+            });
+        }
+    }
+
+    const onBrowseImage = () => {
+        console.log('onBrowse invoked!');
+        $("#image-name").click();
+
+    }
+
+    const onReset = () => {
+        reset({
+            category_id: 0,
+            code: '',
+            name: '',
+            description: '',
+            is_active: true,
+            image_name: '',
+        });
+        setCategory({});
+    }
+
+    const onFileChange = (e) => {
+        console.log('e file', e);
+        const [file] = e.target.files;
+        if (file) {
+            setCategory({ ...category, image_name: URL.createObjectURL(file), file })
+        }
     }
 
     return (
@@ -32,7 +195,7 @@ const CategoryScreen = () => {
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">Home Page</li>
+                                <li className="breadcrumb-item active">Category Page</li>
                             </ol>
                         </div>
                     </div>
@@ -42,39 +205,54 @@ const CategoryScreen = () => {
                 <div className="container-fluid">
                     <div className="row">
                         <div className='col-md-4'>
-                            <div className='card'>
-                                <div className='card-header'>
-                                    <h3 className="card-title">
-                                        <i className="fas fa-tag mr-1" />
-                                        Category Detail
-                                    </h3>
+                            <form name="form-detail" onSubmit={handleSubmit(onSubmit)}>
+                                <div className='card'>
+                                    <div className='card-header'>
+                                        <h3 className="card-title">
+                                            <i className="fas fa-tag mr-1" />
+                                            {category.id ? 'Edit Category' : 'New Category'}
+                                        </h3>
+                                    </div>
+                                    <div className='card-body'>
+                                        <div className='form-group'>
+                                            <label htmlFor="code">Category Code</label>
+                                            <input id="code" {...register("code", { required: { value: true, message: 'Category code is required!' } })} placeholder='Category code' className='form-control' />
+                                            {errors.code && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.code.message}</span>)}
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor="name">Category</label>
+                                            <input id="name" {...register("name", { required: { value: true, message: 'Category name is required!' } })} placeholder='Category name' className='form-control' />
+                                            {errors.name && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.name.message}</span>)}
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor="description">Description</label>
+                                            <input id="description" {...register("description")} placeholder='Description' className='form-control' />
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor="brand-name">Active</label>
+                                            <div>
+                                                <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} />
+                                            </div>
+                                        </div>
+                                        <div className='form-group'>
+                                            <label id="image-name" htmlFor="image_name">Image</label>
+                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} />
+                                            <div style={{ minHeight: 200 }}>
+                                                {category.image_name && (<img src={category.image_name} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />)}
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                                <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage}><i className='fa fa-image'></i> Browse</button>
+                                            </div>
+                                            <div style={{ height: 1, background: '#ccc', marginTop: 16 }}></div>
+                                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                                <div style={{ width: 150, marginRight: 10 }}><button type="button" className="btn btn-block btn-outline-danger" onClick={onReset}><i className='fa fa-times'></i>  Clear</button></div>
+                                                <div style={{ width: 150 }}><button type="submit" className="btn btn-block btn-outline-dark"><i className='fa fa-save'></i> Save</button></div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className='card-body'>
-                                    <div className='form-group'>
-                                        <label htmlFor="brand-name">Category Name</label>
-                                        <input id="brand-name" name="brandName" placeholder='Category name' className='form-control' />
-                                    </div>
-                                    <div className='form-group'>
-                                        <label htmlFor="description">Description</label>
-                                        <input id="description" name="description" placeholder='Description' className='form-control' />
-                                    </div>
-                                    <div className='form-group'>
-                                        <label htmlFor="description">Image</label>
-                                        <div >
-                                            <img src="https://media.web.modena.com/images/homepage/category/3/SB6DKczzaWmNZA5FIgPNXc9bkh7278NhFKpbJmmz.jpg" style={{ objectFit: 'cover', width: '100%' }} alt="select image" />
-                                        </div>
-                                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                                            <button type='button' className='btn btn-default btn-block' style={{ width: 100 }}><i className='fa fa-image'></i> Browse</button>
-                                        </div>
-                                        <div style={{height: 1, background: '#ccc', marginTop: 16}}></div>
-                                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                                            <div style={{ width: 150, marginRight: 10 }}><button type="button" className="btn btn-block btn-outline-danger" ><i className='fa fa-times'></i>  Clear</button></div>
-                                            <div style={{ width: 150 }}><button type="button" className="btn btn-block btn-outline-dark"><i className='fa fa-save'></i> Save</button></div>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </form>
                         </div>
                         <div className="col-md-8">
                             <div className="card">
@@ -85,41 +263,7 @@ const CategoryScreen = () => {
                                     </h3>
                                 </div>
                                 <div className="card-body">
-                                    <table className="table">
-                                        <thead>
-                                            <tr>
-                                                <th style={{ width: 10 }}>#</th>
-                                                {
-                                                    columns.map((item, i) => (
-                                                        <th key={'key-' + item.id}>{item.title}</th>
-                                                    ))
-                                                }
-                                                <th style={{}}>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {
-                                                data.map((item, i) => (
-                                                    <tr key={'key-' + item.id}>
-                                                        <td>{item.id}</td>
-                                                        <td>{item.name}</td>
-                                                        <td>{item.description}</td>
-                                                        <td>
-                                                            <a onClick={onEdit(item)} style={{ cursor: 'pointer', color: 'green', display: 'inline-block', marginRight: 15 }}>
-                                                                <i className="fas fa-edit" />
-                                                                <span style={{ marginLeft: 10 }}>Edit</span>
-                                                            </a>
-                                                            <a onClick={onRemove(item)} style={{ cursor: 'pointer', color: 'red', display: 'inline-block' }}>
-                                                                <i className="fas fa-trash" />
-                                                                <span style={{ marginLeft: 10 }}>Remove</span>
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            }
-
-                                        </tbody>
-                                    </table>
+                                    <MTable {...propsTable} onAddData={onAddData} showIndex={true} />
                                 </div>
                             </div>
                         </div>
@@ -129,5 +273,6 @@ const CategoryScreen = () => {
         </div>
     );
 }
+
 
 export default CategoryScreen;

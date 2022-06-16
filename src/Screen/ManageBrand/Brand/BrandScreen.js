@@ -25,7 +25,7 @@ const BrandScreen = () => {
         localState.paginator = payload;
         getBrandAll(
             payload,
-            res => { 
+            res => {
                 const { data, total } = res.data;
                 setPropsTable({ ...propsTable, data, totalRows: total });
             },
@@ -63,7 +63,7 @@ const BrandScreen = () => {
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
-                        <a onClick={onRemove(item)} style={{ cursor: 'pointer', color: 'red', display: 'inline-block' }}>
+                        <a onClick={onRemove(item)} style={{ cursor: 'pointer', color: 'maroon', display: 'inline-block' }}>
                             <i className="fas fa-trash" />
                             <span style={{ marginLeft: 10 }}>Remove</span>
                         </a>

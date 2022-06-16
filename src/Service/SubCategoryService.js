@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const getCategoryAll = (params, onSuccess, onError) => {
+const getSubCategoryAll = (params, onSuccess, onError) => {
   axios
-    .get ('v1/admin/category/get-all', {params})
+    .get ('v1/admin/category-sub/get-all', {params})
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -11,9 +11,9 @@ const getCategoryAll = (params, onSuccess, onError) => {
     });
 };
 
-const getCategoryById = (id, onSuccess, onError) => {
+const getSubCategoryById = (id, onSuccess, onError) => {
   axios
-    .get (`v1/admin/category/get/${id}`)
+    .get (`v1/admin/category-sub/get/${id}`)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -22,10 +22,10 @@ const getCategoryById = (id, onSuccess, onError) => {
     });
 };
 
-const createCategory = (payload, onSuccess, onError) => {
+const createSubCategory = (payload, onSuccess, onError) => {
   const headers = axios.defaults.headers;
   axios
-    .post (`v1/admin/category/create`, payload, { headers: {...headers, 'Content-Type': 'multipart/form-data'}})
+    .post (`v1/admin/category-sub/create`, payload, { headers: {...headers, 'Content-Type': 'multipart/form-data'}})
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -34,10 +34,10 @@ const createCategory = (payload, onSuccess, onError) => {
     });
 };
 
-const updateCategory = (payload, onSuccess, onError) => {
+const updateSubCategory = (payload, onSuccess, onError) => {
   const id = payload.get('id');
   axios
-    .put (`v1/admin/category/update/${id}`, payload)
+    .put (`v1/admin/category-sub/update/${id}`, payload)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -46,9 +46,9 @@ const updateCategory = (payload, onSuccess, onError) => {
     });
 };
 
-const deleteCategory = (id, onSuccess, onError) => {
+const deleteSubCategory = (id, onSuccess, onError) => {
   axios
-    .delete (`v1/admin/category/delete/${id}`)
+    .delete (`v1/admin/category-sub/delete/${id}`)
     .then (res => {
       if (onSuccess) onSuccess (res);
     })
@@ -57,4 +57,4 @@ const deleteCategory = (id, onSuccess, onError) => {
     });
 };
 
-export {getCategoryAll, getCategoryById, createCategory, updateCategory, deleteCategory};
+export {getSubCategoryAll, getSubCategoryById, createSubCategory, updateSubCategory, deleteSubCategory};

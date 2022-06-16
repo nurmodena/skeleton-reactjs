@@ -237,7 +237,7 @@ const LanguagesScreen = () => {
               </div>
               <div className='modal-footer d-flex justify-content-center'>
                 <button type='button' className='btn btn-outline-dark' data-dismiss="modal"><i className='fa fa-times' ></i> Close</button>
-                <button type='submit' className='btn btn-primary' ><i className='fa fa-save' ></i> Save</button>
+                <button type='submit' className='btn btn-dark' ><i className='fa fa-save' ></i> Save</button>
               </div>
             </div>
           </div>

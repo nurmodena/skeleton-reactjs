@@ -119,7 +119,7 @@ const InstallationScreen = () => {
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">Installation</li>
+                                <li className="breadcrumb-item active"> Installation</li>
                             </ol>
                         </div>
                     </div>
@@ -131,7 +131,7 @@ const InstallationScreen = () => {
                         <div className='col-12'>
                             <div className='card'>
                                 <div className='card-header'>
-                                    <div className='card-title'>Installation List</div>
+                                    <div className='card-title'><i className='fa fa-download' /> Installation List</div>
                                 </div>
                                 <div className='card-body'>
                                     <MTable {...propsTable} />
@@ -145,6 +145,6 @@ const InstallationScreen = () => {
         </div>
     );
 }
- 
+
 
 export default InstallationScreen;

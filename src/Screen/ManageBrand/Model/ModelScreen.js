@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ModelScreen = () => {
   let navigate = useNavigate();
- 
+
   const loadData = payload => {
     getModelAll(
       payload,
@@ -97,7 +97,7 @@ const ModelScreen = () => {
       },
     },
   ];
-  
+
   const onAddData = () => {
     navigate("add/new");
   }
@@ -129,7 +129,7 @@ const ModelScreen = () => {
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title">
-                    <i className="fas fa-globe mr-1" />
+                    <i className="fas fa-tag mr-1" />
                     List Model
                   </h3>
                 </div>
