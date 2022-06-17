@@ -106,7 +106,7 @@ const SideBar = () => {
                         </li>
                         <li className="nav-item">
                             <NavLink to="/troubleshoot" className={getClassName}>
-                                <i className="nav-icon fas fa-copy" />
+                                <i className="nav-icon fas fa-tools" />
                                 <p>Troubleshooting</p>
                             </NavLink>
                         </li>

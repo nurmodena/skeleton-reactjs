@@ -49,9 +49,9 @@ const createUser = (payload, onSuccess, onError) => {
 };
 
 const updateUser = (payload, onSuccess, onError) => {
-    const id = payload.get('id');
+    const username = payload.get('username');
     axios
-        .put(`v1/admin/user/update/${id}`, payload)
+        .put(`v1/admin/user/update/${username}`, payload)
         .then(res => {
             if (onSuccess) onSuccess(res);
         })

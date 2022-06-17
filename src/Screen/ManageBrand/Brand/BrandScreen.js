@@ -176,8 +176,7 @@ const BrandScreen = () => {
         setBrand({});
     }
 
-    const onFileChange = (e) => {
-        console.log('e file', e);
+    const onFileChange = (e) => { 
         const [file] = e.target.files;
         if (file) {
             setBrand({ ...brand, image_name: URL.createObjectURL(file), file })

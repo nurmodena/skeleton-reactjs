@@ -41,9 +41,9 @@ const LoginScreen = () => {
                 <h4 style={{ color: '#777', fontSize: 18, fontWeight: 400, marginBottom: 20 }}>Tecnical Service Manual</h4>
               </div>
               <div className='form-group'>
-                <label>Email</label>
+                <label>Email or Username</label>
                 <div style={{border: 'solid 1px #ccc', borderRadius: 4}}>
-                  <input {...register('username', {required: {value: true, message: 'Email is required'}})} className='inputLogin' type={"email"}/> 
+                  <input {...register('username', {required: {value: true, message: 'Email is required'}})} className='inputLogin'/> 
                 </div>
                 {errors.username && <span className='text-danger'>{errors.username.message}</span>}
               </div>
