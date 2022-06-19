@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { NavLink } from 'react-router-dom';
 import { logout } from '../../Redux/Action/AuthAction';
 
 const NavBar = () => {
@@ -25,7 +26,7 @@ const NavBar = () => {
                     <a className="nav-link" data-widget="pushmenu" href="#" role="button"><i className="fas fa-bars" /></a>
                 </li>
                 <li className="nav-item d-none d-sm-inline-block">
-                    <a href="index3.html" className="nav-link">Home</a>
+                    <NavLink to="/home" className="nav-link">Home</NavLink>
                 </li>
                 <li className="nav-item d-none d-sm-inline-block">
                     <a href="#" className="nav-link">Contact</a>

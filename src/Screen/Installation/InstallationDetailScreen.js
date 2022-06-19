@@ -9,16 +9,16 @@ const { $ } = window;
 const localState = {};
 
 const list = [
-    { id: 1, name: 'Troubleshooting-1', step_order: 1 },
-    { id: 2, name: 'Troubleshooting-1', step_order: 2 },
-    { id: 3, name: 'Troubleshooting-1', step_order: 3 },
-    { id: 4, name: 'Troubleshooting-1', step_order: 4 },
-    { id: 5, name: 'Troubleshooting-1', step_order: 5 },
-    { id: 6, name: 'Troubleshooting-1', step_order: 6 },
-    { id: 7, name: 'Troubleshooting-1', step_order: 7 },
+    { id: 1, name: 'Installation-1', step_order: 1 },
+    { id: 2, name: 'Installation-2', step_order: 2 },
+    { id: 3, name: 'Installation-3', step_order: 3 },
+    { id: 4, name: 'Installation-4', step_order: 4 },
+    { id: 5, name: 'Installation-5', step_order: 5 },
+    { id: 6, name: 'Installation-6', step_order: 6 },
+    { id: 7, name: 'Installation-7', step_order: 7 },
 ];
 
-const TroubleShootingDetailScreen = () => {
+const InstallationDetailScreen = () => {
     const navigate = useNavigate();
     const { pageState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control } = useForm();
@@ -105,12 +105,12 @@ const TroubleShootingDetailScreen = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Manage Troubleshoot</h1>
+                            <h1 className="m-0">Manage Installation</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">Troubleshoot</li>
+                                <li className="breadcrumb-item active">Installation</li>
                             </ol>
                         </div>
                     </div>
@@ -121,22 +121,14 @@ const TroubleShootingDetailScreen = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className='card'>
                             <div className='card-header'>
-                                <div className='card-title'><i className='fa fa-tools' /> {pageState && pageState.charAt(0).toUpperCase() + pageState.slice(1)} Troubleshoot</div>
+                                <div className='card-title'><i className='fa fa-tools' /> {pageState && pageState.charAt(0).toUpperCase() + pageState.slice(1)} installation</div>
                             </div>
                             <div className='card-body'>
                                 <div className='row'>
                                     <div className='col-md-7'>
                                         <div className='form-group'>
-                                            <label htmlFor='troubleshoot-name'>Troubleshooting Name</label>
-                                            <input id="troubleshoot-name" className='form-control' placeholder='Troubleshooting Name' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='error-code'>Error Code</label>
-                                            <input id="error-code" className='form-control' placeholder='Error Code' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='video-url'>Video Url</label>
-                                            <input id="video-url" className='form-control' placeholder='Vide Url' />
+                                            <label htmlFor='installation-name'>Installation Name</label>
+                                            <input id="installation-name" className='form-control' placeholder='Installation Name' />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
@@ -146,7 +138,7 @@ const TroubleShootingDetailScreen = () => {
                                         </div>
                                         <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                         <div className='form-group'>
-                                            <label htmlFor='is-active'>List Troubleshooting Content</label>
+                                            <label htmlFor='is-active'>List Installation Content</label>
                                             <div>
                                                 <MTable {...propsTable} />
                                             </div>
@@ -186,4 +178,4 @@ const TroubleShootingDetailScreen = () => {
     );
 }
 
-export default TroubleShootingDetailScreen;
+export default InstallationDetailScreen;

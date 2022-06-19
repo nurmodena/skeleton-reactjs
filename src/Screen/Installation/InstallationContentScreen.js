@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { getTraoubleshootAll, getTraoubleshootById, createTraoubleshoot, updateTraoubleshoot, deleteTraoubleshoot } from '../../Service/TroubleshootService';
+import { } from '../../Service/InstallationService';
 import { getAll as getLanguages } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -8,7 +8,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 const { $, setupDigitInput } = window;
 
-const TroubleShootingContentScreen = () => {
+const InstallationContentScreen = () => {
     const navigate = useNavigate();
     const { pageState, contentState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control } = useForm();
@@ -83,12 +83,12 @@ const TroubleShootingContentScreen = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Manage Troubleshoot</h1>
+                            <h1 className="m-0">Manage Installation</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">Troubleshoot Content</li>
+                                <li className="breadcrumb-item active">Installation Content</li>
                             </ol>
                         </div>
                     </div>
@@ -99,7 +99,7 @@ const TroubleShootingContentScreen = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className='card'>
                             <div className='card-header'>
-                                <div className='card-title'><i className='fa fa-tools' /> {contentState && contentState.charAt(0).toUpperCase() + contentState.slice(1)} Troubleshoot Content</div>
+                                <div className='card-title'><i className='fa fa-tools' /> {contentState && contentState.charAt(0).toUpperCase() + contentState.slice(1)} Installation Content</div>
                             </div>
                             <div className='card-body'>
                                 <div className='row'>
@@ -110,7 +110,7 @@ const TroubleShootingContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='step-order'>Step Order</label>
-                                            <input id="step-order" className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
+                                            <input id="step-order" type={'number'} className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
                                         </div>
                                         <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                         <div className='form-group'>
@@ -122,6 +122,10 @@ const TroubleShootingContentScreen = () => {
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage}><i className='fa fa-image'></i> Browse</button>
                                             </div>
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor='video-url'>Video Url</label>
+                                            <input id="video-url" className='form-control' placeholder='Content Name' />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
@@ -204,4 +208,4 @@ const TroubleShootingContentScreen = () => {
     );
 }
 
-export default TroubleShootingContentScreen;
+export default InstallationContentScreen;

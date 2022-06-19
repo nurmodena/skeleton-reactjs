@@ -23,7 +23,7 @@ const RoleAccessDetailScreen = () => {
     };
 
     const columns = [
-        { id: 1, title: 'menu_name', field: 'menu_name' },
+        { id: 1, title: 'Menu', field: 'menu_name' },
         { id: 2, title: 'Description', field: 'descriptions' },
         {
             id: 3,

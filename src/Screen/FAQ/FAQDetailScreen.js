@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { getTraoubleshootAll, getTraoubleshootById, createTraoubleshoot, updateTraoubleshoot, deleteTraoubleshoot } from '../../Service/TroubleshootService';
+import { } from '../../Service/FAQService';
 import { getAll as getLanguages } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -7,10 +7,11 @@ import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 const { $, setupDigitInput } = window;
+const localState = {};
 
-const TroubleShootingContentScreen = () => {
+const FAQDetailScreen = () => {
     const navigate = useNavigate();
-    const { pageState, contentState, dataid } = useParams();
+    const { pageState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control } = useForm();
     const [state, setState] = useState({
         dataLanguages: [],
@@ -26,8 +27,12 @@ const TroubleShootingContentScreen = () => {
         setupDigitInput();
     }, []);
 
+    useEffect(() => {
+        $('.select2').select2();
+    }, []);
+
     const onSubmit = data => {
-        console.log('state', state);
+
     }
 
     const onGoback = () => {
@@ -77,18 +82,19 @@ const TroubleShootingContentScreen = () => {
     }
 
     const { languages, language, dataLanguages, selectedLang } = state;
+
     return (
         <div className="content-wrapper">
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Manage Troubleshoot</h1>
+                            <h1 className="m-0">Manage FAQ</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">Troubleshoot Content</li>
+                                <li className="breadcrumb-item active">FAQ</li>
                             </ol>
                         </div>
                     </div>
@@ -99,20 +105,15 @@ const TroubleShootingContentScreen = () => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className='card'>
                             <div className='card-header'>
-                                <div className='card-title'><i className='fa fa-tools' /> {contentState && contentState.charAt(0).toUpperCase() + contentState.slice(1)} Troubleshoot Content</div>
+                                <div className='card-title'><i className='fa fa-tools' /> {pageState && pageState.charAt(0).toUpperCase() + pageState.slice(1)} FAQ</div>
                             </div>
                             <div className='card-body'>
                                 <div className='row'>
                                     <div className='col-md-6'>
                                         <div className='form-group'>
-                                            <label htmlFor='content-name'>Content Name</label>
-                                            <input id="content-name" className='form-control' placeholder='Content Name' />
+                                            <label htmlFor='faq-name'>FAQ Name</label>
+                                            <input id="faq-name" className='form-control' placeholder='FAQ Name' />
                                         </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='step-order'>Step Order</label>
-                                            <input id="step-order" className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
-                                        </div>
-                                        <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                         <div className='form-group'>
                                             <label>Image</label>
                                             <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
@@ -124,14 +125,31 @@ const TroubleShootingContentScreen = () => {
                                             </div>
                                         </div>
                                         <div className='form-group'>
+                                            <label htmlFor='video-url'>Video Url</label>
+                                            <input id="video-url" className='form-control' placeholder='Content Name' />
+                                        </div>
+                                        <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
                                             <div>
                                                 <InputSwitch checked={true} />
                                             </div>
                                         </div>
+                                        <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                     </div>
                                     <div className='col-md-1'></div>
                                     <div className='col-md-5'>
+                                        <div className='form-group'>
+                                            <label htmlFor='model-list'>Model List</label>
+                                            <select id="select-models" className='select2' multiple="multiple" data-paleceholder="Select models" style={{ width: '100%' }}>
+                                                <option>Model - 1</option>
+                                                <option>Model - 2</option>
+                                                <option>Model - 3</option>
+                                                <option>Model - 4</option>
+                                                <option>Model - 5</option>
+                                                <option>Model - 6</option>
+                                                <option>Model - 7</option>
+                                            </select>
+                                        </div>
                                         <div className='form-group d-flex align-items-center'>
                                             <label>Multi Language</label>
                                             <div style={{ height: 1, background: '#ccc', flex: 1, marginLeft: 10 }} />
@@ -189,12 +207,17 @@ const TroubleShootingContentScreen = () => {
                                                 <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
                                             </div>
                                         </div>
+                                        <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
+                                        <div className='form-group'>
+                                            <div className='d-flex justify-content-right'>
+                                                <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
+                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className='card-footer'>
-
-                            </div>
+                            <div className='card-footer'></div>
                         </div>
                     </form>
                 </div>
@@ -204,4 +227,4 @@ const TroubleShootingContentScreen = () => {
     );
 }
 
-export default TroubleShootingContentScreen;
+export default FAQDetailScreen;

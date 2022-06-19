@@ -19,6 +19,9 @@ import UserDetailScreen from '../../Screen/User/UserDetailScreen';
 import RoleAccessDetailScreen from '../../Screen/RoleAccess/RoleAccessDetailScreen';
 import TroubleShootingDetailScreen from '../../Screen/TroubleShooting/TroubleShootingDetailScreen';
 import TroubleShootingContentScreen from '../../Screen/TroubleShooting/TroubleShootingContentScreen';
+import InstallationDetailScreen from '../../Screen/Installation/InstallationDetailScreen';
+import InstallationContentScreen from '../../Screen/Installation/InstallationContentScreen';
+import FAQDetailScreen from '../../Screen/FAQ/FAQDetailScreen';
 
 const ToHome = () => {
   console.log('ToHome invoked');
@@ -44,10 +47,13 @@ const ScreenNavigation = () => {
           <Route path="/roleaccess" element={<RoleAccessScreen />} />
           <Route path="/roleaccess/:pageState/:roleid" element={<RoleAccessDetailScreen />} />
           <Route path="/installation" element={<InstallationScreen />} />
+          <Route path="/installation/:pageState/:dataid" element={<InstallationDetailScreen />} />
+          <Route path="/installation/:pageState/:dataid/content/:contentState/:contentid" element={<InstallationContentScreen />} />
           <Route path="/troubleshoot" element={<TroubleShootingScreen />} />
           <Route path="/troubleshoot/:pageState/:dataid" element={<TroubleShootingDetailScreen />} />
           <Route path="/troubleshoot/:pageState/:dataid/content/:contentState/:contentid" element={<TroubleShootingContentScreen />} />
           <Route path="/faq" element={<FAQScreen />} />
+          <Route path="/faq/:pageState/:dataid" element={<FAQDetailScreen />} />
           <Route path="/*" element={<ToHome />} />
         </Route>
 
