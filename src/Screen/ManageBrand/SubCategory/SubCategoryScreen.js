@@ -247,7 +247,7 @@ const SubCategoryScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label id="image-name" htmlFor="image_name">Image</label>
-                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} />
+                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
                                             <div style={{ minHeight: 200 }}>
                                                 {subcategories.image && (<img src={subcategories.image} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />)}
                                             </div>

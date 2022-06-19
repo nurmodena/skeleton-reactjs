@@ -176,7 +176,7 @@ const BrandScreen = () => {
         setBrand({});
     }
 
-    const onFileChange = (e) => { 
+    const onFileChange = (e) => {
         const [file] = e.target.files;
         if (file) {
             setBrand({ ...brand, image_name: URL.createObjectURL(file), file })
@@ -239,7 +239,7 @@ const BrandScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label id="image-name" htmlFor="image_name">Image</label>
-                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} />
+                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
                                             <div style={{ minHeight: 200 }}>
                                                 {brand.image_name && (<img src={brand.image_name} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />)}
                                             </div>

@@ -18,15 +18,15 @@ const UserDetailScreen = () => {
 
     const [roles, setRoles] = useState([]);
 
-    const { register, handleSubmit, watch, control, formState: { errors }, reset} = useForm({ defaultValues: { roles_id: -1 } });
+    const { register, handleSubmit, watch, control, formState: { errors }, reset } = useForm({ defaultValues: { roles_id: -1 } });
     const password = useRef({});
     password.current = watch("password", "");
 
-    useEffect(() => { 
+    useEffect(() => {
         getRoleAccessAll({ perpage: 100 }, (res => { setRoles(res.data.data); console.log('roles', res.data.data); }));
         getUserById(username, res => {
-            const {data} = res;
-            console.log('randomPassword',randomPassword);
+            const { data } = res;
+            console.log('randomPassword', randomPassword);
             console.log('selected data', data);
             data.image = data.image_name;
             data.password = randomPassword;
@@ -116,7 +116,7 @@ const UserDetailScreen = () => {
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
                                 <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                <li className="breadcrumb-item active">FAQ</li>
+                                <li className="breadcrumb-item active">User</li>
                             </ol>
                         </div>
                     </div>
@@ -141,7 +141,8 @@ const UserDetailScreen = () => {
                                                     <button type='button' className='btn btn-outline-dark' onClick={onSelectImage}>
                                                         <i className='fa fa-image' /> Select Image
                                                     </button>
-                                                    <input id="user-image" type="file" {...register("image", { required: { value: pageState.toLowerCase() == 'add', message: 'Image is required' } })} className='d-none' onChange={onuserImageChange} />
+                                                    <input id="user-image" type="file" accept="image/png, image/jpg, image/jpeg"
+                                                        {...register("image", { required: { value: pageState.toLowerCase() == 'add', message: 'Image is required' } })} className='d-none' onChange={onuserImageChange} />
                                                     {errors.image && <span className='text-danger d-block'>{errors.image.message}</span>}
                                                 </div>
                                             </div>

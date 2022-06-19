@@ -109,6 +109,12 @@ const MTable = props => {
     }
   };
 
+  const onValueEnter = e => {
+    if (e.key == "Enter") {
+      onAddFilter();
+    }
+  }
+
   const onRemoveFilter = item => () => {
     const _filters = filters.filter(e => e.field != item.field);
     setFilters(_filters);
@@ -181,7 +187,7 @@ const MTable = props => {
               <div className="card-header" style={{ height: 40, paddingTop: 7 }}>
                 <div
                   className="card-title"
-                  style={{ color: '#ffc107', fontSize: 16 }}
+                  style={{ fontSize: 16 }}
                 >
                   <i className="fa fa-filter" /> Filter
                 </div>
@@ -232,6 +238,7 @@ const MTable = props => {
                       placeholder="Filter value"
                       value={filter.value}
                       onChange={onFilterValueChange}
+                      onKeyDown={onValueEnter}
                     />
                   </div>
                   <div style={{ width: 10 }} />
@@ -371,7 +378,7 @@ const MTable = props => {
                     }}
                     onClick={onSort(item.field)}
                   >
-                    <span className="d-block mr-2">{item.title}</span>
+                    <span className="d-block mr-2 flex-1">{item.title}</span>
                     {paginator.order == item.field &&
                       <i
                         className={
@@ -382,7 +389,7 @@ const MTable = props => {
                       />}
                   </div>
                 </th>
-                : <th key={'key-' + i}>{item.title}</th>;
+                : <th key={'key-' + i} style={item.style || {}}>{item.title}</th>;
             })}
           </tr>
         </thead>
@@ -421,7 +428,7 @@ const MTable = props => {
           {`${paginator.page} of ${totalPage}`}
         </div>
 
-        <button type='button' className='btn btn-sm' onClick={onFirst}>
+        <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
           <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
           <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
         </button>
@@ -431,7 +438,7 @@ const MTable = props => {
         <button type='button' className='btn btn-sm mr-2 ml-2' onClick={onNext} disabled={paginator.page == lastPage}>
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
         </button>
-        <button type='button' className='btn btn-sm' onClick={onLast}>
+        <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
         </button>

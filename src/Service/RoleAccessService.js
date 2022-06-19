@@ -56,4 +56,15 @@ const deleteRoleAccess = (id, onSuccess, onError) => {
         });
 };
 
-export { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess };
+const getMenuAll = (id, onSuccess, onError) => {
+    axios
+        .get(`v1/admin/menu/get-all`)
+        .then(res => {
+            if (onSuccess) onSuccess(res);
+        })
+        .catch(err => {
+            if (onError) onError(err.response);
+        });
+};
+
+export { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess, getMenuAll };

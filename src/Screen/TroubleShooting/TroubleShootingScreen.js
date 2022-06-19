@@ -18,7 +18,7 @@ const TroubleShootingScreen = () => {
     const loadData = payload => {
         getTraoubleshootAll(
             payload,
-            res => { 
+            res => {
                 const { data, total } = res.data;
                 setPropsTable({ ...propsTable, data, totalRows: total });
             },
@@ -113,7 +113,7 @@ const TroubleShootingScreen = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">Troubleshoot Screen</h1>
+                            <h1 className="m-0">Manage Troubleshoot</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
@@ -130,7 +130,7 @@ const TroubleShootingScreen = () => {
                         <div className='col-12'>
                             <div className='card'>
                                 <div className='card-header'>
-                                    <div className='card-title'><i className='fa fa-copy' /> Troubleshoot List</div>
+                                    <div className='card-title'><i className='fa fa-tools' /> Troubleshoot List</div>
                                 </div>
                                 <div className='card-body'>
                                     <MTable {...propsTable} />
@@ -143,6 +143,6 @@ const TroubleShootingScreen = () => {
             </section>
         </div>
     );
-} 
+}
 
 export default TroubleShootingScreen;

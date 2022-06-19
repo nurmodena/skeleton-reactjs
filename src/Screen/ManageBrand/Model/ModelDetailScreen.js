@@ -57,7 +57,7 @@ export default function ModelDetailScreen() {
                   </div>
                   <div className='form-group'>
                     <label htmlFor="file-image" className='mr-3'>Upload Image</label>
-                    <input id="file-image" className='d-none' type="file" />
+                    <input id="file-image" className='d-none' type="file" accept="image/png, image/jpg, image/jpeg" />
                     <button type='button' className='btn btn-outline-warning' style={{ width: 120 }} onClick={() => { window.$("#file-image").click() }}><i className='fa fa-image' /> Chose </button>
                     <div className='d-flex' style={{ margin: '16px 0', flexFlow: 'wrap', padding: 10 }}>
                       {
