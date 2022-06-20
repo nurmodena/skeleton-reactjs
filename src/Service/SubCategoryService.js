@@ -1,60 +1,30 @@
 import axios from 'axios';
+import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getSubCategoryAll = (params, onSuccess, onError) => {
-  axios
-    .get ('v1/admin/category-sub/get-all', {params})
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.get ('v1/admin/category-sub/get-all', {params});
+  return handleResponse(response, onSuccess, onError);
 };
 
 const getSubCategoryById = (id, onSuccess, onError) => {
-  axios
-    .get (`v1/admin/category-sub/get/${id}`)
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.get (`v1/admin/category-sub/get/${id}`)
+  return handleResponse(response, onSuccess, onError);
 };
 
 const createSubCategory = (payload, onSuccess, onError) => {
-  const headers = axios.defaults.headers;
-  axios
-    .post (`v1/admin/category-sub/create`, payload, { headers: {...headers, 'Content-Type': 'multipart/form-data'}})
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.post (`v1/admin/category-sub/create`, payload, getMultipartOptions(axios))
+  return handleResponse(response, onSuccess, onError);
 };
 
 const updateSubCategory = (payload, onSuccess, onError) => {
   const id = payload.get('id');
-  axios
-    .put (`v1/admin/category-sub/update/${id}`, payload)
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.put (`v1/admin/category-sub/update/${id}`, payload, getMultipartOptions(axios))
+  return handleResponse(response, onSuccess, onError);
 };
 
 const deleteSubCategory = (id, onSuccess, onError) => {
-  axios
-    .delete (`v1/admin/category-sub/delete/${id}`)
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.delete (`v1/admin/category-sub/delete/${id}`)
+  return handleResponse(response, onSuccess, onError);
 };
 
 export {getSubCategoryAll, getSubCategoryById, createSubCategory, updateSubCategory, deleteSubCategory};

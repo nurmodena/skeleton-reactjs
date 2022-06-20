@@ -5,8 +5,7 @@ import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
-const { $ } = window;
-const localState = {};
+const { $ } = window; 
 
 const list = [
     { id: 1, name: 'Installation-1', step_order: 1 },
@@ -27,15 +26,17 @@ const InstallationDetailScreen = () => {
         $('.select2').select2();
     }, []);
 
-    const loadData = payload => {
-        getTraoubleshootAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                //setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
+    const getData = payload => {
+        var promise = new Promise((resolve, reject) => {
+            const result = {
+                data: {
+                    data: list,
+                    total: 7
+                }
+            };
+            resolve(result);
+        });
+        return promise; 
     };
 
     const onSubmit = data => {
@@ -93,7 +94,7 @@ const InstallationDetailScreen = () => {
         navigate("content/add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: list, columns, loadData, showIndex: true, showAddButton: true, onAddData, totalRows: 0 });
+    const propsTable = { data: list, columns, getData, showIndex: true, showAddButton: true, onAddData, totalRows: 0 };
 
     const onGoback = () => {
         navigate(-1);

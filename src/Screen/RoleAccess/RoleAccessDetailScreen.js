@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Checkbox } from 'primereact/checkbox';
 import { InputSwitch } from 'primereact/inputswitch';
 import { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, getMenuAll } from '../../Service/RoleAccessService';
@@ -10,17 +10,7 @@ const RoleAccessDetailScreen = () => {
     const navigate = useNavigate();
     const { pageState, roleid } = useParams();
     const { register, handleSubmit, formState: { errors }, control } = useForm({});
-
-    const loadData = payload => {
-        getMenuAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
-    };
+    const mTable = useRef();
 
     const columns = [
         { id: 1, title: 'Menu', field: 'menu_name' },
@@ -67,7 +57,7 @@ const RoleAccessDetailScreen = () => {
 
     ];
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, });
+    const propsTable  =  { columns, getData: getMenuAll, showIndex: true };
 
     const onGoBack = () => {
         navigate(-1);
@@ -121,7 +111,7 @@ const RoleAccessDetailScreen = () => {
                                         </div>
                                     </div>
                                     <div className='col-md-7'>
-                                        <MTable {...propsTable} />
+                                        <MTable ref={mTable} {...propsTable} />
                                     </div>
                                 </div>
                             </div>

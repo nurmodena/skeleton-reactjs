@@ -9,6 +9,7 @@ import axios from 'axios';
 import { ACTION_LOGIN, ACTION_LOGOUT } from './Redux/Action/AuthAction';
 
 const REFRESH_URL = 'v1/refresh';
+const LOGIN_URL = 'v1/login';
 axios.defaults.baseURL = 'http://192.168.0.41:9502/';
 axios.interceptors.response.use(
   res => {
@@ -21,7 +22,7 @@ axios.interceptors.response.use(
       _orgRequest._retry = true;
       const refreshToken = localStorage.getItem('refresh_token');
       // console.log('refresh_token', refreshToken);
-      if (error.config.url === REFRESH_URL) {
+      if (error.config.url === REFRESH_URL || error.config.url === LOGIN_URL) {
         return Promise.reject(error);
       } else {
         const response = await axios.post(REFRESH_URL, { refreshToken }).catch(errorRefresh => {

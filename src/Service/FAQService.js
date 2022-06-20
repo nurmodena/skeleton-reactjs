@@ -1,61 +1,30 @@
 import axios from 'axios';
+import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getFAQAll = (params, onSuccess, onError) => {
-    axios
-        .get('v1/admin/faq/get-all', { params })
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.get('v1/admin/faq/get-all', { params });
+    return handleResponse(response, onSuccess, onError);
 };
 
 const getFAQById = (id, onSuccess, onError) => {
-    axios
-        .get(`v1/admin/faq/get/${id}`)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.get(`v1/admin/faq/get/${id}`);
+    return handleResponse(response, onSuccess, onError);
 };
 
-const createFAQ = (payload, onSuccess, onError) => {
-    const headers = axios.defaults.headers;
-    axios
-        .post(`v1/admin/faq/create`, payload, { headers: { ...headers, 'Content-Type': 'multipart/form-data' } })
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+const createFAQ = (payload, onSuccess, onError) => { 
+    const response = axios.post(`v1/admin/faq/create`, payload, getMultipartOptions(axios));
+    return handleResponse(response, onSuccess, onError);
 };
 
 const updateFAQ = (payload, onSuccess, onError) => {
-    const headers = axios.defaults.headers;
     const id = payload.get('id');
-    axios
-        .put(`v1/admin/faq/update/${id}`, payload, { headers: { ...headers, 'Content-Type': 'multipart/form-data' } })
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.put(`v1/admin/faq/update/${id}`, payload, getMultipartOptions(axios));
+    return handleResponse(response, onSuccess, onError);
 };
 
 const deleteFAQ = (id, onSuccess, onError) => {
-    axios
-        .delete(`v1/admin/faq/delete/${id}`)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.delete(`v1/admin/faq/delete/${id}`);
+    return handleResponse(response, onSuccess, onError);
 };
 
 export { getFAQAll, getFAQById, createFAQ, updateFAQ, deleteFAQ };

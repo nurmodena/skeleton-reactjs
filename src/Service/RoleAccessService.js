@@ -1,70 +1,35 @@
 import axios from 'axios';
+import { handleResponse } from './HelperService';
 
 const getRoleAccessAll = (params, onSuccess, onError) => {
-    axios
-        .get('v1/admin/role/get-all', { params })
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.get('v1/admin/role/get-all', { params });
+    return handleResponse(response, onSuccess, onError);
 };
 
 const getRoleAccessById = (id, onSuccess, onError) => {
-    axios
-        .get(`v1/admin/role/get/${id}`)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.get(`v1/admin/role/get/${id}`);
+    return handleResponse(response, onSuccess, onError); 
 };
 
 const createRoleAccess = (payload, onSuccess, onError) => {
-    axios
-        .post(`v1/admin/role/create`, payload)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.post(`v1/admin/role/create`, payload);
+    return handleResponse(response, onSuccess, onError); 
 };
 
 const updateRoleAccess = (payload, onSuccess, onError) => {
     const id = payload.get('id');
-    axios
-        .put(`v1/admin/role/update/${id}`, payload)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.put(`v1/admin/role/update/${id}`, payload);
+    return handleResponse(response, onSuccess, onError);
 };
 
 const deleteRoleAccess = (id, onSuccess, onError) => {
-    axios
-        .delete(`v1/admin/role/delete/${id}`)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.delete(`v1/admin/role/delete/${id}`);
+    return handleResponse(response, onSuccess, onError); 
 };
 
 const getMenuAll = (id, onSuccess, onError) => {
-    axios
-        .get(`v1/admin/menu/get-all`)
-        .then(res => {
-            if (onSuccess) onSuccess(res);
-        })
-        .catch(err => {
-            if (onError) onError(err.response);
-        });
+    const response = axios.get(`v1/admin/menu/get-all`);
+    return handleResponse(response, onSuccess, onError);
 };
 
 export { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess, getMenuAll };

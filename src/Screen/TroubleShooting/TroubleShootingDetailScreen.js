@@ -27,15 +27,15 @@ const TroubleShootingDetailScreen = () => {
         $('.select2').select2();
     }, []);
 
-    const loadData = payload => {
-        getTraoubleshootAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                //setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
+    const getData = payload => {
+        return new Promise((resolve, reject) => {
+            resolve({
+                data: {
+                    data: list,
+                    total: 7,
+                }
+            });
+        });
     };
 
     const onSubmit = data => {
@@ -93,7 +93,7 @@ const TroubleShootingDetailScreen = () => {
         navigate("content/add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: list, columns, loadData, showIndex: true, showAddButton: true, onAddData, totalRows: 0 });
+    const propsTable = { columns, getData, showIndex: true, showAddButton: true, onAddData };
 
     const onGoback = () => {
         navigate(-1);

@@ -17,9 +17,9 @@ const LoginScreen = () => {
   }
 
   const onSubmit = data => {
-    dispatch(login(data, err => {
-      if (err.data && err.data.message){
-        setErrorMessage(err.data.message)
+    dispatch(login(data, ({response}) => {
+      if (response.data && response.data.message){
+        setErrorMessage(response.data.message)
       }
       
     }));

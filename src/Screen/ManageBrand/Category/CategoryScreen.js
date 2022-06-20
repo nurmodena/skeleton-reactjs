@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { createBrand, deleteBrand, getBrandAll, updateBrand } from '../../../Service/BrandService';
 import { createCategory, deleteCategory, getCategoryAll, updateCategory } from '../../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
@@ -8,36 +8,12 @@ import { InputSwitch } from 'primereact/inputswitch';
 const { $ } = window;
 const localState = {};
 
-const CategoryScreen = () => {
+const CategoryScreen = () => { 
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm(); 
+    const mTable= useRef();
+    const [category, setCategory] = useState({}); 
 
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
-    const [brands, setBrands] = useState([]);
-    const [category, setCategory] = useState({});
-    useEffect(() => {
-        getBrandAll({ perpage: 100 }, ({ data }) => {
-            setBrands(data.data);
-        })
-    }, []);
-
-
-    const loadData = payload => {
-        localState.paginator = payload;
-        getCategoryAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => {
-                setPropsTable({ ...propsTable, data: [], totalRows: 0 });
-
-            }
-        );
-    }
-
-    const onActiveChange = item => e => {
-
-    }
+    const onActiveChange = item => e => { }
 
     const columns = [
         { id: 1, title: 'Category Name', field: 'name', sortable: true },
@@ -71,7 +47,7 @@ const CategoryScreen = () => {
         },
     ];
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+    const propsTable = { columns, getData: getCategoryAll };
 
     const removeData = id => {
         deleteCategory(id, res => {
@@ -80,7 +56,7 @@ const CategoryScreen = () => {
                     icon: 'success',
                     title: 'Delete data success',
                     text: 'Data has been deleted!'
-                }).then(res => { loadData(localState.paginator) });
+                }).then(res => { mTable.current.refresh(); });
             }
         }, error => {
             Swal.fire({
@@ -130,7 +106,7 @@ const CategoryScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); onReset() })
+                    }).then(r => { mTable.current.refresh(); onReset() })
                 }
             }, err => {
                 Swal.fire({
@@ -146,7 +122,7 @@ const CategoryScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); onReset() })
+                    }).then(r => { mTable.current.refresh();  onReset() })
                 }
             }, err => {
                 Swal.fire({
@@ -263,7 +239,7 @@ const CategoryScreen = () => {
                                     </h3>
                                 </div>
                                 <div className="card-body">
-                                    <MTable {...propsTable} onAddData={onAddData} showIndex={true} />
+                                    <MTable ref={mTable} {...propsTable} onAddData={onAddData} showIndex={true} />
                                 </div>
                             </div>
                         </div>

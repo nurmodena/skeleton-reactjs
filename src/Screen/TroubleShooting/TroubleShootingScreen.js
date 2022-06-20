@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { getTraoubleshootAll, getTraoubleshootById, createTraoubleshoot, updateTraoubleshoot, deleteTraoubleshoot } from '../../Service/TroubleshootService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -9,22 +9,10 @@ const { $ } = window;
 const localState = {};
 
 const TroubleShootingScreen = () => {
-    let navigate = useNavigate();
+    const navigate = useNavigate();
+    const mTable = useRef();
 
-    useEffect(() => {
-
-    }, []);
-
-    const loadData = payload => {
-        getTraoubleshootAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
-    };
+    useEffect(() => {}, []); 
 
     const onView = item => () => {
         navigate("view/" + item.id);
@@ -104,7 +92,7 @@ const TroubleShootingScreen = () => {
         navigate("add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
+    const  propsTable = { columns, getData: getTraoubleshootAll };
 
 
     return (
@@ -133,7 +121,7 @@ const TroubleShootingScreen = () => {
                                     <div className='card-title'><i className='fa fa-tools' /> Troubleshoot List</div>
                                 </div>
                                 <div className='card-body'>
-                                    <MTable {...propsTable} />
+                                    <MTable ref={mTable} {...propsTable} showIndex={true} showAddButton={true} onAddData={onAddData}/>
                                 </div>
                                 <div className='card-footer'></div>
                             </div>

@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, forwardRef, useRef, useImperativeHandle } from 'react';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 
@@ -6,10 +6,14 @@ const $ = window.$;
 const MTableId = `id_mtable_${parseInt(Math.random() * 10000)}`;
 let timeoutId = 0;
 
-const MTable = props => {
-  const { data, columns, totalRows, loadData, onAddData, showIndex, showAddButton, order } = props;
-  const [filters, setFilters] = useState([]);
-  const [filter, setFilter] = useState({ field: '', value: '', title: '' });
+const MTable = forwardRef((props, ref) => {
+  const { columns, onAddData, showIndex, showAddButton, order, getData } = props;
+  const [state, setState] = useState({
+    data: [], 
+    total: 0, 
+    filters: [], 
+    filter: { field: '', value: '', title: '' },
+    search: ''});  
   const [paginator, setPaginator] = useState({
     page: 1,
     perpage: 10,
@@ -17,22 +21,31 @@ const MTable = props => {
     filter: '',
     order: order ? order : 'id',
     direction: 'asc',
+    refresh: false,
   });
-
-  const [search, setSearch] = useState('');
 
   useEffect(
     () => {
-      loadData(paginator);
+      getData && getData(paginator).then(res => {
+        const {data: {data, total}} = res;
+        setState({...state, data, total});
+      });
     },
     [paginator]
   );
 
-  const totalPage = Math.ceil(totalRows / paginator.perpage);
+  useImperativeHandle(ref, () => ({
+    refresh: () => { 
+      setPaginator({ ...paginator, refresh: !paginator.refresh });
+    }
+  }));
+  
+  const {data, total, filters, filter, search} = state;
+  const totalPage = Math.ceil(total / paginator.perpage);
   const lastPage = totalPage >= 15 ? 15 : totalPage;
   const startRow = (paginator.page - 1) * paginator.perpage + 1;
   const _endRow = paginator.page * paginator.perpage;
-  const endRow = _endRow >= totalRows ? totalRows : _endRow;
+  const endRow = _endRow >= total ? total : _endRow;
 
   const onPerPageChange = e => {
     setPaginator({ ...paginator, perpage: e.value, page: 1 });
@@ -60,8 +73,8 @@ const MTable = props => {
   };
 
   const onSearchChange = e => {
-    const value = e.target.value;
-    setSearch(value);
+    const value = e.target.value; 
+    setState({...state, search: value});
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       setPaginator({ ...paginator, search: value, page: 1 });
@@ -69,7 +82,7 @@ const MTable = props => {
   };
 
   const onClear = () => {
-    setSearch('');
+    setState({...state, search: ''});
     setPaginator({ ...paginator, search: '' });
   };
 
@@ -101,8 +114,7 @@ const MTable = props => {
   const onAddFilter = () => {
     if (filter.field && filter.value) {
       const _filters = [...filters, filter];
-      setFilters(_filters);
-      setFilter({ field: '', value: '', title: '' });
+      setState({...state, filters: _filters, filter: { field: '', value: '', title: '' }}); 
       //do filtered request
       const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
       setPaginator({ ...paginator, filter: _filter });
@@ -117,7 +129,7 @@ const MTable = props => {
 
   const onRemoveFilter = item => () => {
     const _filters = filters.filter(e => e.field != item.field);
-    setFilters(_filters);
+    setState({...state, filters: _filters});
     //do filtered request
     const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
     setPaginator({ ...paginator, filter: _filter });
@@ -125,16 +137,18 @@ const MTable = props => {
 
   const onFilterFieldChange = e => {
     const select = e.target;
-    const title = select.options[select.selectedIndex].text;
-    setFilter({ ...filter, field: select.value, title });
+    const title = select.options[select.selectedIndex].text; 
+    const _filter = { ...filter, field: select.value, title };
+    setState({...state, filter: _filter});
   };
 
-  const onFilterValueChange = e => {
-    setFilter({ ...filter, value: e.target.value });
+  const onFilterValueChange = e => { 
+    const _filter = { ...filter, value: e.target.value };
+    setState({...state, filter: _filter});
   };
 
   const onResetFilter = () => {
-    setFilters([]);
+    setState({...state, filters: []});
     setPaginator({ ...paginator, filter: '' });
     closeFilter();
   };
@@ -412,7 +426,7 @@ const MTable = props => {
       <div className="mb-3 mt-3" style={{ height: 1, background: '#ccc' }} />
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <div style={{ flex: 1, lineHeight: 3 }}>
-          {`Showing ${startRow} - ${endRow} of ${totalRows}`}
+          {`Showing ${startRow} - ${endRow} of ${total}`}
         </div>
         <div style={{ lineHeight: 3, width: 150, textAlign: 'center' }}>
           Rows per page
@@ -441,40 +455,10 @@ const MTable = props => {
         <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-        </button>
-        {
-          /**
-           * <Button
-        className="p-button-text"
-        icon="pi pi-angle-double-left"
-        style={{ marginLeft: 10 }}
-        onClick={onFirst}
-      />
-      <Button
-        className="p-button-text"
-        icon="pi pi-angle-left"
-        style={{ marginLeft: 10 }}
-        onClick={onPrev}
-        disabled={paginator.page == 1}
-      />
-      <Button
-        className="p-button-text"
-        icon="pi pi-angle-right"
-        style={{ marginLeft: 10 }}
-        onClick={onNext}
-        disabled={paginator.page == lastPage}
-      />
-      <Button
-        className="p-button-text"
-        icon="pi pi-angle-double-right"
-        style={{ marginLeft: 10 }}
-        onClick={onLast}
-      />
-           */
-        }
+        </button> 
       </div>
     </div>
   );
-};
+});
 
 export default MTable;

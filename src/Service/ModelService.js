@@ -1,25 +1,14 @@
 import axios from 'axios';
+import { handleResponse } from './HelperService';
 
 const getModelAll = (params, onSuccess, onError) => {
-  axios
-    .get ('v1/admin/model/get-all', {params})
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.get ('v1/admin/model/get-all', {params});
+  return handleResponse(response, onSuccess, onError);
 };
 
 const getModelById = (id, onSuccess, onError) => {
-  axios
-    .get (`v1/admin/model/get/${id}`)
-    .then (res => {
-      if (onSuccess) onSuccess (res);
-    })
-    .catch (err => {
-      if (onError) onError (err.response);
-    });
+  const response = axios.get (`v1/admin/model/get/${id}`);
+  return handleResponse(response, onSuccess, onError);
 };
 
 export {getModelAll, getModelById};

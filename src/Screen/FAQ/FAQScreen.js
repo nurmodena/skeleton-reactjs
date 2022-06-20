@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { getFAQAll, getFAQById, createFAQ, updateFAQ, deleteFAQ } from '../../Service/FAQService';
 import { getCategoryAll } from '../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
@@ -6,27 +6,11 @@ import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
-const { $ } = window;
-const localState = {};
+const { $ } = window; 
 
 const FAQScreen = () => {
-    let navigate = useNavigate();
-
-    useEffect(() => {
-
-    }, []);
-
-    const loadData = payload => {
-        getFAQAll(
-            payload,
-            res => {
-                console.log('res', res);
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
-    };
+    const navigate = useNavigate(); 
+    const mTable = useRef();
 
     const onView = item => () => {
         navigate("view/" + item.id);
@@ -105,7 +89,7 @@ const FAQScreen = () => {
         navigate("add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
+    const propsTable = { columns, getData: getFAQAll, showIndex: true, showAddButton: true, onAddData };
 
 
     return (
@@ -134,7 +118,7 @@ const FAQScreen = () => {
                                     <div className='card-title'><i className='fa fa-question-circle' /> FAQ List</div>
                                 </div>
                                 <div className='card-body'>
-                                    <MTable {...propsTable} />
+                                    <MTable ref={mTable} {...propsTable} />
                                 </div>
                                 <div className='card-footer'></div>
                             </div>

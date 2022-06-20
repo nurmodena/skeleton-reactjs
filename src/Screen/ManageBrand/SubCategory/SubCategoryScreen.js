@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { createBrand, deleteBrand, getBrandAll, updateBrand } from '../../../Service/BrandService';
 import { getCategoryAll } from '../../../Service/CategoriesService';
 import { getSubCategoryAll, createSubCategory, updateSubCategory, deleteSubCategory } from '../../../Service/SubCategoryService';
@@ -10,31 +10,15 @@ const { $ } = window;
 const localState = {};
 
 const SubCategoryScreen = () => {
-
     const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
+    const mTable = useRef();
     useEffect(() => {
         getBrandAll({ perpage: 100 }, ({ data }) => {
             setCategories(data.data);
         })
-    }, []);
-
-
-    const loadData = payload => {
-        localState.paginator = payload;
-        getSubCategoryAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => {
-                setPropsTable({ ...propsTable, data: [], totalRows: 0 });
-
-            }
-        );
-    }
+    }, []); 
 
     const onActiveChange = item => e => {
 
@@ -74,7 +58,7 @@ const SubCategoryScreen = () => {
         },
     ];
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+    const propsTable = { columns, getData: getSubCategoryAll };
 
     const removeData = id => {
         deleteSubCategory(id, res => {
@@ -83,7 +67,7 @@ const SubCategoryScreen = () => {
                     icon: 'success',
                     title: 'Delete data success',
                     text: 'Data has been deleted!'
-                }).then(res => { loadData(localState.paginator) });
+                }).then(res => { mTable.current.refresh(); });
             }
         }, error => {
             Swal.fire({
@@ -132,7 +116,7 @@ const SubCategoryScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); onReset() })
+                    }).then(r => { mTable.current.refresh(); onReset() })
                 }
             }, err => {
                 Swal.fire({
@@ -148,7 +132,7 @@ const SubCategoryScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); })
+                    }).then(r => { mTable.current.refresh(); })
                 }
             }, err => {
                 Swal.fire({
@@ -274,7 +258,7 @@ const SubCategoryScreen = () => {
                                     </h3>
                                 </div>
                                 <div className="card-body">
-                                    <MTable {...propsTable} onAddData={onAddData} showIndex={true} />
+                                    <MTable ref={mTable} {...propsTable} onAddData={onAddData} showIndex={true} />
                                 </div>
                             </div>
                         </div>

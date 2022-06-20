@@ -1,14 +1,15 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { InputSwitch } from 'primereact/inputswitch';
 import { RadioButton } from 'primereact/radiobutton';
 import MTable from '../../Components/MTable/MTable';
-import { createLanguage, deleteLanguage, getAll, updateLanguage } from '../../Service/LanguageService';
+import { createLanguage, deleteLanguage, getLanguageAll, updateLanguage } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
-const { $ } = window;
-const shared = {};
+
+const { $ } = window; 
 
 const LanguagesScreen = () => {
+  const mTable = useRef();
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
     defaultValues: {
       name: '',
@@ -16,34 +17,19 @@ const LanguagesScreen = () => {
       is_default: false,
       is_active: true
     }
-  });
-
-   const loadData = payload => {
-    shared.pagintor = payload;
-    getAll(
-      payload,
-      res => {
-        const { data, total } = res.data;
-        setPropsTable({ ...propsTable, data, totalRows: total });
-      },
-      err => {
-        setPropsTable({ ...propsTable, data: [], totalRows: 0 });
-        
-      }
-    );
-  };
+  }); 
 
   const removeData = id => {
     deleteLanguage(id, res => {
       if (res.status == 200 || res.status == 201) {
-        Swal.fire({ 
+        Swal.fire({
           icon: 'success',
           title: 'Delete data success',
           text: 'Data has been deleted!'
-        }).then(res => {loadData(shared.pagintor)}); 
+        }).then(res => { mTable.current.refresh(); });
       }
     }, error => {
-      Swal.fire({ 
+      Swal.fire({
         icon: 'error',
         title: 'Delete data fail',
         text: 'Data can not be deleetd!'
@@ -53,28 +39,28 @@ const LanguagesScreen = () => {
 
   const onRemove = item => () => {
     console.log('You click remove', item);
-    Swal.fire({ 
+    Swal.fire({
       icon: 'question',
       title: 'Are you sure?',
       text: 'Deleted data can not be restored!',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
-    }).then(({isConfirmed}) => {
+    }).then(({ isConfirmed }) => {
       if (isConfirmed) {
         removeData(item.code);
       }
     });
   };
-  
+
   const onActiveChange = item => (e) => {
     item.is_active = e.value;
-    updateLanguage(item, res=>{loadData(shared.pagintor)});
-  } 
+    updateLanguage(item, res => { mTable.current.refresh(); });
+  }
 
-  const onDefaultChange = item => (e) => { 
+  const onDefaultChange = item => (e) => {
     item.is_default = e.checked;
-    updateLanguage(item, res=>{loadData(shared.pagintor)});
-  } 
+    updateLanguage(item, res => { mTable.current.refresh(); });
+  }
 
   const columns = [
     { id: 1, title: 'ID', field: 'id', sortable: true },
@@ -86,7 +72,7 @@ const LanguagesScreen = () => {
       field: 'is_active',
       sortable: true,
       render: item => {
-        return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)}/>;
+        return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)} />;
       },
     },
     {
@@ -95,7 +81,7 @@ const LanguagesScreen = () => {
       field: 'is_default',
       sortable: true,
       render: item => {
-        return <RadioButton checked={item.is_default} onChange={onDefaultChange(item)}/>;
+        return <RadioButton checked={item.is_default} onChange={onDefaultChange(item)} />;
       },
     },
     {
@@ -119,7 +105,7 @@ const LanguagesScreen = () => {
     },
   ];
 
-  const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+  const propsTable= { columns, getData: getLanguageAll };
 
   const onAddData = () => {
     reset({
@@ -136,28 +122,28 @@ const LanguagesScreen = () => {
   }
 
   const onSubmitData = (data) => {
-    console.log('form data', data); 
-    createLanguage(data, ({data, status}) => {
-      if(status == 200 || status == 201) {
+    console.log('form data', data);
+    createLanguage(data, ({ data, status }) => {
+      if (status == 200 || status == 201) {
         //show Info success Create Language
-        Swal.fire({ 
+        Swal.fire({
           icon: 'success',
           title: 'Save data success',
           text: 'Data has been saved!'
         }).then(val => {
           onCloseModal();
-        }); 
+        });
       }
     },
-    err => {
-      //show Info fail Create Language
-      Swal.fire({ 
-        icon: 'error',
-        title: 'Error',
-        text: 'Save data error!'
-      }); 
-      console.log('Error: ', err);
-    })
+      err => {
+        //show Info fail Create Language
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Save data error!'
+        });
+        console.log('Error: ', err);
+      })
   }
 
   return (
@@ -189,7 +175,7 @@ const LanguagesScreen = () => {
                   </h3>
                 </div>
                 <div className="card-body">
-                  <MTable {...propsTable} onAddData={onAddData} showAddButton={true}/>
+                  <MTable ref={mTable} {...propsTable} onAddData={onAddData} showAddButton={true} />
                 </div>
               </div>
             </div>
@@ -225,12 +211,12 @@ const LanguagesScreen = () => {
                     <div className='flex-1'>
                       <label>Active</label>
                       <div>
-                        <Controller name="is_active" control={control} render={({field})=>{ return (<InputSwitch {...field} checked={field.value} />)}}/>
+                        <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} />
                       </div>
                     </div>
                     <div className='flex-2'>
                       <label>Default</label>
-                      <div><Controller name="is_default" control={control} render={({field})=>{ return (<InputSwitch {...field} checked={field.value} />)}}/></div>
+                      <div><Controller name="is_default" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} /></div>
                     </div>
                   </div>
                 </div>

@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { getUserAll, getUserById, createUser, updateUser, deleteUser } from '../../Service/UserService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -6,26 +6,14 @@ import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
 
-const { $ } = window;
-const localState = {};
+const { $ } = window; 
 
 const UserScreen = () => {
-    let navigate = useNavigate();
-
+    const navigate = useNavigate();
+    const mTable = useRef();
     useEffect(() => {
 
-    }, []);
-
-    const loadData = payload => {
-        getUserAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
-    };
+    }, []); 
 
     const onView = item => () => {
         navigate("view/" + item.id);
@@ -95,7 +83,7 @@ const UserScreen = () => {
         navigate("add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
+    const propsTable = { columns, getData: getUserAll, showIndex: true, showAddButton: true, onAddData };
 
 
     return (
@@ -124,7 +112,7 @@ const UserScreen = () => {
                                     <div className='card-title'><i className='fa fa-user-tag' /> List User</div>
                                 </div>
                                 <div className='card-body'>
-                                    <MTable {...propsTable} order="nik" />
+                                    <MTable ref={mTable} {...propsTable} order="nik" />
                                 </div>
                                 <div className='card-footer'></div>
                             </div>

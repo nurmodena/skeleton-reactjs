@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import { } from '../../Service/InstallationService';
-import { getAll as getLanguages } from '../../Service/LanguageService';
+import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
@@ -20,7 +20,7 @@ const InstallationContentScreen = () => {
     });
 
     useEffect(() => {
-        getLanguages({ perpage: 1000 }, res => {
+        getLanguageAll({ perpage: 1000 }, res => {
             setState({ ...state, dataLanguages: res.data.data })
         });
         setupDigitInput();

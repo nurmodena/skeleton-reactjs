@@ -12,7 +12,7 @@ const logout = () => dispatch => {
   dispatch({ type: ACTION_LOGOUT });
 }
 
-const login = (payload, onError) => dispatch => {
+const login = (payload, onError = err=>{}) => dispatch => {
   loginUser(payload, res => {
     console.log('Success ', res);
     const { access_token, refresh_token, fullname, office, role, image_filename } = res.data;
@@ -33,12 +33,7 @@ const login = (payload, onError) => dispatch => {
       dispatch({ type: ACTION_LOGIN, userInfo });
     })
     //
-  }, err => {
-    console.log('Error', err);
-    if (onError) {
-      onError(err)
-    }
-  })
+  }, onError)
 
 }
 

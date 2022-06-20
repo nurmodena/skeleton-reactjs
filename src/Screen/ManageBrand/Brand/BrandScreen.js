@@ -1,40 +1,24 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { createBrand, deleteBrand, getBrandAll, updateBrand } from '../../../Service/BrandService';
 import { getCategoryAll } from '../../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../../Components/MTable/MTable';
-import { InputSwitch } from 'primereact/inputswitch';
+import { InputSwitch } from 'primereact/inputswitch'; 
 const { $ } = window;
 const localState = {};
 
 const BrandScreen = () => {
-
     const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
     const [categories, setCategories] = useState([]);
     const [brand, setBrand] = useState({});
+    const mTable = useRef();
     useEffect(() => {
         console.log('UseEffect invoked');
         getCategoryAll({ perpage: 100 }, ({ data }) => {
             setCategories(data.data);
         })
-    }, []);
-
-
-    const loadData = payload => {
-        localState.paginator = payload;
-        getBrandAll(
-            payload,
-            res => {
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => {
-                setPropsTable({ ...propsTable, data: [], totalRows: 0 });
-
-            }
-        );
-    }
+    }, []); 
 
     const onActiveChange = item => e => {
 
@@ -72,7 +56,7 @@ const BrandScreen = () => {
         },
     ];
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData });
+    const propsTable = { columns, getData: getBrandAll };
 
     const removeData = id => {
         deleteBrand(id, res => {
@@ -81,7 +65,7 @@ const BrandScreen = () => {
                     icon: 'success',
                     title: 'Delete data success',
                     text: 'Data has been deleted!'
-                }).then(res => { loadData(localState.paginator) });
+                }).then(res => { mTable.current.refresh(); });
             }
         }, error => {
             Swal.fire({
@@ -131,7 +115,7 @@ const BrandScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); onReset() })
+                    }).then(r => { mTable.current.refresh(); onReset() })
                 }
             }, err => {
                 Swal.fire({
@@ -147,7 +131,7 @@ const BrandScreen = () => {
                         icon: 'success',
                         title: 'Save data success',
                         text: 'Data has been saved!'
-                    }).then(r => { loadData(localState.paginator); })
+                    }).then(r => { mTable.current.refresh(); })
                 }
             }, err => {
                 Swal.fire({
@@ -266,7 +250,7 @@ const BrandScreen = () => {
                                     </h3>
                                 </div>
                                 <div className="card-body">
-                                    <MTable {...propsTable} onAddData={onAddData} showIndex={true} />
+                                    <MTable ref={mTable} {...propsTable} onAddData={onAddData} showIndex={true} />
                                 </div>
                             </div>
                         </div>

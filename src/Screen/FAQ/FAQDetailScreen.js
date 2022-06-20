@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useState } from 'react';
 import { } from '../../Service/FAQService';
-import { getAll as getLanguages } from '../../Service/LanguageService';
+import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
@@ -21,7 +21,7 @@ const FAQDetailScreen = () => {
     });
 
     useEffect(() => {
-        getLanguages({ perpage: 1000 }, res => {
+        getLanguageAll({ perpage: 1000 }, res => {
             setState({ ...state, dataLanguages: res.data.data })
         });
         setupDigitInput();
@@ -206,14 +206,7 @@ const FAQDetailScreen = () => {
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
                                                 <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
                                             </div>
-                                        </div>
-                                        <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
-                                        <div className='form-group'>
-                                            <div className='d-flex justify-content-right'>
-                                                <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
-                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
-                                            </div>
-                                        </div>
+                                        </div> 
                                     </div>
                                 </div>
                             </div>

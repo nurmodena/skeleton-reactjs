@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { InputSwitch } from 'primereact/inputswitch';
 import { RadioButton } from 'primereact/radiobutton';
 import MTable from '../../../Components/MTable/MTable';
@@ -6,19 +6,8 @@ import { getModelAll } from '../../../Service/ModelService';
 import { useNavigate } from 'react-router-dom';
 
 const ModelScreen = () => {
-  let navigate = useNavigate();
-
-  const loadData = payload => {
-    getModelAll(
-      payload,
-      res => {
-        console.log('res', res);
-        const { data, total } = res.data;
-        setPropsTable({ ...propsTable, data, totalRows: total });
-      },
-      err => { }
-    );
-  };
+  const navigate = useNavigate(); 
+  const mTable = useRef(); 
 
   const onView = item => () => {
     navigate("view/" + item.id);
@@ -102,7 +91,7 @@ const ModelScreen = () => {
     navigate("add/new");
   }
 
-  const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
+  const propsTable = { columns, getData: getModelAll, showIndex: true, showAddButton: true, onAddData };
 
 
   return (
@@ -134,7 +123,7 @@ const ModelScreen = () => {
                   </h3>
                 </div>
                 <div className="card-body">
-                  <MTable {...propsTable} />
+                  <MTable ref={mTable} {...propsTable} />
                 </div>
               </div>
             </div>

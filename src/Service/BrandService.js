@@ -1,61 +1,30 @@
 import axios from 'axios';
+import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getBrandAll = (params, onSuccess, onError) => {
-  axios
-    .get('v1/admin/brand/get-all', { params })
-    .then(res => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch(err => {
-      if (onError) onError(err.response);
-    });
+  const response = axios.get('v1/admin/brand/get-all', { params })
+  return handleResponse(response, onSuccess, onError);
 };
 
 const getBrandById = (id, onSuccess, onError) => {
-  axios
-    .get(`v1/admin/brand/get/${id}`)
-    .then(res => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch(err => {
-      if (onError) onError(err.response);
-    });
+  const response = axios.get(`v1/admin/brand/get/${id}`)
+  return handleResponse(response, onSuccess, onError);
 };
 
-const createBrand = (payload, onSuccess, onError) => {
-  const headers = axios.defaults.headers;
-  axios
-    .post(`v1/admin/brand/create`, payload, { headers: { ...headers, 'Content-Type': 'multipart/form-data' } })
-    .then(res => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch(err => {
-      if (onError) onError(err.response);
-    });
+const createBrand = (payload, onSuccess, onError) => { 
+  const response = axios.post(`v1/admin/brand/create`, payload, getMultipartOptions(axios))
+  return handleResponse(response, onSuccess, onError);
 };
 
-const updateBrand = (payload, onSuccess, onError) => {
-  const headers = axios.defaults.headers;
+const updateBrand = (payload, onSuccess, onError) => {  
   const id = payload.get('id');
-  axios
-    .put(`v1/admin/brand/update/${id}`, payload, { headers: { ...headers, 'Content-Type': 'multipart/form-data' } })
-    .then(res => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch(err => {
-      if (onError) onError(err.response);
-    });
+  const response = axios.put(`v1/admin/brand/update/${id}`, payload, getMultipartOptions(axios));
+  return handleResponse(response, onSuccess, onError);
 };
 
 const deleteBrand = (id, onSuccess, onError) => {
-  axios
-    .delete(`v1/admin/brand/delete/${id}`)
-    .then(res => {
-      if (onSuccess) onSuccess(res);
-    })
-    .catch(err => {
-      if (onError) onError(err.response);
-    });
+  const response = axios.delete(`v1/admin/brand/delete/${id}`);
+  return handleResponse(response, onSuccess, onError);
 };
 
 export { getBrandAll, getBrandById, createBrand, updateBrand, deleteBrand };

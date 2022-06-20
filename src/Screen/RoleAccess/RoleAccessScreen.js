@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess } from '../../Service/RoleAccessService';
 import { getCategoryAll } from '../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
@@ -10,23 +10,8 @@ const { $ } = window;
 const localState = {};
 
 const RoleAccessScreen = () => {
-    let navigate = useNavigate();
-
-    useEffect(() => {
-
-    }, []);
-
-    const loadData = payload => {
-        getRoleAccessAll(
-            payload,
-            res => {
-                console.log('res', res);
-                const { data, total } = res.data;
-                setPropsTable({ ...propsTable, data, totalRows: total });
-            },
-            err => { }
-        );
-    };
+    const navigate = useNavigate(); 
+    const mTable = useRef();
 
     const onView = item => () => {
         navigate("view/" + item.id);
@@ -93,8 +78,7 @@ const RoleAccessScreen = () => {
         navigate("add/new");
     }
 
-    const [propsTable, setPropsTable] = useState({ data: [], columns, loadData, showIndex: true, showAddButton: true, onAddData });
-
+    const propsTable = { columns, getData: getRoleAccessAll, showIndex: true, showAddButton: true, onAddData };
 
     return (
         <div className="content-wrapper">
@@ -122,7 +106,7 @@ const RoleAccessScreen = () => {
                                     <div className='card-title'><i className='fa fa-address-card' /> Role List</div>
                                 </div>
                                 <div className='card-body'>
-                                    <MTable {...propsTable} />
+                                    <MTable ref={mTable} {...propsTable} />
                                 </div>
                                 <div className='card-footer'></div>
                             </div>
