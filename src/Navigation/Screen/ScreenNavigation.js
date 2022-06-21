@@ -24,7 +24,7 @@ import InstallationContentScreen from '../../Screen/Installation/InstallationCon
 import FAQDetailScreen from '../../Screen/FAQ/FAQDetailScreen';
 
 const ToHome = () => {
-  console.log('ToHome invoked');
+  console.log('To Home invoked');
   return <Navigate to="/home" replace={true} />;
 };
 

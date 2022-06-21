@@ -5,11 +5,14 @@ import MTable from '../../Components/MTable/MTable';
 import { createLanguage, deleteLanguage, getLanguageAll, updateLanguage } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import Overlay from '../../Components/Overlay/Overlay';
 
-const { $ } = window; 
+const { $ } = window;
+let processTimeout = 0;
 
 const LanguagesScreen = () => {
   const mTable = useRef();
+  const [state, setState] = useState({ processing: false });
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
     defaultValues: {
       name: '',
@@ -17,7 +20,7 @@ const LanguagesScreen = () => {
       is_default: false,
       is_active: true
     }
-  }); 
+  });
 
   const removeData = id => {
     deleteLanguage(id, res => {
@@ -37,8 +40,7 @@ const LanguagesScreen = () => {
     });
   }
 
-  const onRemove = item => () => {
-    console.log('You click remove', item);
+  const onRemove = item => () => { 
     Swal.fire({
       icon: 'question',
       title: 'Are you sure?',
@@ -105,7 +107,7 @@ const LanguagesScreen = () => {
     },
   ];
 
-  const propsTable= { columns, getData: getLanguageAll };
+  const propsTable = { columns, getData: getLanguageAll };
 
   const onAddData = () => {
     reset({
@@ -122,8 +124,11 @@ const LanguagesScreen = () => {
   }
 
   const onSubmitData = (data) => {
-    console.log('form data', data);
+    processTimeout = setTimeout(() => {
+      setState({ ...state, processing: true });
+    }, 150);
     createLanguage(data, ({ data, status }) => {
+      setState({ ...state, processing: false });
       if (status == 200 || status == 201) {
         //show Info success Create Language
         Swal.fire({
@@ -132,6 +137,7 @@ const LanguagesScreen = () => {
           text: 'Data has been saved!'
         }).then(val => {
           onCloseModal();
+          mTable.current.refresh();
         });
       }
     },
@@ -142,9 +148,12 @@ const LanguagesScreen = () => {
           title: 'Error',
           text: 'Save data error!'
         });
-        console.log('Error: ', err);
+        setState({ ...state, processing: false });
       })
+
   }
+
+  const { processing } = state;
 
   return (
     <div className="content-wrapper">
@@ -188,6 +197,7 @@ const LanguagesScreen = () => {
         <form name="form-detail" onSubmit={handleSubmit(onSubmitData)}>
           <div className='modal-dialog modal-dialog-centered'>
             <div className='modal-content'>
+              <Overlay display={processing} />
               <div className='modal-header'>
                 <h5 className="modal-title"><i className='fa fa-globe'></i> Add Language</h5>
                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">

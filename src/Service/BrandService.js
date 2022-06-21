@@ -12,7 +12,7 @@ const getBrandById = (id, onSuccess, onError) => {
 };
 
 const createBrand = (payload, onSuccess, onError) => { 
-  const response = axios.post(`v1/admin/brand/create`, payload, getMultipartOptions(axios))
+  const response = axios.post(`v1/admin/brand/create`, payload, getMultipartOptions(axios));
   return handleResponse(response, onSuccess, onError);
 };
 

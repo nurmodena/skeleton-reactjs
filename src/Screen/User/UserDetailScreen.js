@@ -7,40 +7,46 @@ import { getRoleAccessAll } from '../../Service/RoleAccessService';
 import { createUser, getUserById, updateUser } from '../../Service/UserService';
 
 const { $ } = window;
-
 const randomPassword = parseInt(Math.random() * 1000000);
 const localState = { isNew: true };
+let procesingId = -1;
 
 const UserDetailScreen = () => {
     const { pageState, username } = useParams();
-
-    const [dataUser, setDataUser] = useState({ roles_id: -1 });
-
-    const [roles, setRoles] = useState([]);
+    const [state, setState] = useState({
+        user: { roles_id: -1 },
+        roles: [],
+        processing: false
+    });
 
     const { register, handleSubmit, watch, control, formState: { errors }, reset } = useForm({ defaultValues: { roles_id: -1 } });
     const password = useRef({});
     password.current = watch("password", "");
 
     useEffect(() => {
-        getRoleAccessAll({ perpage: 100 }, (res => { setRoles(res.data.data); console.log('roles', res.data.data); }));
-        getUserById(username, res => {
-            const { data } = res;
-            console.log('randomPassword', randomPassword);
-            console.log('selected data', data);
-            data.image = data.image_name;
-            data.password = randomPassword;
-            data.retypePassword = randomPassword;
-            setDataUser(data);
-            reset(data);
+        const requests = [
+            getRoleAccessAll({ perpage: 100 }),
+            getUserById(username).catch(({ response: { data: { message } } }) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error when getting user',
+                    text: message
+                }).then(() => { navigate(-1) });
+            })
+        ];
+
+        Promise.all(requests).then(responses => {
+            const [res1, res2] = responses;
+            const _roles = res1.data.data;
+            const _user = res2.data;
+            _user.image = _user.image_name;
+            _user.password = randomPassword;
+            _user.retypePassword = randomPassword;
+            setState({ ...state, roles: _roles, user: _user });
+            reset(_user);
             localState.isNew = false;
-        }, err => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error when getting user',
-                text: 'Data user not found!'
-            });
         });
+
     }, []);
 
     const navigate = useNavigate();
@@ -54,56 +60,56 @@ const UserDetailScreen = () => {
     const onuserImageChange = e => {
         const [file] = e.target.files;
         if (file) {
-            setDataUser({ ...dataUser, image: URL.createObjectURL(file), file })
+            const _user = { ...user, image: URL.createObjectURL(file), file };
+            setState({ ...state, user: _user });
         }
     }
 
+    const startProcessing = () => {
+        procesingId = setTimeout(() => {
+            setState({ ...state, processing: true });
+        }, 150);
+    }
+
+    const stopProcessing = () => {
+        setState({ ...state, processing: false });
+    }
+
     const onSubmit = (data) => {
-        console.log('data submit', data);
-        console.log('dataUser', dataUser);
-        data.image = dataUser.file;
+        data.image = user.file;
         const formData = new FormData();
         for (var key in data) {
             formData.append(key, data[key]);
         }
         formData.delete("retypePassword");
-        if (localState.isNew == false) {
-            if (data.password == randomPassword) {
-                formData.delete("password");
-            }
-            updateUser(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { onBack(); })
-                }
-            }, err => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Save data error!'
-                });
-            });
-        } else {
-            createUser(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { onBack(); })
-                }
-            }, err => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Save data error!'
-                });
-            });
+        if (localState.isNew == false && data.password == randomPassword) {
+            formData.delete("password");
         }
+        startProcessing();
+        const response = localState.isNew ? createUser(formData) : updateUser(formData);
+        response.then(res => {
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Save data success',
+                    text: 'Data has been saved!'
+                }).then(r => { onBack(); })
+            }
+        }).catch(({ response: { data } }) => {
+            const [key] = Object.keys(data.errors || {});
+            const message = data.errors[key];
+            if (message) {
+                console.log('error data', data);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: message[0]
+                });
+            } 
+        });
     }
+
+    const { user, roles } = state;
 
     return (
         <div className="content-wrapper">
@@ -135,7 +141,7 @@ const UserDetailScreen = () => {
                                         <div className='row mt-3 mb-3'>
                                             <div className='col-md-9 d-flex flex-column align-items-center'>
                                                 <div className='mb-4' >
-                                                    <img src={dataUser.image ? dataUser.image : "../../images/pp_default.jpg"} alt='A' className='img-circle elevation-2' style={{ width: 160, height: 160 }} />
+                                                    <img src={user.image || "../../images/pp_default.jpg"} alt='A' className='img-circle elevation-2' style={{ width: 160, height: 160 }} />
                                                 </div>
                                                 <div className='mb-3'>
                                                     <button type='button' className='btn btn-outline-dark' onClick={onSelectImage}>

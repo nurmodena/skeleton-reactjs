@@ -5,13 +5,14 @@ import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
+import Overlay from '../../../Components/Overlay/Overlay';
 const { $ } = window;
-const localState = {};
+let processingId = -1;
 
-const CategoryScreen = () => { 
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm(); 
-    const mTable= useRef();
-    const [category, setCategory] = useState({}); 
+const CategoryScreen = () => {
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const mTable = useRef();
+    const [state, setState] = useState({category: {}, processing: false}); 
 
     const onActiveChange = item => e => { }
 
@@ -69,7 +70,7 @@ const CategoryScreen = () => {
 
     const onEdit = item => () => {
         reset(item);
-        setCategory(item);
+        setState({...state, category: item});
         console.log('selected ', item);
     }
 
@@ -91,6 +92,17 @@ const CategoryScreen = () => {
         onReset();
     }
 
+    const startProcessing = () => {
+        processingId = setTimeout(() => {
+            setState({...state, processing: true});
+        }, 150);
+    }
+
+    const stopProcessing = () => {
+        clearTimeout(processingId);
+        setState({...state, processing: false});
+    }
+
     const onSubmit = (data) => {
         console.log('submit data', data);
         console.log('brand', category);
@@ -99,39 +111,25 @@ const CategoryScreen = () => {
         for (var key in data) {
             formData.append(key, data[key]);
         }
-        if (category.id) {
-            updateCategory(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { mTable.current.refresh(); onReset() })
-                }
-            }, err => {
+        startProcessing();
+        const response = category.id ? updateCategory(formData) : createCategory(formData);
+        response.then(res => {
+            if (res.status == 200 || res.status == 201) {
+                stopProcessing();
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Save data error!'
-                });
+                    icon: 'success',
+                    title: 'Save data success',
+                    text: 'Data has been saved!'
+                }).then(r => { mTable.current.refresh(); onReset() })
+            }
+        }).catch(({respomnse: { data } }) => {
+            stopProcessing();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Save data error!'
             });
-        } else {
-            createCategory(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { mTable.current.refresh();  onReset() })
-                }
-            }, err => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Save data error!'
-                });
-            });
-        }
+        }); 
     }
 
     const onBrowseImage = () => {
@@ -149,16 +147,19 @@ const CategoryScreen = () => {
             is_active: true,
             image_name: '',
         });
-        setCategory({});
+        setState({...state, category: {}});
     }
 
     const onFileChange = (e) => {
         console.log('e file', e);
         const [file] = e.target.files;
         if (file) {
-            setCategory({ ...category, image_name: URL.createObjectURL(file), file })
+            const _category = { ...category, image_name: URL.createObjectURL(file), file };
+            setState({ ...state, category: _category });
         }
     }
+
+    const { category, processing } = state;
 
     return (
         <div className="content-wrapper">
@@ -181,6 +182,7 @@ const CategoryScreen = () => {
                 <div className="container-fluid">
                     <div className="row">
                         <div className='col-md-4'>
+                            <Overlay display={processing} />
                             <form name="form-detail" onSubmit={handleSubmit(onSubmit)}>
                                 <div className='card'>
                                     <div className='card-header'>

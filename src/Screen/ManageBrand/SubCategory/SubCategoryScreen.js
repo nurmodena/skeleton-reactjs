@@ -18,7 +18,7 @@ const SubCategoryScreen = () => {
         getBrandAll({ perpage: 100 }, ({ data }) => {
             setCategories(data.data);
         })
-    }, []); 
+    }, []);
 
     const onActiveChange = item => e => {
 
@@ -151,7 +151,7 @@ const SubCategoryScreen = () => {
 
     const onReset = () => {
         reset({
-            category_id: 0,
+            brand_id: '',
             code: '',
             name: '',
             is_active: true,
@@ -202,6 +202,7 @@ const SubCategoryScreen = () => {
                                         <div className='form-group'>
                                             <label>Brand</label>
                                             <select className='form-control' {...register("brand_id", { required: { value: true, message: 'Brand is required!' } })}>
+                                                <option value={''}>Select Brand</option>
                                                 {
                                                     categories.map((ctg, i) => (<option key={`ctg-` + i} value={ctg.id}>{ctg.name}</option>))
                                                 }

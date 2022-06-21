@@ -74,7 +74,7 @@ export default function ModelDetailScreen() {
                   </div>
                   <div className='form-group'>
                     <label className='mr-3'>Description</label>
-                    <textarea className='form-control' rows={8}></textarea>
+                    <textarea className='form-control' rows={4}></textarea>
                   </div>
                   <div className='form-group'>
                     <label className='mr-3'>Dimension</label>

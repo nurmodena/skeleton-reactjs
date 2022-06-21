@@ -4,21 +4,23 @@ import { getCategoryAll } from '../../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../../Components/MTable/MTable';
-import { InputSwitch } from 'primereact/inputswitch'; 
+import { InputSwitch } from 'primereact/inputswitch';
+import Overlay from '../../../Components/Overlay/Overlay';
 const { $ } = window;
-const localState = {};
+let processingId = -1;
 
 const BrandScreen = () => {
     const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
-    const [categories, setCategories] = useState([]);
-    const [brand, setBrand] = useState({});
+    const [state, setState] = useState({ categories: [], brand: {}, processing: false });
     const mTable = useRef();
+    const { categories, brand, processing } = state;
+
     useEffect(() => {
         console.log('UseEffect invoked');
         getCategoryAll({ perpage: 100 }, ({ data }) => {
-            setCategories(data.data);
+            setState({ ...state, categories: data.data });
         })
-    }, []); 
+    }, []);
 
     const onActiveChange = item => e => {
 
@@ -78,7 +80,7 @@ const BrandScreen = () => {
 
     const onEdit = item => () => {
         reset(item);
-        setBrand(item);
+        setState({ ...state, brand: item });
         console.log('selected ', item);
     }
 
@@ -100,70 +102,71 @@ const BrandScreen = () => {
         onReset();
     }
 
+    const startProcessing = () => {
+        processingId = setTimeout(() => {
+            setState({ ...state, processing: true });
+        }, 150);
+    }
+
+    const stopProcessing = () => {
+        clearTimeout(processingId);
+        setState({ ...state, processing: false });
+    }
+
     const onSubmit = (data) => {
-        console.log('submit data', data);
-        console.log('brand', brand);
+        startProcessing();
         data.image = brand.file;
         const formData = new FormData();
         for (var key in data) {
             formData.append(key, data[key]);
         }
-        if (brand.id) {
-            updateBrand(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { mTable.current.refresh(); onReset() })
-                }
-            }, err => {
+        const response = brand.id ? updateBrand(formData) : createBrand(formData);
+        response.then(res => {
+            stopProcessing();
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Save data success',
+                    text: 'Data has been saved!'
+                }).then(r => { mTable.current.refresh(); onReset() })
+            }
+        }).catch(({ response: { data } }) => {
+            stopProcessing();
+            const [key] = Object.keys(data.errors || {});
+            const message = data.errors[key];
+            if (message) {
+                console.log('error data', data);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Save data error!'
+                    text: message[0]
                 });
-            });
-        } else {
-            createBrand(formData, res => {
-                if (res.status == 200 || res.status == 201) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Save data success',
-                        text: 'Data has been saved!'
-                    }).then(r => { mTable.current.refresh(); })
-                }
-            }, err => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Save data error!'
-                });
-            });
-        }
+            }
+        });
     }
 
-    const onBrowseImage = () => {
-        console.log('onBrowse invoked!');
+    const onBrowseImage = () => { 
         $("#image-name").click();
 
     }
 
     const onReset = () => {
         reset({
-            category_id: 0,
+            category_id: '',
             code: '',
             name: '',
+            description: '',
             is_active: true,
             image_name: '',
         });
-        setBrand({});
+        setState({ ...state, brand: {} });
     }
 
     const onFileChange = (e) => {
         const [file] = e.target.files;
         if (file) {
-            setBrand({ ...brand, image_name: URL.createObjectURL(file), file })
+            const _brand = { ...brand, image_name: URL.createObjectURL(file), file };
+            setState({ ...state, brand: _brand });
         }
     }
 
@@ -188,6 +191,7 @@ const BrandScreen = () => {
                 <div className="container-fluid">
                     <div className="row">
                         <div className='col-md-4'>
+                            <Overlay display={processing} />
                             <form name="form-detail" onSubmit={handleSubmit(onSubmit)}>
                                 <div className='card'>
                                     <div className='card-header'>
@@ -199,11 +203,13 @@ const BrandScreen = () => {
                                     <div className='card-body'>
                                         <div className='form-group'>
                                             <label>Category</label>
-                                            <select className='form-control' {...register("category_id", { required: { value: true, message: 'Category is required!' } })}>
+                                            <select id='category_id' className='form-control' {...register("category_id", { required: { value: true, message: 'Category is required!' } })}>
+                                                <option value={''}>Select Category</option>
                                                 {
                                                     categories.map((ctg, i) => (<option key={`ctg-` + i} value={ctg.id}>{ctg.name}</option>))
                                                 }
                                             </select>
+                                            {errors.category_id && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.category_id.message}</span>)}
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor="brand-code">Brand Code</label>
@@ -213,6 +219,11 @@ const BrandScreen = () => {
                                         <div className='form-group'>
                                             <label htmlFor="brand-name">Brand Name</label>
                                             <input name="brand-name" {...register("name", { required: { value: true, message: 'Brand name is required!' } })} placeholder='Brand name' className='form-control' />
+                                            {errors.name && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.name.message}</span>)}
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor="brand-description">Description</label>
+                                            <input name="brand-description" {...register("description", { required: { value: true, message: 'Description name is required!' } })} placeholder='Brand name' className='form-control' />
                                             {errors.name && (<span className='text-danger' style={{ fontSize: 14 }}>{errors.name.message}</span>)}
                                         </div>
                                         <div className='form-group'>

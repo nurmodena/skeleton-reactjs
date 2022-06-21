@@ -32,7 +32,7 @@ const UserScreen = () => {
         { id: 1, title: 'NIK', field: 'nik', sortable: true },
         { id: 3, title: 'Full Name', field: 'full_name', sortable: true },
         { id: 2, title: 'User Name', field: 'username', sortable: true },
-        { id: 3, title: 'Role', field: 'role_name', sortable: true },
+        { id: 3, title: 'Role', field: 'roles_name', sortable: true },
         { id: 3, title: 'Email', field: 'email', sortable: true },
         {
             id: 4,
@@ -84,7 +84,6 @@ const UserScreen = () => {
     }
 
     const propsTable = { columns, getData: getUserAll, showIndex: true, showAddButton: true, onAddData };
-
 
     return (
         <div className="content-wrapper">

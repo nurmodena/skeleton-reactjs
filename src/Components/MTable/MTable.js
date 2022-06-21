@@ -1,19 +1,23 @@
 import React, { Component, useEffect, useState, forwardRef, useRef, useImperativeHandle } from 'react';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import Overlay from '../Overlay/Overlay'
 
 const $ = window.$;
 const MTableId = `id_mtable_${parseInt(Math.random() * 10000)}`;
 let timeoutId = 0;
+let loadTimeout = 0;
 
 const MTable = forwardRef((props, ref) => {
   const { columns, onAddData, showIndex, showAddButton, order, getData } = props;
-  const [state, setState] = useState({
+  const [state, setCurrentState] = useState({
     data: [], 
     total: 0, 
     filters: [], 
     filter: { field: '', value: '', title: '' },
-    search: ''});  
+    search: '',
+    processing: false
+  });  
   const [paginator, setPaginator] = useState({
     page: 1,
     perpage: 10,
@@ -21,14 +25,25 @@ const MTable = forwardRef((props, ref) => {
     filter: '',
     order: order ? order : 'id',
     direction: 'asc',
-    refresh: false,
+    refresh: false
   });
+
+  const setState = value => {
+    setCurrentState({...state, ...value});
+  }
 
   useEffect(
     () => {
+      loadTimeout = setTimeout(()=>{
+        setState({processing: true});
+      }, 150);
       getData && getData(paginator).then(res => {
+        clearTimeout(loadTimeout);
         const {data: {data, total}} = res;
-        setState({...state, data, total});
+        setState({data, total, processing: false});
+      }).catch(err => {
+        clearTimeout(loadTimeout);
+        setState({processing: false, data: [], total: 0});
       });
     },
     [paginator]
@@ -40,7 +55,7 @@ const MTable = forwardRef((props, ref) => {
     }
   }));
   
-  const {data, total, filters, filter, search} = state;
+  const {data, total, filters, filter, search, processing} = state;
   const totalPage = Math.ceil(total / paginator.perpage);
   const lastPage = totalPage >= 15 ? 15 : totalPage;
   const startRow = (paginator.page - 1) * paginator.perpage + 1;
@@ -161,6 +176,7 @@ const MTable = forwardRef((props, ref) => {
 
   return (
     <div className="" id={MTableId}>
+      <Overlay display={processing} />
       <div className="row">
         <div className="col-md-3">
           <div className="form-group">
@@ -218,15 +234,13 @@ const MTable = forwardRef((props, ref) => {
               <div className="card-body">
                 <div
                   className="d-flex"
-                  style={{ justifyContent: 'space-between' }}
-                >
+                  style={{ justifyContent: 'space-between' }} >
                   <div style={{ flex: 1 }}>
                     <select
                       className="form-control rounded-0"
                       name="filter_field"
                       value={filter.field}
-                      onChange={onFilterFieldChange}
-                    >
+                      onChange={onFilterFieldChange} >
                       <option value={''}>Select field</option>
                       {columns
                         .filter(item => item.field)
