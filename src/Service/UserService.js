@@ -27,8 +27,7 @@ const createUser = (payload, onSuccess, onError) => {
     return handleResponse (response, onSuccess, onError); 
 };
 
-const updateUser = (payload, onSuccess, onError) => {
-    const username = payload.get('username');
+const updateUser = (username, payload, onSuccess, onError) => { 
     const response = axios.put(`v1/admin/user/update/${username}`, payload);
     return handleResponse (response, onSuccess, onError); 
 };

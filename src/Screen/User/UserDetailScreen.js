@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import Overlay from '../../Components/Overlay/Overlay';
 import { getRoleAccessAll } from '../../Service/RoleAccessService';
 import { createUser, getUserById, updateUser } from '../../Service/UserService';
 
@@ -72,6 +73,7 @@ const UserDetailScreen = () => {
     }
 
     const stopProcessing = () => {
+        clearInterval(procesingId);
         setState({ ...state, processing: false });
     }
 
@@ -86,8 +88,9 @@ const UserDetailScreen = () => {
             formData.delete("password");
         }
         startProcessing();
-        const response = localState.isNew ? createUser(formData) : updateUser(formData);
+        const response = localState.isNew ? createUser(formData) : updateUser(username, formData);
         response.then(res => {
+            stopProcessing();
             if (res.status == 200 || res.status == 201) {
                 Swal.fire({
                     icon: 'success',
@@ -96,6 +99,7 @@ const UserDetailScreen = () => {
                 }).then(r => { onBack(); })
             }
         }).catch(({ response: { data } }) => {
+            stopProcessing();
             const [key] = Object.keys(data.errors || {});
             const message = data.errors[key];
             if (message) {
@@ -109,7 +113,7 @@ const UserDetailScreen = () => {
         });
     }
 
-    const { user, roles } = state;
+    const { user, roles, processing } = state;
 
     return (
         <div className="content-wrapper">
@@ -133,6 +137,7 @@ const UserDetailScreen = () => {
                     <div className="row">
                         <div className='col-md-12 '>
                             <div className='card'>
+                                <Overlay display={processing} />
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <div className='card-header'>
                                         <div className='card-title'><i className='fa fa-user-tag' /> {pageState && pageState.charAt(0).toUpperCase() + pageState.slice(1)} User </div>
