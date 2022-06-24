@@ -6,14 +6,14 @@ import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
 
-const { $ } = window; 
+const { $ } = window;
 
 const UserScreen = () => {
     const navigate = useNavigate();
     const mTable = useRef();
     useEffect(() => {
 
-    }, []); 
+    }, []);
 
     const onView = item => () => {
         navigate("view/" + item.id);
@@ -26,6 +26,21 @@ const UserScreen = () => {
 
     const onResetPassword = item => () => {
         console.log('You click remove', item);
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure',
+            text: 'Reseted password can not be restored'
+        }).then(({ isConfirmed }) => {
+            console.log('isConfirmed', isConfirmed);
+            Swal.fire({
+                title: 'Input the new password here!',
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Reset'                 
+            }).then(result => {
+                console.log('result', result);
+            })
+        });
     };
 
     const columns = [

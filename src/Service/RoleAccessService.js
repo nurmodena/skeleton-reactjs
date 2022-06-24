@@ -16,8 +16,7 @@ const createRoleAccess = (payload, onSuccess, onError) => {
     return handleResponse(response, onSuccess, onError); 
 };
 
-const updateRoleAccess = (payload, onSuccess, onError) => {
-    const id = payload.get('id');
+const updateRoleAccess = (id, payload, onSuccess, onError) => { 
     const response = axios.put(`v1/admin/role/update/${id}`, payload);
     return handleResponse(response, onSuccess, onError);
 };
@@ -27,9 +26,14 @@ const deleteRoleAccess = (id, onSuccess, onError) => {
     return handleResponse(response, onSuccess, onError); 
 };
 
-const getMenuAll = (id, onSuccess, onError) => {
-    const response = axios.get(`v1/admin/menu/get-all`);
+const softDeleteRoleAccess = (id, onSuccess, onError) => {
+    const response = axios.put(`v1/admin/role/delete/${id}`, {is_active: false});
+    return handleResponse(response, onSuccess, onError); 
+};
+
+const getMenuAll = (params, onSuccess, onError) => { 
+    const response = axios.get(`v1/admin/menu/get-all`, {params});
     return handleResponse(response, onSuccess, onError);
 };
 
-export { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess, getMenuAll };
+export { getRoleAccessAll, getRoleAccessById, createRoleAccess, updateRoleAccess, deleteRoleAccess, getMenuAll, softDeleteRoleAccess };

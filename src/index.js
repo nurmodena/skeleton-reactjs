@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import store from './Redux/Store/Store';
 import axios from 'axios';
 import { ACTION_LOGIN, ACTION_LOGOUT } from './Redux/Action/AuthAction';
+import Swal from 'sweetalert2';
 
 const REFRESH_URL = 'v1/refresh';
 const LOGIN_URL = 'v1/login';
@@ -52,7 +53,15 @@ axios.interceptors.response.use(
       }
 
     } else {
-      console.log('general error');
+      console.log('general error', error);
+      const {code} = error;
+      if (code == 'ERR_NETWORK') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error!',
+          text: 'Request fail, please check your connection!'
+        });
+      }
       return Promise.reject(error);
     }
   }

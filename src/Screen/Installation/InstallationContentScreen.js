@@ -110,7 +110,7 @@ const InstallationContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='step-order'>Step Order</label>
-                                            <input id="step-order" type={'number'} className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
+                                            <input id="step-order" className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
                                         </div>
                                         <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                         <div className='form-group'>

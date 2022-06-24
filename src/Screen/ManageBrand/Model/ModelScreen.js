@@ -10,11 +10,11 @@ const ModelScreen = () => {
   const mTable = useRef(); 
 
   const onView = item => () => {
-    navigate("view/" + item.id);
+    navigate("view/" + item.code);
   };
 
   const onEdit = item => () => {
-    navigate("edit/" + item.id);
+    navigate("edit/" + item.code);
   };
 
   const onRemove = item => () => {

@@ -13,8 +13,25 @@ const RoleAccessScreen = () => {
     const navigate = useNavigate(); 
     const mTable = useRef();
 
-    const onView = item => () => {
-        navigate("view/" + item.id);
+    const removeData = item => { 
+        deleteRoleAccess(item.id).then(
+            Swal.fire({
+                icon: 'success',
+                title: 'Delete data success',
+                text: 'Data has been deleted!'
+            }).then(r => { mTable.current.refresh(); })
+        ).catch(({ response: { data } }) => { 
+            const [key] = Object.keys(data.errors || {});
+            const message = data.errors[key];
+            if (message) {
+                console.log('error data', data);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: message[0]
+                });
+            } 
+        });
     };
 
     const onEdit = item => () => {
@@ -23,6 +40,17 @@ const RoleAccessScreen = () => {
 
     const onRemove = item => () => {
         console.log('You click remove', item);
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure?',
+            text: 'Deleted data can not be restored!',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+          }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+              removeData(item);
+            }
+          });
     };
 
     const columns = [

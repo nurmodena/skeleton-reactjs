@@ -1,6 +1,10 @@
 import { Button } from 'primereact/button';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { useParams, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { getModelByCode, getModelById } from '../../../Service/ModelService';
+
 
 const images = [
   "https://images.bisnis-cdn.com/photos/2019/09/20/138906/modena.jpg",
@@ -11,13 +15,29 @@ const images = [
   'https://images.bisnis-cdn.com/posts/2019/12/10/1179872/img20191210134340-1-min.jpg'
 ];
 
+const wrapStyle = { width: 150, height: 100, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative' };
+
 export default function ModelDetailScreen() {
 
   const { pageState, modelid } = useParams();
+  const navigate = useNavigate();
+  const [state, setState] = useState({ model: {} });
 
-  const navigate = useNavigate()
+  const { register, handleSubmit, reset, formState: { errors }, control } = useForm({});
 
-  const wrapStyle = { width: 150, height: 100, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative' };
+  useEffect(() => {
+    getModelByCode(modelid).then(({ data }) => {
+      setState({ ...state, model: data });
+      console.log('model', data);
+    }).catch(({ response: { data } }) => {
+      Swal.fire({
+        icone: 'error',
+        title: 'Error when geting data model!',
+        text: data.message
+      }).then(() => { navigate(-1) });
+    })
+
+  }, []);
 
   const onBack = () => { navigate(-1); }
 
@@ -80,21 +100,24 @@ export default function ModelDetailScreen() {
                     <label className='mr-3'>Dimension</label>
                     <br />
                     <span>Enter product size to calculate volume weight</span>
-                    <div className='d-flex justify-content-beteween mt-3'>
-                      <div className='input-group' style={{ flex: 1 }}>
-                        <input className='form-control' />
-                        <div className='input-group-append'>
-                          <span className='input-group-text'>cm</span>
+                    <div className='d-flex mt-3'>
+                      <div className='flex-1'>
+                        <div className='input-group'>
+                          <input className='form-control' placeholder='Length' />
+                          <div className='input-group-append'>
+                            <span className='input-group-text'>cm</span>
+                          </div>
                         </div>
                       </div>
                       <div className='input-group' style={{ flex: 1, margin: '0 20px' }}>
-                        <input className='form-control' />
+                        
+                        <input className='form-control' placeholder='Width' />
                         <div className='input-group-append'>
                           <span className='input-group-text'>cm</span>
                         </div>
                       </div>
                       <div className='input-group' style={{ flex: 1 }}>
-                        <input className='form-control' />
+                        <input className='form-control' placeholder='Height' />
                         <div className='input-group-append'>
                           <span className='input-group-text'>cm</span>
                         </div>
