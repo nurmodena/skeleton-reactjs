@@ -89,7 +89,7 @@ const MTable = forwardRef((props, ref) => {
 
   const onSearchChange = e => {
     const value = e.target.value; 
-    setState({...state, search: value});
+    setState({search: value});
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       setPaginator({ ...paginator, search: value, page: 1 });
@@ -97,7 +97,7 @@ const MTable = forwardRef((props, ref) => {
   };
 
   const onClear = () => {
-    setState({...state, search: ''});
+    setState({search: ''});
     setPaginator({ ...paginator, search: '' });
   };
 
@@ -129,7 +129,7 @@ const MTable = forwardRef((props, ref) => {
   const onAddFilter = () => {
     if (filter.field && filter.value) {
       const _filters = [...filters, filter];
-      setState({...state, filters: _filters, filter: { field: '', value: '', title: '' }}); 
+      setState({filters: _filters, filter: { field: '', value: '', title: '' }}); 
       //do filtered request
       const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
       setPaginator({ ...paginator, filter: _filter });
@@ -144,7 +144,7 @@ const MTable = forwardRef((props, ref) => {
 
   const onRemoveFilter = item => () => {
     const _filters = filters.filter(e => e.field != item.field);
-    setState({...state, filters: _filters});
+    setState({filters: _filters});
     //do filtered request
     const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
     setPaginator({ ...paginator, filter: _filter });
@@ -154,16 +154,16 @@ const MTable = forwardRef((props, ref) => {
     const select = e.target;
     const title = select.options[select.selectedIndex].text; 
     const _filter = { ...filter, field: select.value, title };
-    setState({...state, filter: _filter});
+    setState({filter: _filter});
   };
 
   const onFilterValueChange = e => { 
     const _filter = { ...filter, value: e.target.value };
-    setState({...state, filter: _filter});
+    setState({filter: _filter});
   };
 
   const onResetFilter = () => {
-    setState({...state, filters: []});
+    setState({filters: []});
     setPaginator({ ...paginator, filter: '' });
     closeFilter();
   };

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { handleResponse } from './HelperService';
+import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getModelAll = (params, onSuccess, onError) => {
   const response = axios.get ('v1/admin/model/get-all', {params});
@@ -16,4 +16,14 @@ const getModelByCode = (code, onSuccess, onError) => {
   return handleResponse(response, onSuccess, onError);
 };
 
-export {getModelAll, getModelById,getModelByCode};
+const createModel = (payload, onSuccess, onError) => { 
+  const response = axios.post (`v1/admin/model/create`, payload, getMultipartOptions(axios));
+  return handleResponse(response, onSuccess, onError);
+};
+
+const updateModel = (id,payload, onSuccess, onError) => { 
+  const response = axios.put (`v1/admin/model/update/${id}`, payload, getMultipartOptions(axios));
+  return handleResponse(response, onSuccess, onError);
+};
+
+export {getModelAll, getModelById,getModelByCode, createModel, updateModel};

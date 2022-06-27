@@ -27,4 +27,9 @@ const deleteBrand = (id, onSuccess, onError) => {
   return handleResponse(response, onSuccess, onError);
 };
 
-export { getBrandAll, getBrandById, createBrand, updateBrand, deleteBrand };
+const getSubcategoriesByBrandId = (id, onSuccess, onError) => {
+  const response = axios.get(`v1/admin/brand/${id}/subcategories`);
+  return handleResponse(response, onSuccess, onError);
+};
+
+export { getBrandAll, getBrandById, createBrand, updateBrand, deleteBrand, getSubcategoriesByBrandId };
