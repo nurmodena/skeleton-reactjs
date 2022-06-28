@@ -132,7 +132,7 @@ const MTable = forwardRef((props, ref) => {
       setState({filters: _filters, filter: { field: '', value: '', title: '' }}); 
       //do filtered request
       const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
-      setPaginator({ ...paginator, filter: _filter });
+      setPaginator({ ...paginator, page: 1, filter: _filter });
     }
   };
 

@@ -25,10 +25,9 @@ const FAQDetailScreen = () => {
             setState({ ...state, dataLanguages: res.data.data })
         });
         setupDigitInput();
-    }, []);
-
-    useEffect(() => {
-        $('.select2').select2();
+        $('.select2').select2().on('change', e => {
+            console.log('');
+        });
     }, []);
 
     const onSubmit = data => {
@@ -79,6 +78,10 @@ const FAQDetailScreen = () => {
         language[name] = value;
         console.log('language', { name, value });
         setState({ ...state, language });
+    }
+
+    const onSelectModelChange = e => {
+        console.log('models', e);
     }
 
     const { languages, language, dataLanguages, selectedLang } = state;
@@ -140,7 +143,7 @@ const FAQDetailScreen = () => {
                                     <div className='col-md-5'>
                                         <div className='form-group'>
                                             <label htmlFor='model-list'>Model List</label>
-                                            <select id="select-models" className='select2' multiple="multiple" data-paleceholder="Select models" style={{ width: '100%' }}>
+                                            <select id="select-models" className='select2' multiple="multiple" onChange={onSelectModelChange} data-paleceholder="Select models" style={{ width: '100%' }}>
                                                 <option>Model - 1</option>
                                                 <option>Model - 2</option>
                                                 <option>Model - 3</option>
@@ -206,7 +209,7 @@ const FAQDetailScreen = () => {
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
                                                 <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
                                             </div>
-                                        </div> 
+                                        </div>
                                     </div>
                                 </div>
                             </div>

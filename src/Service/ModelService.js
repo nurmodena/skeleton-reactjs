@@ -26,4 +26,9 @@ const updateModel = (id,payload, onSuccess, onError) => {
   return handleResponse(response, onSuccess, onError);
 };
 
-export {getModelAll, getModelById,getModelByCode, createModel, updateModel};
+const deleteModel = (id, onSuccess, onError) => { 
+  const response = axios.delete (`v1/admin/model/delete/${id}`);
+  return handleResponse(response, onSuccess, onError);
+};
+
+export {getModelAll, getModelById,getModelByCode, createModel, updateModel, deleteModel};

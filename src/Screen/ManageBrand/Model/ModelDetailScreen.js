@@ -10,14 +10,22 @@ import { getBrandAll, getSubcategoriesByBrandId } from '../../../Service/BrandSe
 import axios, { Axios } from 'axios';
 import { InputSwitch } from 'primereact/inputswitch';
 
-const wrapStyle = { width: 150, height: 100, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative' };
+const wrapStyle = { width: 200, height: 160, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative', border: 'solid 1px #ccc', borderRadius: 6 };
 let processingId = -1;
 
 export default function ModelDetailScreen() {
 
   const { pageState, modelid } = useParams();
   const navigate = useNavigate();
-  const [state, setState] = useState({ model: { is_active: true }, brands: [], subctg: {}, subCategories: [], files: [], isViewOnly: false });
+  const [state, setState] = useState({
+    model: { is_active: true },
+    brands: [],
+    subctg: {},
+    subCategories: [],
+    files: [],
+    isViewOnly: false,
+    deletedContents: []
+  });
 
   const { register, handleSubmit, reset, formState: { errors }, control } = useForm({});
 
@@ -37,12 +45,12 @@ export default function ModelDetailScreen() {
         const reqSubCtg = reqModel.then(res => getSubCategoryById(res.category_sub_id).then(res => res.data));
         const reqSubCtgs = reqSubCtg.then(res => getSubcategoriesByBrandId(res.brand_id).then(res => res.data));
         axios.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs]).then(results => {
-          console.log('results',results);
+          console.log('results', results);
           const [_brands, _model, _subctg, _sucategories] = results;
           _model.length = _model.length == "null" ? null : _model.length;
           _model.width = _model.width == "null" ? null : _model.width;
           _model.height = _model.height == "null" ? null : _model.height;
-          
+
           setState({ ...state, brands: _brands, subctg: _subctg, subCategories: _sucategories, model: _model, isViewOnly });
           reset(_model);
         }).catch(({ response: { data } }) => {
@@ -72,14 +80,16 @@ export default function ModelDetailScreen() {
     setState({ ...state, processing: false });
   }
 
-  const onRemoveClick = item => () => {
-    console.log('remove ', item);
+  const onRemoveContent = (item, i) => () => {
+    model.content.splice(i, 1);
+    const _deletedContents = [...deletedContents];
+    _deletedContents.push(item);
+    setState({ ...state, model, deletedContents: _deletedContents });
   }
 
   const onRemoveFile = i => () => {
     files.splice(i, 1);
-    const _files = [...files];
-    setState({ ...state, files: _files });
+    setState({ ...state, files });
   }
 
   const onBrandChange = e => {
@@ -93,14 +103,19 @@ export default function ModelDetailScreen() {
   }
 
   const onSubmit = data => {
-    data.images = files;
     data.status = data.status ? 1 : 0;
-    console.log('data', data); 
+    console.log('data', data);
     const { id } = data;
     const formData = new FormData();
-        for (var key in data) {
-            formData.append(key, data[key]);
-        }
+    for (var key in data) {
+      formData.append(key, data[key]);
+    }
+    for (let i in files) {
+      formData.append(`images[${i}]`, files[i]);
+    }
+    if (deletedContents.length > 0) {
+      formData.deletedContents = JSON.stringify(deletedContents);
+    }
     const submit = pageState == 'add' ? createModel(formData) : updateModel(id, formData);
     startProcessing();
     submit.then(res => {
@@ -117,7 +132,7 @@ export default function ModelDetailScreen() {
         title: 'Error',
         text: 'Save data error!'
       });
-    }).finally(()=>{
+    }).finally(() => {
       stopProcessing();
     });
   }
@@ -128,7 +143,7 @@ export default function ModelDetailScreen() {
     setState({ ...state, files: _files });
   }
 
-  const { model, subctg, brands, subCategories, files, isViewOnly } = state;
+  const { model, subctg, brands, subCategories, files, isViewOnly, deletedContents } = state;
 
   return (
     <div className="content-wrapper">
@@ -161,12 +176,12 @@ export default function ModelDetailScreen() {
                 <div className='row'>
                   <div className='col-md-12 col-lg-7'> <div className='form-group'>
                     <label>Model Code</label>
-                    <input {...register("code", { required: "Code is required!" })} className='form-control' placeholder='Code' readOnly={isViewOnly}/>
+                    <input {...register("code", { required: "Code is required!" })} className='form-control' placeholder='Code' readOnly={isViewOnly} />
                     {errors.code && (<span className='text-danger'>{errors.code.message}</span>)}
                   </div>
                     <div className='form-group'>
                       <label>Model Name</label>
-                      <input {...register("name", { required: "Name is required!" })} className='form-control' placeholder='Model name' readOnly={isViewOnly}/>
+                      <input {...register("name", { required: "Name is required!" })} className='form-control' placeholder='Model name' readOnly={isViewOnly} />
                       {errors.name && (<span className='text-danger'>{errors.name.message}</span>)}
                     </div>
                     <div className='form-group'>
@@ -178,9 +193,9 @@ export default function ModelDetailScreen() {
                           (model.content || []).map((item, i) => (
                             <div style={wrapStyle} key={`image-${i}`}>
                               <div style={{ position: 'absolute', right: -10, top: -10 }}>
-                                <Button type='button' className='p-button-rounded p-button-danger' icon="pi pi-times" style={{ width: 30, height: 30 }} onClick={onRemoveClick(item)} />
+                                {!isViewOnly && <Button type='button' className='p-button-rounded p-button-danger' icon="pi pi-times" style={{ width: 30, height: 30 }} onClick={onRemoveContent(item, i)} />}
                               </div>
-                              <img src={item.image_name} style={{ objectFit: 'cover', width: '100%', borderRadius: 4 }} />
+                              <img src={item.image_name} style={{ objectFit: 'contain', width: '100%', height: '100%', borderRadius: 4 }} />
                             </div>
                           ))
                         }
@@ -207,20 +222,20 @@ export default function ModelDetailScreen() {
                       <div className='d-flex mt-3'>
                         <div className='flex-1'>
                           <div className='input-group'>
-                            <input {...register("length")} className='form-control' placeholder='Length' readOnly={isViewOnly}/>
+                            <input {...register("length")} className='form-control' placeholder='Length' readOnly={isViewOnly} />
                             <div className='input-group-append'>
                               <span className='input-group-text'>cm</span>
                             </div>
                           </div>
                         </div>
                         <div className='input-group' style={{ flex: 1, margin: '0 20px' }}>
-                          <input {...register("width")} className='form-control' placeholder='Width' readOnly={isViewOnly}/>
+                          <input {...register("width")} className='form-control' placeholder='Width' readOnly={isViewOnly} />
                           <div className='input-group-append'>
                             <span className='input-group-text'>cm</span>
                           </div>
                         </div>
                         <div className='input-group' style={{ flex: 1 }}>
-                          <input {...register("height")} className='form-control' placeholder='Height' readOnly={isViewOnly}/>
+                          <input {...register("height")} className='form-control' placeholder='Height' readOnly={isViewOnly} />
                           <div className='input-group-append'>
                             <span className='input-group-text'>cm</span>
                           </div>
@@ -230,13 +245,13 @@ export default function ModelDetailScreen() {
                     <div className='form-group'>
                       <label htmlFor="brand-name">Active</label>
                       <div>
-                        <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} disabled={isViewOnly}/>) }} />
+                        <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} disabled={isViewOnly} />) }} />
                       </div>
                     </div>
                     <div className='form-group'>
                       <label htmlFor="brand-name">Publish</label>
                       <div>
-                        <Controller name="status" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} disabled={isViewOnly}/>) }} />
+                        <Controller name="status" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} disabled={isViewOnly} />) }} />
                       </div>
                     </div>
                   </div>
@@ -260,7 +275,7 @@ export default function ModelDetailScreen() {
                     <div className='form-group d-flex justify-content-end'>
                       <div style={{ marginTop: 40 }}>
                         <button type='button' className='btn btn-outline-dark' style={{ width: 120, marginRight: 16 }} onClick={onBack}><i className='fa fa-reply'></i> Back</button>
-                        <button type='submit' className='btn btn-dark' style={{ width: 120 }}><i className='fa fa-save'></i> Save</button>
+                        <button type='submit' className='btn btn-dark' style={{ width: 120 }} disabled={isViewOnly}><i className='fa fa-save'></i> Save</button>
                       </div>
                     </div>
                   </div>

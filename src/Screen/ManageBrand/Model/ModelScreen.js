@@ -2,12 +2,13 @@ import React, { Component, useEffect, useState, useRef } from 'react';
 import { InputSwitch } from 'primereact/inputswitch';
 import { RadioButton } from 'primereact/radiobutton';
 import MTable from '../../../Components/MTable/MTable';
-import { getModelAll } from '../../../Service/ModelService';
+import { getModelAll, deleteModel } from '../../../Service/ModelService';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const ModelScreen = () => {
-  const navigate = useNavigate(); 
-  const mTable = useRef(); 
+  const navigate = useNavigate();
+  const mTable = useRef();
 
   const onView = item => () => {
     navigate("view/" + item.code);
@@ -18,8 +19,36 @@ const ModelScreen = () => {
   };
 
   const onRemove = item => () => {
-    console.log('You click remove', item);
+    Swal.fire({
+      icon: 'question',
+      title: 'Are you sure?',
+      text: 'Deleted data can not be restored!',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
+        removeData(item.id);
+      }
+    });
   };
+
+  const removeData = id => {
+    deleteModel(id, res => {
+        if (res.status == 200 || res.status == 201) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Delete data success',
+                text: 'Data has been deleted!'
+            }).then(res => { mTable.current.refresh(); });
+        }
+    }, error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Delete data fail',
+            text: 'Data can not be deleetd!'
+        });
+    });
+}
 
   const columns = [
     { id: 1, title: 'Modela Name', field: 'name', sortable: true },
