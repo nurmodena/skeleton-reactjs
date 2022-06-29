@@ -71,34 +71,36 @@ code {
 
 .bg-login {
   border: solid 0px red;
-  display: inline-block; 
-  flex: 5; 
+  display: inline-block;
+  flex: 5;
 }
 
 .login-form {
   border: solid 0px blue;
   display: inline-block;
-  flex: 2; 
+  flex: 2;
 }
 
 @media (max-width: 800px) {
   .login-container {
     flex-direction: column;
   }
+
   .bg-login {
-    flex: 1; 
+    flex: 1;
     overflow: hidden;
   }
+
   .login-form {
-    flex: 4; 
+    flex: 4;
   }
 }
 
 .inputLogin {
-    width: 100%; 
-    border: none !important; 
-    padding: 10px; 
-    flex: 1;   
+  width: 100%;
+  border: none !important;
+  padding: 10px;
+  flex: 1;
 }
 
 .inputLogin:focus {
@@ -106,9 +108,24 @@ code {
   border-width: 0;
 }
 
-.p-checkbox-icon { color: white !important; }
+.p-checkbox-icon {
+  color: white !important;
+}
 
-.select2-selection__choice { background-color: #FFC107 !important; border-color: #FFC107 !important;}
-.select2-results__option--highlighted { background-color: #FFC107 !important; }
+.select2-selection__choice {
+  background-color: #FFC107 !important;
+  border-color: #FFC107 !important;
+}
 
-.btn-warning { color: white !important; }
+.select2-results__option--highlighted {
+  background-color: #FFC107 !important;
+}
+
+.btn-warning {
+  color: white !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #FFC107 !important;
+  color: #FFC107 !important;
+}

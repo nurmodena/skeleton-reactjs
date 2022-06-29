@@ -6,10 +6,10 @@ import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
-const { $ } = window; 
+const { $ } = window;
 
 const FAQScreen = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const mTable = useRef();
 
     const onView = item => () => {
@@ -21,8 +21,36 @@ const FAQScreen = () => {
     };
 
     const onRemove = item => () => {
-        console.log('You click remove', item);
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure?',
+            text: 'Deleted data can not be restored!',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+        }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+                removeData(item.id);
+            }
+        });
     };
+
+    const removeData = id => {
+        deleteFAQ(id, res => {
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Delete data success',
+                    text: 'Data has been deleted!'
+                }).then(res => { mTable.current.refresh(); });
+            }
+        }, error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Delete data fail',
+                text: 'Data can not be deleetd!'
+            });
+        });
+    }
 
     const columns = [
         { id: 1, title: 'Name', field: 'name', sortable: true },
@@ -30,11 +58,10 @@ const FAQScreen = () => {
         { id: 3, title: 'Languages', field: 'languages', sortable: true },
         {
             id: 4,
-            title: 'Active',
-            field: 'is_active',
+            title: 'Published',
             sortable: true,
             render: data => {
-                return <InputSwitch checked={data.is_active} />;
+                return <InputSwitch checked={data.status.toLowerCase() == 'published'} />;
             },
         },
         {

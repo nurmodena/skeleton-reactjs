@@ -9,7 +9,6 @@ import { createUser, getUserById, updateUser } from '../../Service/UserService';
 
 const { $ } = window;
 const randomPassword = parseInt(Math.random() * 1000000);
-const localState = { isNew: true };
 let procesingId = -1;
 
 const UserDetailScreen = () => {
@@ -25,28 +24,40 @@ const UserDetailScreen = () => {
     password.current = watch("password", "");
 
     useEffect(() => {
-        const requests = [
-            getRoleAccessAll({ perpage: 100 }),
-            getUserById(username).catch(({ response: { data: { message } } }) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error when getting user',
-                    text: message
-                }).then(() => { navigate(-1) });
-            })
-        ];
 
-        Promise.all(requests).then(responses => {
-            const [res1, res2] = responses;
-            const _roles = res1.data.data;
-            const _user = res2.data;
-            _user.image = _user.image_name;
-            _user.password = randomPassword;
-            _user.retypePassword = randomPassword;
-            setState({ ...state, roles: _roles, user: _user });
-            reset(_user);
-            localState.isNew = false;
-        });
+        const requests = [getRoleAccessAll({ perpage: 100 }).then(res => res.data.data)];
+        switch (pageState) {
+            case 'add':
+                Promise.all(requests).then(results => {
+                    const [_roles] = results;
+                    setState({ ...state, roles: _roles, user: {} });
+                });
+                break;
+            case 'edit':
+            case 'view':
+                requests.push(
+                    getUserById(username)
+                        .then(res => res.data)
+                        .catch(({ response: { data: { message } } }) => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error when getting user',
+                                text: message
+                            }).then(() => { navigate(-1) });
+                        })
+                );
+                Promise.all(requests).then(results => {
+                    const [_roles, _user] = results;
+                    _user.image = _user.image_name;
+                    _user.password = randomPassword;
+                    _user.retypePassword = randomPassword;
+                    setState({ ...state, roles: _roles, user: _user });
+                    reset(_user);
+                });
+                break;
+            default:
+                break;
+        }
 
     }, []);
 
@@ -84,11 +95,11 @@ const UserDetailScreen = () => {
             formData.append(key, data[key]);
         }
         formData.delete("retypePassword");
-        if (localState.isNew == false && data.password == randomPassword) {
+        if (pageState.toLowerCase() == 'edit' && data.password == randomPassword) {
             formData.delete("password");
         }
         startProcessing();
-        const response = localState.isNew ? createUser(formData) : updateUser(username, formData);
+        const response = pageState.toLowerCase() == 'add' ? createUser(formData) : updateUser(username, formData);
         response.then(res => {
             stopProcessing();
             if (res.status == 200 || res.status == 201) {
@@ -109,7 +120,7 @@ const UserDetailScreen = () => {
                     title: 'Error',
                     text: message[0]
                 });
-            } 
+            }
         });
     }
 

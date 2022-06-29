@@ -11,14 +11,13 @@ const getFAQById = (id, onSuccess, onError) => {
     return handleResponse(response, onSuccess, onError);
 };
 
-const createFAQ = (payload, onSuccess, onError) => { 
-    const response = axios.post(`v1/admin/faq/create`, payload, getMultipartOptions(axios));
+const createFAQ = (payload, onSuccess, onError) => {
+    const response = axios.post(`v2/admin/faq/create`, payload, getMultipartOptions(axios));
     return handleResponse(response, onSuccess, onError);
 };
 
-const updateFAQ = (payload, onSuccess, onError) => {
-    const id = payload.get('id');
-    const response = axios.put(`v1/admin/faq/update/${id}`, payload, getMultipartOptions(axios));
+const updateFAQ = (id, payload, onSuccess, onError) => {
+    const response = axios.put(`v2/admin/faq/update/${id}`, payload, getMultipartOptions(axios));
     return handleResponse(response, onSuccess, onError);
 };
 

@@ -44,7 +44,7 @@ export default function ModelDetailScreen() {
         const reqModel = getModelByCode(modelid).then(res => res.data);
         const reqSubCtg = reqModel.then(res => getSubCategoryById(res.category_sub_id).then(res => res.data));
         const reqSubCtgs = reqSubCtg.then(res => getSubcategoriesByBrandId(res.brand_id).then(res => res.data));
-        axios.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs]).then(results => {
+        Promise.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs]).then(results => {
           console.log('results', results);
           const [_brands, _model, _subctg, _sucategories] = results;
           _model.length = _model.length == "null" ? null : _model.length;
@@ -114,7 +114,8 @@ export default function ModelDetailScreen() {
       formData.append(`images[${i}]`, files[i]);
     }
     if (deletedContents.length > 0) {
-      formData.deletedContents = JSON.stringify(deletedContents);
+      const _ids = deletedContents.map(e => e.id);
+      formData.append('deletedContent', JSON.stringify(_ids));
     }
     const submit = pageState == 'add' ? createModel(formData) : updateModel(id, formData);
     startProcessing();
@@ -126,11 +127,11 @@ export default function ModelDetailScreen() {
           text: 'Data has been saved!'
         }).then(r => { onBack(); })
       }
-    }).catch(({ respomnse: { data } }) => {
+    }).catch(({ response: { data } }) => {
       Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: 'Save data error!'
+        title: 'Save data error!',
+        text: data.message
       });
     }).finally(() => {
       stopProcessing();
