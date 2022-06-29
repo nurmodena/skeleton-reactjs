@@ -113,9 +113,8 @@ export default function ModelDetailScreen() {
     for (let i in files) {
       formData.append(`images[${i}]`, files[i]);
     }
-    if (deletedContents.length > 0) {
-      const _ids = deletedContents.map(e => e.id);
-      formData.append('deletedContent', JSON.stringify(_ids));
+    for (let i in deletedContents) {
+      formData.append(`deletedContents[${i}]`, deletedContents[i]);
     }
     const submit = pageState == 'add' ? createModel(formData) : updateModel(id, formData);
     startProcessing();

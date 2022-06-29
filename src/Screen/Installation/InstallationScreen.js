@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState, useRef } from 'react';
-import { getInstallationAll, getInstallationById, createInstallation, updateInstallation, deleteInstallation } from '../../Service/InstallationService';
+import { getInstallationAll, deleteInstallation } from '../../Service/InstallationService';
 import { getCategoryAll } from '../../Service/CategoriesService';
 import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -11,8 +11,8 @@ const localState = {};
 
 const InstallationScreen = () => {
 
-    const navigate = useNavigate(); 
-    const mTable = useRef(); 
+    const navigate = useNavigate();
+    const mTable = useRef();
 
     const onView = item => () => {
         navigate("view/" + item.id);

@@ -4,6 +4,7 @@ import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
+import Select2Checkbox from '../../Components/Select2Checkbox/Select2Checkbox';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getModelAll } from '../../Service/ModelService';
@@ -32,12 +33,13 @@ const FAQDetailScreen = () => {
         const reqLang = getLanguageAll({ perpage: 1000 }).then(res => res.data.data);
         const reqModels = getModelAll({ perpage: 1000 }).then(res => res.data.data);
         //setup select2
-        $('.select2').select2({ placeholder: 'Select models' })
-            .on('change', e => {
-                clearErrors('models');
-                localState.models = $('.select2').val();
-                console.log('models', localState.models);
-            });
+        $('.select2').select2({
+            placeholder: 'Select models',
+            templateResult: Select2Checkbox
+        }).on('change', e => {
+            clearErrors('models');
+            localState.models = $('.select2').val();
+        });
 
         switch (pageState) {
             case 'add':
@@ -222,24 +224,24 @@ const FAQDetailScreen = () => {
                                     <div className='col-md-6'>
                                         <div className='form-group'>
                                             <label htmlFor='faq-name'>FAQ Name</label>
-                                            <input {...register('name', { required: 'Name is required!' })} id="faq-name" className='form-control' placeholder='FAQ Name' />
+                                            <input {...register('name', { required: 'Name is required!' })} id="faq-name" className='form-control' placeholder='FAQ Name' disabled={isViewOnly} />
                                             {errors.name && <span className='text-danger'>{errors.name.message}</span>}
                                         </div>
                                         <div className='form-group'>
                                             <label>Image</label>
-                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
+                                            <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" disabled={isViewOnly} />
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                                                 <div style={{ minHeight: 200, maxWidth: 500, borderRadius: 6, overflow: 'hidden' }}>
                                                     <img src={faq.image_name} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />
                                                 </div>
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
-                                                <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage}><i className='fa fa-image'></i> Browse</button>
+                                                <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage} disabled={isViewOnly}><i className='fa fa-image'></i> Browse</button>
                                             </div>
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='video-url'>Video Url</label>
-                                            <input {...register('video_url')} id="video-url" className='form-control' placeholder='Content Name' />
+                                            <input {...register('video_url')} id="video-url" className='form-control' placeholder='Video url' disabled={isViewOnly} />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
@@ -253,7 +255,8 @@ const FAQDetailScreen = () => {
                                     <div className='col-md-5'>
                                         <div className='form-group'>
                                             <label htmlFor='model-list'>Model List</label>
-                                            <select id="select-models" {...register('models', { validate: val => (localState.models || []).length > 0 || 'Models is required' })} className='select2' multiple="multiple" data-paleceholder="Select models" style={{ width: '100%' }}>
+                                            <select id="select-models" {...register('models', { validate: val => (localState.models || []).length > 0 || 'Models is required' })}
+                                                className='select2' multiple="multiple" disabled={isViewOnly} style={{ width: '100%' }} >
                                                 {
                                                     models.map((m, i) => <option key={'model-' + i} value={m.id}>{m.name}</option>)
                                                 }
@@ -267,7 +270,9 @@ const FAQDetailScreen = () => {
                                         <div className='form-group'>
                                             <label htmlFor='select-language'>Language</label>
                                             <div className='d-flex justify-content-between'>
-                                                <select id="select-language" name="select-language" {...register('languages', { validate: val => languages.length > 0 || 'Content is required!' })} value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange}>
+                                                <select id="select-language" name="select-language"
+                                                    {...register('languages', { validate: val => languages.length > 0 || 'Content is required!' })}
+                                                    value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange} disabled={isViewOnly}>
                                                     <option value=''>Select language</option>
                                                     {
                                                         dataLanguages.filter(e => { return languages.map(l => l.code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
@@ -297,17 +302,17 @@ const FAQDetailScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='question'>Question</label>
-                                            <textarea name='question' value={language.question} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
+                                            <textarea name='question' value={language.question} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code || isViewOnly}></textarea>
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='title'>Solution</label>
-                                            <textarea value={language.solution} name='solution' className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
+                                            <textarea value={language.solution} name='solution' className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code || isViewOnly}></textarea>
                                         </div>
                                         <div style={{ margin: '30px 0', background: '#ccc', height: 1 }} />
                                         <div className='form-group '>
                                             <div className='d-flex justify-content-end'>
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
-                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
+                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }} disabled={isViewOnly}><i className='fa fa-save' /> Save</button>
                                             </div>
                                         </div>
                                     </div>

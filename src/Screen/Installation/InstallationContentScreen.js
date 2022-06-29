@@ -1,4 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
 import { } from '../../Service/InstallationService';
 import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
@@ -6,23 +7,62 @@ import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
+import { setLanguages } from '../../Redux/Action/InstallationAction';
+import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 const { $, setupDigitInput } = window;
 
 const InstallationContentScreen = () => {
     const navigate = useNavigate();
-    const { pageState, contentState, dataid } = useParams();
-    const { register, handleSubmit, formState: { errors }, control } = useForm();
-    const [state, setState] = useState({
+    const { contentState, contentid } = useParams();
+    const { register, handleSubmit, formState: { errors }, control, reset } = useForm();
+    const [state, setStates] = useState({
         dataLanguages: [],
-        languages: [],
         language: {},
         selectedLang: {},
+        content: {},
+        description: {},
     });
+    const setState = value => {
+        setStates({ ...state, ...value });
+    }
+
+
+    const { languages, installation } = useSelector(({ installation }) => installation);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        getLanguageAll({ perpage: 1000 }, res => {
-            setState({ ...state, dataLanguages: res.data.data })
-        });
+        console.log('installation', installation);
+        const _language = languages.length > 0 ? languages[0] : {};
+        const _data = { language: _language };
+        switch (contentState) {
+            case 'add':
+                const _content = {
+                    id: undefined,
+                    descriptions: [],
+                    image_name: '../../images/no-image.png',
+                    name: '',
+                    step_order: (installation.contents || []).length + 1,
+                };
+                _content.descriptions = languages.map(e => ({
+                    id: undefined,
+                    language_code: e.code,
+                    language_name: e.name,
+                    title: '',
+                    description: ''
+                }));
+                _data.content = _content;
+                break;
+            case 'edit':
+            case 'view':
+                _data.content = installation.contents.find(c => c.id == contentid);
+                break;
+            default:
+                break;
+
+        }
+        console.log('_data', _data);
+        reset(_data.content);
+        setState(_data);
         setupDigitInput();
     }, []);
 
@@ -40,43 +80,18 @@ const InstallationContentScreen = () => {
 
     const onLanguageClick = lang => () => {
         console.log('onLanguageClick', lang);
-        setState({ ...state, language: lang });
-    }
-
-    const onSelectedLangChange = e => {
-        const code = e.target.value.toLowerCase();
-        if (code) {
-            const lang = dataLanguages.find(i => i.code.toLowerCase() == code);
-            setState({ ...state, selectedLang: { code, name: lang.name } });
-        }
-    }
-
-    const onAddLangClick = () => {
-        const { code, name } = selectedLang;
-        if (code) {
-            console.log('selectedLang', selectedLang);
-            const _languages = [...languages, { code, name, title: '', description: '', question: '', solution: '' }];
-            console.log('_languages', _languages);
-            setState({ ...state, languages: _languages, selectedLang: { code: '' } });
-        }
-    }
-
-    const onRemovelangClick = item => () => {
-        const _languages = languages.filter(e => e.code.toLowerCase() != item.code.toLowerCase());
-        const _state = { ...state, languages: _languages };
-        if (item.code == language.code) {
-            _state.language = { code: '', name: '', title: '', description: '', question: '', solution: '' };
-        }
-        setState(_state);
+        const _description = content.descriptions.find(e => e.language_code == lang.code);
+        setState({ description: _description });
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
         language[name] = value;
         console.log('language', { name, value });
-        setState({ ...state, language });
+        setState({ language });
     }
 
-    const { languages, language, dataLanguages, selectedLang } = state;
+    const { language, content, selectedLang, descriptions, description } = state;
+
     return (
         <div className="content-wrapper">
             <div className="content-header">
@@ -116,21 +131,13 @@ const InstallationContentScreen = () => {
                                         <div className='form-group'>
                                             <label>Image</label>
                                             <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
-                                            <div style={{ minHeight: 200, maxWidth: 500, borderRadius: 6, overflow: 'hidden' }}>
-                                                {true && (<img src={'https://i.ytimg.com/vi/y2g9OtTHQis/maxresdefault.jpg'} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />)}
+                                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                                                <div style={{ minHeight: 200, maxWidth: 500, borderRadius: 6, overflow: 'hidden' }}>
+                                                    <img src={'https://i.ytimg.com/vi/y2g9OtTHQis/maxresdefault.jpg'} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />
+                                                </div>
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage}><i className='fa fa-image'></i> Browse</button>
-                                            </div>
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='video-url'>Video Url</label>
-                                            <input id="video-url" className='form-control' placeholder='Content Name' />
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='is-active'>Active</label>
-                                            <div>
-                                                <InputSwitch checked={true} />
                                             </div>
                                         </div>
                                     </div>
@@ -141,20 +148,6 @@ const InstallationContentScreen = () => {
                                             <div style={{ height: 1, background: '#ccc', flex: 1, marginLeft: 10 }} />
                                         </div>
                                         <div className='form-group'>
-                                            <label htmlFor='select-language'>Language</label>
-                                            <div className='d-flex justify-content-between'>
-                                                <select id="select-language" name="select-language" value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange}>
-                                                    <option value=''>Select language</option>
-                                                    {
-                                                        dataLanguages.filter(e => { return languages.map(l => l.code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
-                                                            <option key={`key-item-${i}`} value={item.code.toLowerCase()} >{item.name}</option>
-                                                        ))
-                                                    }
-                                                </select>
-                                                <button type='button' className='btn btn-sm btn-warning' onClick={onAddLangClick}><i className='fa fa-plus' /> Add</button>
-                                            </div>
-                                        </div>
-                                        <div className='form-group'>
                                             <div className='d-flex flex-wrap'>
                                                 {
                                                     languages.map((item, i) => (
@@ -162,9 +155,8 @@ const InstallationContentScreen = () => {
                                                             <a onClick={onLanguageClick(item)}
                                                                 type='button'
                                                                 style={{ minWidth: 100 }}>
-                                                                {item.name}
+                                                                <CountryFlag code={item.code} />{item.name}
                                                             </a>
-                                                            <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>
                                                         </div>
                                                     ))
                                                 }

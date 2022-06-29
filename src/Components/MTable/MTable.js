@@ -9,15 +9,15 @@ let timeoutId = 0;
 let loadTimeout = 0;
 
 const MTable = forwardRef((props, ref) => {
-  const { columns, onAddData, showIndex, showAddButton, order, getData } = props;
+  const { columns, onAddData, showIndex, showAddButton, order, getData, hideFilter } = props;
   const [state, setCurrentState] = useState({
-    data: [], 
-    total: 0, 
-    filters: [], 
+    data: [],
+    total: 0,
+    filters: [],
     filter: { field: '', value: '', title: '' },
     search: '',
     processing: false
-  });  
+  });
   const [paginator, setPaginator] = useState({
     page: 1,
     perpage: 10,
@@ -29,33 +29,33 @@ const MTable = forwardRef((props, ref) => {
   });
 
   const setState = value => {
-    setCurrentState({...state, ...value});
+    setCurrentState({ ...state, ...value });
   }
 
   useEffect(
     () => {
-      loadTimeout = setTimeout(()=>{
-        setState({processing: true});
+      loadTimeout = setTimeout(() => {
+        setState({ processing: true });
       }, 150);
       getData && getData(paginator).then(res => {
         clearTimeout(loadTimeout);
-        const {data: {data, total}} = res;
-        setState({data, total, processing: false});
+        const { data: { data, total } } = res;
+        setState({ data, total, processing: false });
       }).catch(err => {
         clearTimeout(loadTimeout);
-        setState({processing: false, data: [], total: 0});
+        setState({ processing: false, data: [], total: 0 });
       });
     },
     [paginator]
   );
 
   useImperativeHandle(ref, () => ({
-    refresh: () => { 
+    refresh: () => {
       setPaginator({ ...paginator, refresh: !paginator.refresh });
     }
   }));
-  
-  const {data, total, filters, filter, search, processing} = state;
+
+  const { data, total, filters, filter, search, processing } = state;
   const totalPage = Math.ceil(total / paginator.perpage);
   const lastPage = totalPage >= 15 ? 15 : totalPage;
   const startRow = (paginator.page - 1) * paginator.perpage + 1;
@@ -88,8 +88,8 @@ const MTable = forwardRef((props, ref) => {
   };
 
   const onSearchChange = e => {
-    const value = e.target.value; 
-    setState({search: value});
+    const value = e.target.value;
+    setState({ search: value });
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => {
       setPaginator({ ...paginator, search: value, page: 1 });
@@ -97,7 +97,7 @@ const MTable = forwardRef((props, ref) => {
   };
 
   const onClear = () => {
-    setState({search: ''});
+    setState({ search: '' });
     setPaginator({ ...paginator, search: '' });
   };
 
@@ -129,7 +129,7 @@ const MTable = forwardRef((props, ref) => {
   const onAddFilter = () => {
     if (filter.field && filter.value) {
       const _filters = [...filters, filter];
-      setState({filters: _filters, filter: { field: '', value: '', title: '' }}); 
+      setState({ filters: _filters, filter: { field: '', value: '', title: '' } });
       //do filtered request
       const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
       setPaginator({ ...paginator, page: 1, filter: _filter });
@@ -144,7 +144,7 @@ const MTable = forwardRef((props, ref) => {
 
   const onRemoveFilter = item => () => {
     const _filters = filters.filter(e => e.field != item.field);
-    setState({filters: _filters});
+    setState({ filters: _filters });
     //do filtered request
     const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
     setPaginator({ ...paginator, filter: _filter });
@@ -152,18 +152,18 @@ const MTable = forwardRef((props, ref) => {
 
   const onFilterFieldChange = e => {
     const select = e.target;
-    const title = select.options[select.selectedIndex].text; 
+    const title = select.options[select.selectedIndex].text;
     const _filter = { ...filter, field: select.value, title };
-    setState({filter: _filter});
+    setState({ filter: _filter });
   };
 
-  const onFilterValueChange = e => { 
+  const onFilterValueChange = e => {
     const _filter = { ...filter, value: e.target.value };
-    setState({filter: _filter});
+    setState({ filter: _filter });
   };
 
   const onResetFilter = () => {
-    setState({filters: []});
+    setState({ filters: [] });
     setPaginator({ ...paginator, filter: '' });
     closeFilter();
   };
@@ -359,18 +359,22 @@ const MTable = forwardRef((props, ref) => {
               </div>
             </div>
           </div>
-          <div style={{ width: 120 }}>
-            <button
-              type="button"
-              className="btn btn-block btn-outline-dark"
-              onClick={openFilter}
-            >
-              <i className="fa fa-filter" />
-              {` Filter `}
-              {filters.length > 0 &&
-                <span className="badge badge-danger">{filters.length}</span>}
-            </button>
-          </div>
+          {
+            !hideFilter && (
+              <div style={{ width: 120 }}>
+                <button
+                  type="button"
+                  className="btn btn-block btn-outline-dark"
+                  onClick={openFilter}
+                >
+                  <i className="fa fa-filter" />
+                  {` Filter `}
+                  {filters.length > 0 &&
+                    <span className="badge badge-danger">{filters.length}</span>}
+                </button>
+              </div>
+            )
+          }
 
         </div>
         <div className="col-md-5" />
@@ -469,7 +473,7 @@ const MTable = forwardRef((props, ref) => {
         <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
           <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-        </button> 
+        </button>
       </div>
     </div>
   );
