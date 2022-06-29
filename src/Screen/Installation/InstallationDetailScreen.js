@@ -33,15 +33,16 @@ const InstallationDetailScreen = () => {
     const { pageState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control, clearErrors, reset } = useForm();
     const [state, setCommonState] = useState({
-        installation: { is_active: true, processing: false },
+        installation: { is_active: true, name: '' },
         dataLanguages: [],
-        language: {},
+        language: { code: '', name: '', title: '', video_url: '' },
         selectedLang: {},
         models: [],
         isViewOnly: false,
+        processing: false
     });
-    const languages = useSelector(({ installation: { languages } }) => languages)
-    const setState = data => setCommonState({ ...state, ...data });
+    const { languages, isDraft } = useSelector(({ installation }) => installation);
+    const setState = data => { setCommonState({ ...state, ...data }) };
 
 
     useEffect(() => {
@@ -51,7 +52,8 @@ const InstallationDetailScreen = () => {
         }).on('change', e => {
             clearErrors('models');
             localState.models = $('.select2').val();
-        });;
+        });
+        console.log('useEffect invoked');;
         localState.models = [];
         const _isViewOnly = pageState.toLowerCase() == 'view';
         const reqLang = getLanguageAll({ perpage: 1000 }).then(res => res.data.data);
@@ -60,7 +62,11 @@ const InstallationDetailScreen = () => {
             case 'add':
                 Promise.all([reqLang, reqModels]).then(results => {
                     const [langs, _models] = results;
-                    dispatch(setInstallation({}));
+                    if (!isDraft) {
+                        dispatch(setInstallation({}));
+                        dispatch(setLanguages([]));
+                    }
+
                     setState({ dataLanguages: langs, models: _models, isViewOnly: _isViewOnly });
                 })
                 break;
@@ -77,7 +83,7 @@ const InstallationDetailScreen = () => {
                     }));
                     dispatch(setLanguages(_languages));
                     dispatch(setInstallation(_installation));
-                    const _language = _languages.length ? _languages[0] : {};
+                    const _language = _languages.length ? _languages[0] : { ...language };
                     setState({
                         installation: _installation,
                         dataLanguages: langs,
@@ -188,10 +194,6 @@ const InstallationDetailScreen = () => {
         navigate(-1);
     }
 
-    const onLanguageClick = lang => () => {
-        setState({ language: lang });
-    }
-
     const onSelectedLangChange = e => {
         clearErrors('languages');
         const code = e.target.value.toLowerCase();
@@ -205,7 +207,6 @@ const InstallationDetailScreen = () => {
         const { code, name } = selectedLang;
         if (code) {
             const _languages = [...languages, { code, name, title: '', video_url: '' }];
-            console.log('_languages', _languages);
             setState({ selectedLang: { code: '' } });
             dispatch(setLanguages(_languages));
         }
@@ -217,9 +218,20 @@ const InstallationDetailScreen = () => {
         dispatch(setLanguages(_languages))
     }
 
+    const onLanguageClick = lang => () => {
+        const _languages = [...languages];
+        if (language.code) {
+            const i = _languages.findIndex(e => e.code == language.code);
+            _languages.splice(i, 1, language);
+            dispatch(setLanguages(_languages));
+        }
+        setState({ language: lang });
+    }
+
     const onLangValChange = ({ target: { name, value } }) => {
-        language[name] = value;
-        setState({ language });
+        const _language = { ...language };
+        _language[name] = value;
+        setState({ language: _language });
     }
 
     const { models, language, isViewOnly, dataLanguages, installation, selectedLang } = state;

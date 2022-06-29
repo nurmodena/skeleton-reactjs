@@ -20,7 +20,11 @@ const InstallationContentScreen = () => {
         language: {},
         selectedLang: {},
         content: {},
-        description: {},
+        description: {
+            title: '',
+            description: '',
+
+        },
     });
     const setState = value => {
         setStates({ ...state, ...value });
@@ -79,15 +83,15 @@ const InstallationContentScreen = () => {
     const onBrowseImage = () => { $("#image_name").click() }
 
     const onLanguageClick = lang => () => {
-        console.log('onLanguageClick', lang);
-        const _description = content.descriptions.find(e => e.language_code == lang.code);
+        const _description = content.descriptions.find(e => e.language_code == lang.code) || { title: '', description: '' };
+        console.log('onLanguageClick', _description);
         setState({ description: _description });
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
-        language[name] = value;
-        console.log('language', { name, value });
-        setState({ language });
+        description[name] = value;
+        console.log('description', { name, value });
+        setState({ description });
     }
 
     const { language, content, selectedLang, descriptions, description } = state;
@@ -164,19 +168,11 @@ const InstallationContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='title'>Title</label>
-                                            <input name="title" value={language.title} className='form-control' onChange={onLangValChange} disabled={!language.code} />
+                                            <input name="title" value={description.title} className='form-control' onChange={onLangValChange} disabled={!language.code} />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='description'>Description</label>
-                                            <textarea name='description' value={language.description} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='question'>Question</label>
-                                            <textarea name='question' value={language.question} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
-                                        </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='title'>Solution</label>
-                                            <textarea value={language.solution} name='solution' className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
+                                            <textarea name='description' value={description.description} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
                                         </div>
                                         <div style={{ margin: '30px 0', background: '#ccc', height: 1 }} />
                                         <div className='form-group '>

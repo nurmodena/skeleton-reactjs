@@ -6,13 +6,18 @@ import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setInstallationDraft } from '../../Redux/Action/InstallationAction';
 const { $ } = window;
 const localState = {};
 
 const InstallationScreen = () => {
-
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const mTable = useRef();
+    useEffect(() => {
+        dispatch(setInstallationDraft(false));
+    }, []);
 
     const onView = item => () => {
         navigate("view/" + item.id);
