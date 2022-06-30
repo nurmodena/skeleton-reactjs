@@ -16,8 +16,7 @@ const createInstallation = (payload, onSuccess, onError) => {
     return handleResponse(response, onSuccess, onError);
 };
 
-const updateInstallation = (payload, onSuccess, onError) => {
-    const id = payload.get('id');
+const updateInstallation = (id, payload, onSuccess, onError) => {
     const response = axios.put(`v2/admin/installation/update/${id}`, payload);
     return handleResponse(response, onSuccess, onError);
 };
@@ -27,8 +26,9 @@ const deleteInstallation = (id, onSuccess, onError) => {
     return handleResponse(response, onSuccess, onError);
 };
 
-const uploadImage = (payload, onSuccess, onError) => {
-    const response = axios.post(`v2/admin/installation/temp-image`, payload, getMultipartOptions(axios));
+const uploadImage = (payload, onUploadProgress = e => { }, onSuccess, onError) => {
+    const options = { ...getMultipartOptions(axios), onUploadProgress };
+    const response = axios.post(`v2/admin/installation/temp-image`, payload, options);
     return handleResponse(response, onSuccess, onError);
 };
 

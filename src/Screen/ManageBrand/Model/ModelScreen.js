@@ -34,21 +34,21 @@ const ModelScreen = () => {
 
   const removeData = id => {
     deleteModel(id, res => {
-        if (res.status == 200 || res.status == 201) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Delete data success',
-                text: 'Data has been deleted!'
-            }).then(res => { mTable.current.refresh(); });
-        }
-    }, error => {
+      if (res.status == 200 || res.status == 201) {
         Swal.fire({
-            icon: 'error',
-            title: 'Delete data fail',
-            text: 'Data can not be deleetd!'
-        });
+          icon: 'success',
+          title: 'Delete data success',
+          text: 'Data has been deleted!'
+        }).then(res => { mTable.current.refresh(); });
+      }
+    }, error => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Delete data fail',
+        text: 'Data can not be deleetd!'
+      });
     });
-}
+  }
 
   const columns = [
     { id: 1, title: 'Modela Name', field: 'name', sortable: true },
@@ -56,6 +56,11 @@ const ModelScreen = () => {
       id: 2, title: 'Description', field: 'description', sortable: true, style: { width: '40%' }, render: data => {
         return (<div style={{ maxHeight: 50, overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.description}</div>)
       }
+    },
+    {
+      title: 'Sub Category',
+      field: 'category_sub_name',
+      sortable: true,
     },
     { id: 4, title: 'Series', field: 'code', sortable: true },
     { id: 5, title: 'Status', field: 'status', sortable: true },

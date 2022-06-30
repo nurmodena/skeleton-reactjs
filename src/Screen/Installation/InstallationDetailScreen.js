@@ -1,5 +1,5 @@
 import React, { Component, useEffect, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import Select2Checkbox from '../../Components/Select2Checkbox/Select2Checkbox';
@@ -7,10 +7,11 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getLanguageAll } from '../../Service/LanguageService';
 import { getModelAll } from '../../Service/ModelService';
-import { getInstallationById } from '../../Service/InstallationService';
+import { createInstallation, getInstallationById, updateInstallation } from '../../Service/InstallationService';
 import { setInstallation, setLanguages } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 import { useDispatch, useSelector } from 'react-redux';
+import Overlay from '../../Components/Overlay/Overlay';
 
 const { $ } = window;
 const localState = { models: [] };
@@ -31,9 +32,8 @@ const InstallationDetailScreen = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { pageState, dataid } = useParams();
-    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset, getValues, trigger } = useForm();
     const [state, setCommonState] = useState({
-        installation: { is_active: true, name: '' },
         dataLanguages: [],
         language: { code: '', name: '', title: '', video_url: '' },
         selectedLang: {},
@@ -41,9 +41,8 @@ const InstallationDetailScreen = () => {
         isViewOnly: false,
         processing: false
     });
-    const { languages, isDraft } = useSelector(({ installation }) => installation);
+    const { installation, languages, isDraft } = useSelector(({ installation }) => installation);
     const setState = data => { setCommonState({ ...state, ...data }) };
-
 
     useEffect(() => {
         $('.select2').select2({
@@ -52,23 +51,34 @@ const InstallationDetailScreen = () => {
         }).on('change', e => {
             clearErrors('models');
             localState.models = $('.select2').val();
+            const _installation = { ...installation, models: localState.models };
+            dispatch(setInstallation(_installation));
         });
         console.log('useEffect invoked');;
         localState.models = [];
         const _isViewOnly = pageState.toLowerCase() == 'view';
-        const reqLang = getLanguageAll({ perpage: 1000 }).then(res => res.data.data);
-        const reqModels = getModelAll({ perpage: 1000 }).then(res => res.data.data);
+        const reqLang = getLanguageAll({ perpage: 1000, filter: 'is_active:1' }).then(res => res.data.data);
+        const reqModels = getModelAll({ perpage: 1000, filter: 'is_active:1' }).then(res => res.data.data);
         switch (pageState) {
             case 'add':
                 Promise.all([reqLang, reqModels]).then(results => {
                     const [langs, _models] = results;
-                    if (!isDraft) {
-                        dispatch(setInstallation({}));
-                        dispatch(setLanguages([]));
-                    }
-
                     setState({ dataLanguages: langs, models: _models, isViewOnly: _isViewOnly });
-                })
+                    if (!isDraft) {
+                        dispatch(setInstallation({ is_active: true, name: '', contents: [] }));
+                        dispatch(setLanguages([]));
+                        reset({ is_active: true, name: '', contents: [] });
+                    } else {
+                        reset(installation);
+                        localState.models = installation.models || [];
+                        console.log('back add', installation);
+                        setTimeout(() => {
+                            $('.select2').val(localState.models);
+                            $('.select2').trigger('change');
+                        }, 10);
+                    }
+                });
+
                 break;
             case 'edit':
             case 'view':
@@ -85,7 +95,6 @@ const InstallationDetailScreen = () => {
                     dispatch(setInstallation(_installation));
                     const _language = _languages.length ? _languages[0] : { ...language };
                     setState({
-                        installation: _installation,
                         dataLanguages: langs,
                         language: _language,
                         models: _models,
@@ -134,7 +143,36 @@ const InstallationDetailScreen = () => {
     };
 
     const onSubmit = data => {
-
+        console.log('data', data);
+        const { name, models, is_active, contents } = installation;
+        for (let c of contents) {
+            delete c.id;
+        }
+        const payload = {
+            installation: { name, models, is_active },
+            installation_header: languages,
+            installation_content: contents
+        };
+        console.log('payload', payload);
+        const submit = pageState == 'add' ? createInstallation(payload) : updateInstallation(dataid, payload);
+        startProcessing();
+        submit.then(res => {
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Save data success',
+                    text: 'Data has been saved!'
+                }).then(r => { onGoback(); })
+            }
+        }).catch(({ response: { data } }) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Save data error!',
+                text: data.message
+            });
+        }).finally(() => {
+            stopProcessing();
+        });
     }
 
     const onEdit = item => () => {
@@ -185,7 +223,13 @@ const InstallationDetailScreen = () => {
     ];
 
     const onAddData = () => {
-        navigate("content/add/new");
+        trigger('languages').then(status => {
+            console.log('res languages', status);
+            if (status) {
+                navigate("content/add/new");
+            }
+        });
+
     }
 
     const propsTable = { data: list, columns, getData, showIndex: true, showAddButton: true, onAddData, hideFilter: true };
@@ -234,10 +278,16 @@ const InstallationDetailScreen = () => {
         setState({ language: _language });
     }
 
-    const { models, language, isViewOnly, dataLanguages, installation, selectedLang } = state;
+    const onNameChange = ({ target: { value } }) => {
+        const _installation = { ...installation, name: value };
+        dispatch(setInstallation(_installation));
+    }
+
+    const { models, language, isViewOnly, dataLanguages, selectedLang, processing } = state;
 
     return (
         <div className="content-wrapper">
+            <Overlay display={processing} />
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
@@ -265,7 +315,7 @@ const InstallationDetailScreen = () => {
                                     <div className='col-md-7'>
                                         <div className='form-group'>
                                             <label htmlFor='installation-name'>Installation Name</label>
-                                            <input id="installation-name" {...register('name', { required: 'Installation Name is required!' })} className='form-control'
+                                            <input id="installation-name" {...register('name', { required: 'Installation Name is required!', onChange: onNameChange })} className='form-control'
                                                 placeholder='Installation Name' disabled={isViewOnly} />
                                             {errors.name && <span className='text-danger'>{errors.name.message}</span>}
                                         </div>
@@ -273,7 +323,7 @@ const InstallationDetailScreen = () => {
                                             <label htmlFor='select-language'>Language</label>
                                             <div className='d-flex justify-content-between'>
                                                 <select id="select-language" name="select-language"
-                                                    {...register('languages', { validate: val => languages.length > 0 || 'Content is required!' })}
+                                                    {...register('languages', { validate: val => languages.length > 0 || 'Languages is required!' })}
                                                     value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange} disabled={isViewOnly}>
                                                     <option value=''>Select language</option>
                                                     {

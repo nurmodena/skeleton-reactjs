@@ -3,7 +3,7 @@ const SET_LANGUAGES = 'SET_LANGUAGES';
 const SET_DRAFT = 'SET_DRAFT';
 
 const init = {
-    installation: {},
+    installation: { is_active: true, name: '', contents: [] },
     languages: [],
     isDraft: false
 }

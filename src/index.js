@@ -11,7 +11,8 @@ import Swal from 'sweetalert2';
 
 const REFRESH_URL = 'v1/refresh';
 const LOGIN_URL = 'v1/login';
-axios.defaults.baseURL = 'https://scstaging.modena.com/';
+axios.defaults.baseURL = 'http://192.168.0.41:9502/';
+// axios.defaults.baseURL = 'https://scstaging.modena.com/';
 axios.interceptors.response.use(
   res => {
     return res;

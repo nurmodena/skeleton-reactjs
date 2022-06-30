@@ -8,6 +8,7 @@ import Select2Checkbox from '../../Components/Select2Checkbox/Select2Checkbox';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getModelAll } from '../../Service/ModelService';
+import { no_image } from '../../Images';
 const { $, setupDigitInput } = window;
 
 const localState = { models: [] };
@@ -18,7 +19,7 @@ const FAQDetailScreen = () => {
     const { pageState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control, clearErrors, reset } = useForm();
     const [state, setState] = useState({
-        faq: { is_active: true, image_name: '../../images/no-image.png' },
+        faq: { is_active: true, image_name: no_image },
         dataLanguages: [],
         languages: [],
         language: {},

@@ -1,49 +1,68 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { } from '../../Service/InstallationService';
+import { uploadImage } from '../../Service/InstallationService';
 import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
-import { setLanguages } from '../../Redux/Action/InstallationAction';
+import { setInstallation, setLanguages } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
+import { no_image } from '../../Images';
+import Overlay from '../../Components/Overlay/Overlay';
+
 const { $, setupDigitInput } = window;
+let processingId = -1;
 
 const InstallationContentScreen = () => {
     const navigate = useNavigate();
     const { contentState, contentid } = useParams();
-    const { register, handleSubmit, formState: { errors }, control, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, control, reset, setValue } = useForm();
     const [state, setStates] = useState({
-        dataLanguages: [],
-        language: {},
-        selectedLang: {},
-        content: {},
+        content: {
+            id: undefined,
+            descriptions: [],
+            image_name: no_image,
+            name: '',
+            step_order: 1
+        },
         description: {
+            language_code: '',
+            language_name: '',
             title: '',
             description: '',
-
         },
+        file: undefined,
+        processing: false,
     });
     const setState = value => {
         setStates({ ...state, ...value });
     }
 
-
     const { languages, installation } = useSelector(({ installation }) => installation);
     const dispatch = useDispatch();
 
+    const startProcessing = () => {
+        processingId = setTimeout(() => {
+            setState({ processing: true });
+        }, 150);
+    }
+
+    const stopProcessing = () => {
+        clearTimeout(processingId);
+        setState({ processing: false });
+    }
+
     useEffect(() => {
         console.log('installation', installation);
-        const _language = languages.length > 0 ? languages[0] : {};
-        const _data = { language: _language };
+        const _data = {};
         switch (contentState) {
             case 'add':
                 const _content = {
                     id: undefined,
                     descriptions: [],
-                    image_name: '../../images/no-image.png',
+                    image_name: no_image,
                     name: '',
                     step_order: (installation.contents || []).length + 1,
                 };
@@ -62,39 +81,78 @@ const InstallationContentScreen = () => {
                 break;
             default:
                 break;
-
         }
-        console.log('_data', _data);
+        if ((_data.content.descriptions || []).length > 0) {
+            const [desc] = _data.content.descriptions;
+            _data.description = desc;
+        }
+
         reset(_data.content);
         setState(_data);
         setupDigitInput();
     }, []);
 
     const onSubmit = data => {
+        data.descriptions = content.descriptions;
         console.log('state', state);
+        console.log('data', data);
+        const _contents = [...installation.contents];
+        if (contentState == 'edit') {
+            const i = _contents.findIndex(e => e.id == content.id);
+            _contents.splice(i, 1, data);
+        } else {
+            data.id = parseInt(Math.random() * 1000000000); //get random id
+            _contents.push(data);
+        }
+        const _installation = { ...installation, contents: _contents };
+        dispatch(setInstallation(_installation));
+        onGoback();
     }
 
     const onGoback = () => {
         navigate(-1);
     }
 
-    const onFileChange = e => { }
+    const onFileChange = e => {
+        const [image] = e.target.files;
+        const onProgress = e => {
+            if (e.total == 0) {
+                console.log('start processing');
+
+            }
+        };
+        uploadImage({ image }, onProgress).then(({ data: { image_name } }) => {
+            console.log('image_name', image_name);
+            const _content = { ...content, image_name };
+            setState({ content: _content, processing: false });
+            setValue('image_name', image_name);
+        }).catch(err => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Upload Image Error',
+                text: 'Please check the image you uploaded!'
+            });
+        }).finally(_ => {
+
+        });
+
+    }
 
     const onBrowseImage = () => { $("#image_name").click() }
 
     const onLanguageClick = lang => () => {
+        const i = content.descriptions.findIndex(e => e.language_code == description.language_code);
+        content.descriptions.splice(i, 1, description);
         const _description = content.descriptions.find(e => e.language_code == lang.code) || { title: '', description: '' };
-        console.log('onLanguageClick', _description);
-        setState({ description: _description });
+        setState({ content, description: _description });
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
-        description[name] = value;
-        console.log('description', { name, value });
-        setState({ description });
+        const _description = { ...description, [name]: value };
+        setState({ description: _description });
     }
 
-    const { language, content, selectedLang, descriptions, description } = state;
+    const { content, descriptions, description } = state;
 
     return (
         <div className="content-wrapper">
@@ -116,6 +174,7 @@ const InstallationContentScreen = () => {
             <section className="content">
                 <div className="container-fluid">
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <Overlay display={state.processing} />
                         <div className='card'>
                             <div className='card-header'>
                                 <div className='card-title'><i className='fa fa-tools' /> {contentState && contentState.charAt(0).toUpperCase() + contentState.slice(1)} Installation Content</div>
@@ -125,11 +184,13 @@ const InstallationContentScreen = () => {
                                     <div className='col-md-6'>
                                         <div className='form-group'>
                                             <label htmlFor='content-name'>Content Name</label>
-                                            <input id="content-name" className='form-control' placeholder='Content Name' />
+                                            <input id="content-name" {...register('name', { required: 'Content name is required!' })} className='form-control' placeholder='Content Name' />
+                                            {errors.name && (<span className='text-danger'>{errors.name.message}</span>)}
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='step-order'>Step Order</label>
-                                            <input id="step-order" className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
+                                            <input id="step-order" {...register('step_order', { required: 'Step order is required', min: { value: 1, message: 'Step order has greater than 0' } })} className='form-control digit' placeholder='Step Order' style={{ maxWidth: 150, textAlign: 'end' }} />
+                                            {errors.step_order && (<span className='text-danger'>{errors.step_order.message}</span>)}
                                         </div>
                                         <div style={{ height: 1, background: '#ccc', margin: '20px 0' }} />
                                         <div className='form-group'>
@@ -137,7 +198,7 @@ const InstallationContentScreen = () => {
                                             <input id="image_name" type="file" name="image_name" className='d-none' onChange={onFileChange} accept="image/png, image/jpg, image/jpeg" />
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                                                 <div style={{ minHeight: 200, maxWidth: 500, borderRadius: 6, overflow: 'hidden' }}>
-                                                    <img src={'https://i.ytimg.com/vi/y2g9OtTHQis/maxresdefault.jpg'} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />
+                                                    <img src={content.image_name} style={{ objectFit: 'cover', width: '100%' }} alt="select image" />
                                                 </div>
                                             </div>
                                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
@@ -155,7 +216,7 @@ const InstallationContentScreen = () => {
                                             <div className='d-flex flex-wrap'>
                                                 {
                                                     languages.map((item, i) => (
-                                                        <div key={`item-${i}`} className={`btn btn${item.code == language.code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
+                                                        <div key={`item-${i}`} className={`btn btn${item.code == description.language_code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
                                                             <a onClick={onLanguageClick(item)}
                                                                 type='button'
                                                                 style={{ minWidth: 100 }}>
@@ -168,11 +229,11 @@ const InstallationContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='title'>Title</label>
-                                            <input name="title" value={description.title} className='form-control' onChange={onLangValChange} disabled={!language.code} />
+                                            <input name="title" value={description.title} className='form-control' onChange={onLangValChange} />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='description'>Description</label>
-                                            <textarea name='description' value={description.description} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code}></textarea>
+                                            <textarea name='description' value={description.description} className='form-control' rows={2} onChange={onLangValChange} ></textarea>
                                         </div>
                                         <div style={{ margin: '30px 0', background: '#ccc', height: 1 }} />
                                         <div className='form-group '>
