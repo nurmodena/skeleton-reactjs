@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useRef } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getLanguageAll } from '../../Service/LanguageService';
 import { getModelAll } from '../../Service/ModelService';
 import { createInstallation, getInstallationById, updateInstallation } from '../../Service/InstallationService';
-import { setInstallation, setLanguages } from '../../Redux/Action/InstallationAction';
+import { setDeletedHeader, setInstallation, setInstallationContent, setInstallationHeader, setLanguages } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 import { useDispatch, useSelector } from 'react-redux';
 import Overlay from '../../Components/Overlay/Overlay';
@@ -18,30 +18,28 @@ const localState = { models: [] };
 
 let processingId = -1;
 
-const list = [
-    { id: 31, name: 'Installation-1', step_order: 1 },
-    { id: 32, name: 'Installation-2', step_order: 2 },
-    { id: 33, name: 'Installation-3', step_order: 3 },
-    { id: 34, name: 'Installation-4', step_order: 4 },
-    { id: 35, name: 'Installation-5', step_order: 5 },
-    { id: 36, name: 'Installation-6', step_order: 6 },
-    { id: 37, name: 'Installation-7', step_order: 7 },
-];
-
 const InstallationDetailScreen = () => {
+    const mTable = useRef();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { pageState, dataid } = useParams();
     const { register, handleSubmit, formState: { errors }, control, clearErrors, reset, getValues, trigger } = useForm();
     const [state, setCommonState] = useState({
         dataLanguages: [],
-        language: { code: '', name: '', title: '', video_url: '' },
+        language: { language_code: '', name: '', title: '', video_url: '' },
         selectedLang: {},
         models: [],
         isViewOnly: false,
-        processing: false
+        processing: false,
     });
-    const { installation, languages, isDraft } = useSelector(({ installation }) => installation);
+    const {
+        installation,
+        installation_content,
+        installation_header,
+        languages,
+        isDraft,
+        deleted_header,
+        deleted_content } = useSelector(({ installation }) => installation);
     const setState = data => { setCommonState({ ...state, ...data }) };
 
     useEffect(() => {
@@ -51,10 +49,8 @@ const InstallationDetailScreen = () => {
         }).on('change', e => {
             clearErrors('models');
             localState.models = $('.select2').val();
-            const _installation = { ...installation, models: localState.models };
-            dispatch(setInstallation(_installation));
-        });
-        console.log('useEffect invoked');;
+        })
+        console.log('useEffect invoked');
         localState.models = [];
         const _isViewOnly = pageState.toLowerCase() == 'view';
         const reqLang = getLanguageAll({ perpage: 1000, filter: 'is_active:1' }).then(res => res.data.data);
@@ -63,12 +59,9 @@ const InstallationDetailScreen = () => {
             case 'add':
                 Promise.all([reqLang, reqModels]).then(results => {
                     const [langs, _models] = results;
-                    setState({ dataLanguages: langs, models: _models, isViewOnly: _isViewOnly });
-                    if (!isDraft) {
-                        dispatch(setInstallation({ is_active: true, name: '', contents: [] }));
-                        dispatch(setLanguages([]));
-                        reset({ is_active: true, name: '', contents: [] });
-                    } else {
+                    const [_language] = languages.length > 0 ? languages : [language];
+                    setState({ dataLanguages: langs, models: _models, isViewOnly: _isViewOnly, language: _language });
+                    if (isDraft) {
                         reset(installation);
                         localState.models = installation.models || [];
                         console.log('back add', installation);
@@ -85,27 +78,35 @@ const InstallationDetailScreen = () => {
                 const reqInstallation = getInstallationById(dataid).then(res => res.data);
                 Promise.all([reqLang, reqModels, reqInstallation]).then(results => {
                     const [langs, _models, _installation] = results;
-                    const _languages = _installation.headers.map(lang => ({
-                        code: lang.language_code,
+                    const _installation_header = _installation.headers.map(lang => ({
+                        language_code: lang.language_code,
                         name: lang.language_name,
                         title: lang.title,
                         video_url: lang.video_url
                     }));
-                    dispatch(setLanguages(_languages));
-                    dispatch(setInstallation(_installation));
-                    const _language = _languages.length ? _languages[0] : { ...language };
+                    if (!isDraft) {
+                        console.log('_installation', _installation);
+                        dispatch(setInstallation(_installation));
+                        dispatch(setInstallationHeader(_installation_header));
+                        dispatch(setInstallationContent(_installation.contents));
+                        reset(_installation);
+                        localState.models = _installation.models.map(m => m.id);
+                    } else {
+                        reset(installation);
+                        localState.models = installation.models || [];
+                    }
+                    const [_language] = _installation_header;
                     setState({
                         dataLanguages: langs,
                         language: _language,
                         models: _models,
                         isViewOnly: _isViewOnly
                     });
-                    reset(_installation);
-                    localState.models = _installation.models.map(m => m.id);
                     setTimeout(() => {
                         $('.select2').val(localState.models);
                         $('.select2').trigger('change');
-                    }, 10)
+                    }, 10);
+                    mTable.current.refresh();
                 })
                 break;
             default:
@@ -126,7 +127,7 @@ const InstallationDetailScreen = () => {
 
     const getData = payload => {
         const { page, perpage, search } = payload;
-        const _list = list.filter(e => e.name.indexOf(search) > -1)
+        const _list = installation_content.filter(e => e.name.indexOf(search) > -1)
         const start = page * perpage - perpage;
         const end = start + perpage;
         const data = _list.slice(start, end);
@@ -144,16 +145,15 @@ const InstallationDetailScreen = () => {
 
     const onSubmit = data => {
         console.log('data', data);
-        const { name, models, is_active, contents } = installation;
-        for (let c of contents) {
-            delete c.id;
-        }
+        const { name, models, is_active } = installation;
+
         const payload = {
             installation: { name, models, is_active },
-            installation_header: languages,
-            installation_content: contents
+            installation_header,
+            installation_content
         };
         console.log('payload', payload);
+        // return;
         const submit = pageState == 'add' ? createInstallation(payload) : updateInstallation(dataid, payload);
         startProcessing();
         submit.then(res => {
@@ -176,11 +176,20 @@ const InstallationDetailScreen = () => {
     }
 
     const onEdit = item => () => {
+        //set models to installation
+        const _installation = { ...installation };
+        _installation.models = localState.models;
+        dispatch(setInstallation(_installation));
         navigate("content/edit/" + item.id);
     };
 
     const onRemove = item => () => {
-        console.log('You click remove', item);
+        if ((item.id + '').indexOf('_') == -1) {
+            const _deleted_content = [...deleted_content, item.id];
+            dispatch(setDeletedHeader(_deleted_content));
+        }
+        const _installation_content = installation_content.filter(e => e.id != item.id);
+        dispatch(setInstallationContent(_installation_content));
     };
 
     const columns = [
@@ -227,12 +236,16 @@ const InstallationDetailScreen = () => {
             console.log('res languages', status);
             if (status) {
                 navigate("content/add/new");
+                //set models to installation
+                const _installation = { ...installation };
+                _installation.models = localState.models;
+                dispatch(setInstallation(_installation));
             }
         });
 
     }
 
-    const propsTable = { data: list, columns, getData, showIndex: true, showAddButton: true, onAddData, hideFilter: true };
+    const propsTable = { columns, getData, showIndex: true, showAddButton: true, onAddData, hideFilter: true };
 
     const onGoback = () => {
         navigate(-1);
@@ -250,36 +263,47 @@ const InstallationDetailScreen = () => {
     const onAddLangClick = () => {
         const { code, name } = selectedLang;
         if (code) {
-            const _languages = [...languages, { code, name, title: '', video_url: '' }];
+            const _installation_header = [...installation_header, { language_code: code, name, title: '', video_url: '' }];
+            dispatch(setInstallationHeader(_installation_header));
             setState({ selectedLang: { code: '' } });
-            dispatch(setLanguages(_languages));
         }
     }
 
     const onRemovelangClick = item => () => {
-        const _languages = languages.filter(e => e.code.toLowerCase() != item.code.toLowerCase());
-        setState({ language: { code: '', name: '', title: '', video_url: '' } });
-        dispatch(setLanguages(_languages))
+        const _installation_header = installation_header.filter(e => e.language_code.toLowerCase() != item.language_code.toLowerCase());
+        setState({ language: { language_code: '', name: '', title: '', video_url: '' } });
+        dispatch(setLanguages(_installation_header));
+        if (item.id) {
+            const _deleteds = [...deleted_header, item.id];
+            dispatch(setDeletedHeader(_deleteds))
+        }
     }
 
     const onLanguageClick = lang => () => {
-        const _languages = [...languages];
-        if (language.code) {
-            const i = _languages.findIndex(e => e.code == language.code);
-            _languages.splice(i, 1, language);
-            dispatch(setLanguages(_languages));
-        }
         setState({ language: lang });
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
-        const _language = { ...language };
-        _language[name] = value;
-        setState({ language: _language });
+        if (language.language_code) {
+            const _language = { ...language };
+            _language[name] = value;
+            setState({ language: _language });
+        }
     }
 
-    const onNameChange = ({ target: { value } }) => {
-        const _installation = { ...installation, name: value };
+    const onLangBlur = ({ target: { name, value } }) => {
+        if (language.language_code) {
+            const _header = { ...language };
+            _header[name] = value;
+            const _installation_header = [...installation_header];
+            const i = _installation_header.findIndex(e => e.language_code == _header.language_code);
+            _installation_header.splice(i, 1, _header);
+            dispatch(setInstallationHeader(_installation_header));
+        }
+    }
+
+    const onNameBlur = _ => {
+        const _installation = { ...installation, name: getValues('name') };
         dispatch(setInstallation(_installation));
     }
 
@@ -315,7 +339,7 @@ const InstallationDetailScreen = () => {
                                     <div className='col-md-7'>
                                         <div className='form-group'>
                                             <label htmlFor='installation-name'>Installation Name</label>
-                                            <input id="installation-name" {...register('name', { required: 'Installation Name is required!', onChange: onNameChange })} className='form-control'
+                                            <input id="installation-name" {...register('name', { required: 'Installation Name is required!', onBlur: onNameBlur })} className='form-control'
                                                 placeholder='Installation Name' disabled={isViewOnly} />
                                             {errors.name && <span className='text-danger'>{errors.name.message}</span>}
                                         </div>
@@ -327,7 +351,7 @@ const InstallationDetailScreen = () => {
                                                     value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange} disabled={isViewOnly}>
                                                     <option value=''>Select language</option>
                                                     {
-                                                        dataLanguages.filter(e => { return languages.map(l => l.code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
+                                                        dataLanguages.filter(e => { return languages.map(l => l.language_code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
                                                             <option key={`key-item-${i}`} value={item.code.toLowerCase()}> {item.name}</option>
                                                         ))
                                                     }
@@ -339,12 +363,12 @@ const InstallationDetailScreen = () => {
                                         <div className='form-group'>
                                             <div className='d-flex flex-wrap'>
                                                 {
-                                                    languages.map((item, i) => (
-                                                        <div key={`item-${i}`} className={`btn btn${item.code == language.code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
+                                                    installation_header.map((item, i) => (
+                                                        <div key={`item-${i}`} className={`btn btn${item.language_code == language.language_code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
                                                             <a onClick={onLanguageClick(item)}
                                                                 type='button'
                                                                 style={{ minWidth: 100 }}>
-                                                                <CountryFlag code={item.code} />{item.name}
+                                                                <CountryFlag code={item.language_code} />{item.name}
                                                             </a>
                                                             <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>
                                                         </div>
@@ -354,11 +378,11 @@ const InstallationDetailScreen = () => {
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="header-title">Title</label>
-                                            <input value={language.title} id="header-title" name="title" className="form-control" onChange={onLangValChange} placeholder='Title' />
+                                            <input value={language.title} id="header-title" name="title" className="form-control" onChange={onLangValChange} onBlur={onLangBlur} placeholder='Title' />
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="header-video">Video URL</label>
-                                            <input value={language.video_url} id="header-video" name="video_url" className="form-control" onChange={onLangValChange} placeholder='Video URL' />
+                                            <input value={language.video_url} id="header-video" name="video_url" className="form-control" onChange={onLangValChange} onBlur={onLangBlur} placeholder='Video URL' />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
@@ -370,7 +394,7 @@ const InstallationDetailScreen = () => {
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>List Installation Content</label>
                                             <div>
-                                                <MTable {...propsTable} />
+                                                <MTable ref={mTable}  {...propsTable} />
                                             </div>
                                         </div>
                                     </div>

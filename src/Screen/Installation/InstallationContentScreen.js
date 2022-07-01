@@ -1,13 +1,10 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { uploadImage } from '../../Service/InstallationService';
-import { getLanguageAll } from '../../Service/LanguageService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import MTable from '../../Components/MTable/MTable';
-import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
-import { setInstallation, setLanguages } from '../../Redux/Action/InstallationAction';
+import { setInstallation } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 import { no_image } from '../../Images';
 import Overlay from '../../Components/Overlay/Overlay';
@@ -31,7 +28,7 @@ const InstallationContentScreen = () => {
             language_code: '',
             language_name: '',
             title: '',
-            description: '',
+            descriptions: '',
         },
         file: undefined,
         processing: false,
@@ -40,7 +37,7 @@ const InstallationContentScreen = () => {
         setStates({ ...state, ...value });
     }
 
-    const { languages, installation } = useSelector(({ installation }) => installation);
+    const { installation_header, installation } = useSelector(({ installation }) => installation);
     const dispatch = useDispatch();
 
     const startProcessing = () => {
@@ -66,12 +63,12 @@ const InstallationContentScreen = () => {
                     name: '',
                     step_order: (installation.contents || []).length + 1,
                 };
-                _content.descriptions = languages.map(e => ({
+                _content.descriptions = installation_header.map(e => ({
                     id: undefined,
-                    language_code: e.code,
+                    language_code: e.language_code,
                     language_name: e.name,
                     title: '',
-                    description: ''
+                    descriptions: ''
                 }));
                 _data.content = _content;
                 break;
@@ -101,7 +98,7 @@ const InstallationContentScreen = () => {
             const i = _contents.findIndex(e => e.id == content.id);
             _contents.splice(i, 1, data);
         } else {
-            data.id = parseInt(Math.random() * 1000000000); //get random id
+            data.id = '_' + parseInt(Math.random() * 1000000000); //get random id
             _contents.push(data);
         }
         const _installation = { ...installation, contents: _contents };
@@ -143,7 +140,7 @@ const InstallationContentScreen = () => {
     const onLanguageClick = lang => () => {
         const i = content.descriptions.findIndex(e => e.language_code == description.language_code);
         content.descriptions.splice(i, 1, description);
-        const _description = content.descriptions.find(e => e.language_code == lang.code) || { title: '', description: '' };
+        const _description = content.descriptions.find(e => e.language_code == lang.language_code) || { title: '', descriptions: '' };
         setState({ content, description: _description });
     }
 
@@ -215,12 +212,12 @@ const InstallationContentScreen = () => {
                                         <div className='form-group'>
                                             <div className='d-flex flex-wrap'>
                                                 {
-                                                    languages.map((item, i) => (
-                                                        <div key={`item-${i}`} className={`btn btn${item.code == description.language_code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
+                                                    installation_header.map((item, i) => (
+                                                        <div key={`item-${i}`} className={`btn btn${item.language_code == description.language_code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
                                                             <a onClick={onLanguageClick(item)}
                                                                 type='button'
                                                                 style={{ minWidth: 100 }}>
-                                                                <CountryFlag code={item.code} />{item.name}
+                                                                <CountryFlag code={item.language_code} />{item.name}
                                                             </a>
                                                         </div>
                                                     ))
@@ -233,7 +230,7 @@ const InstallationContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='description'>Description</label>
-                                            <textarea name='description' value={description.description} className='form-control' rows={2} onChange={onLangValChange} ></textarea>
+                                            <textarea name='descriptions' value={description.descriptions} className='form-control' rows={2} onChange={onLangValChange} ></textarea>
                                         </div>
                                         <div style={{ margin: '30px 0', background: '#ccc', height: 1 }} />
                                         <div className='form-group '>
