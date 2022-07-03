@@ -29,11 +29,11 @@ const setInstallationContent = (installation_content) => dispatch => {
 }
 
 const setDeletedHeader = (deleted_header) => dispatch => {
-    dispatch({ type: SET_INSTALLATION_CONTENT, deleted_header });
+    dispatch({ type: SET_DELETED_HEADER, deleted_header });
 }
 
-const setDeletedContent = (deleted_content) => dispatch => {
-    dispatch({ type: SET_INSTALLATION_CONTENT, deleted_content });
+const setDeletedContent = (deleted_content) => (dispatch, getState) => {
+    dispatch({ type: SET_DELETED_CONTENT, deleted_content });
 }
 
 

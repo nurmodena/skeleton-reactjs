@@ -8,7 +8,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getLanguageAll } from '../../Service/LanguageService';
 import { getModelAll } from '../../Service/ModelService';
 import { createInstallation, getInstallationById, updateInstallation } from '../../Service/InstallationService';
-import { setDeletedHeader, setInstallation, setInstallationContent, setInstallationHeader, setLanguages } from '../../Redux/Action/InstallationAction';
+import { setDeletedContent, setDeletedHeader, setInstallation, setInstallationContent, setInstallationHeader } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 import { useDispatch, useSelector } from 'react-redux';
 import Overlay from '../../Components/Overlay/Overlay';
@@ -36,7 +36,6 @@ const InstallationDetailScreen = () => {
         installation,
         installation_content,
         installation_header,
-        languages,
         isDraft,
         deleted_header,
         deleted_content } = useSelector(({ installation }) => installation);
@@ -59,7 +58,7 @@ const InstallationDetailScreen = () => {
             case 'add':
                 Promise.all([reqLang, reqModels]).then(results => {
                     const [langs, _models] = results;
-                    const [_language] = languages.length > 0 ? languages : [language];
+                    const [_language] = installation_header.length > 0 ? installation_header : [language];
                     setState({ dataLanguages: langs, models: _models, isViewOnly: _isViewOnly, language: _language });
                     if (isDraft) {
                         reset(installation);
@@ -79,6 +78,7 @@ const InstallationDetailScreen = () => {
                 Promise.all([reqLang, reqModels, reqInstallation]).then(results => {
                     const [langs, _models, _installation] = results;
                     const _installation_header = _installation.headers.map(lang => ({
+                        id: lang.id,
                         language_code: lang.language_code,
                         name: lang.language_name,
                         title: lang.title,
@@ -86,11 +86,12 @@ const InstallationDetailScreen = () => {
                     }));
                     if (!isDraft) {
                         console.log('_installation', _installation);
+                        localState.models = _installation.models.map(m => m.id);
+                        _installation.models = localState.models;
                         dispatch(setInstallation(_installation));
                         dispatch(setInstallationHeader(_installation_header));
                         dispatch(setInstallationContent(_installation.contents));
                         reset(_installation);
-                        localState.models = _installation.models.map(m => m.id);
                     } else {
                         reset(installation);
                         localState.models = installation.models || [];
@@ -144,15 +145,22 @@ const InstallationDetailScreen = () => {
     };
 
     const onSubmit = data => {
-        console.log('data', data);
-        const { name, models, is_active } = installation;
-
+        const { name, is_active } = installation;
+        const _contents = installation_content.map(e => ({ ...e })).map(e => {
+            if ((e.id + '').indexOf('_') != -1) {
+                delete e.id;
+            }
+            e.image_name = e.image_name.replace('https://scstaging.modena.com', 'http://192.168.0.41:8070');
+            return e;
+        })
         const payload = {
-            installation: { name, models, is_active },
+            installation: { name, models: localState.models, is_active },
             installation_header,
-            installation_content
+            installation_content: _contents,
+            deleted_content,
+            deleted_header
         };
-        console.log('payload', payload);
+        // console.log('payload', payload);
         // return;
         const submit = pageState == 'add' ? createInstallation(payload) : updateInstallation(dataid, payload);
         startProcessing();
@@ -184,12 +192,13 @@ const InstallationDetailScreen = () => {
     };
 
     const onRemove = item => () => {
+        console.log('item', item);
+        window.payload = { item };
         if ((item.id + '').indexOf('_') == -1) {
             const _deleted_content = [...deleted_content, item.id];
-            dispatch(setDeletedHeader(_deleted_content));
+            dispatch(setDeletedContent(_deleted_content));
         }
-        const _installation_content = installation_content.filter(e => e.id != item.id);
-        dispatch(setInstallationContent(_installation_content));
+        mTable.current.refresh();
     };
 
     const columns = [
@@ -201,30 +210,25 @@ const InstallationDetailScreen = () => {
             render: item => {
                 return (
                     <div>
-                        <a
-                            onClick={onEdit(item)}
-                            style={{
-                                cursor: 'pointer',
-                                color: 'green',
-                                display: 'inline-block',
-                                marginRight: 20
-                            }}
-                        >
+                        {!isViewOnly && (<a onClick={onEdit(item)} style={{
+                            cursor: 'pointer',
+                            color: 'green',
+                            display: 'inline-block',
+                            marginRight: 20
+                        }} >
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
-                        </a>
-                        <a
-                            onClick={onRemove(item)}
+                        </a>)}
+                        {!isViewOnly && (<a onClick={onRemove(item)}
                             style={{
                                 cursor: 'pointer',
                                 color: 'maroon',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-trash" />
                             <span style={{ marginLeft: 10 }}>Delete</span>
-                        </a>
+                        </a>)}
                     </div>
                 );
             },
@@ -245,7 +249,7 @@ const InstallationDetailScreen = () => {
 
     }
 
-    const propsTable = { columns, getData, showIndex: true, showAddButton: true, onAddData, hideFilter: true };
+    const propsTable = { columns, getData, showIndex: true, showAddButton: (!state.isViewOnly), onAddData, hideFilter: true };
 
     const onGoback = () => {
         navigate(-1);
@@ -265,17 +269,28 @@ const InstallationDetailScreen = () => {
         if (code) {
             const _installation_header = [...installation_header, { language_code: code, name, title: '', video_url: '' }];
             dispatch(setInstallationHeader(_installation_header));
+            const _installation_content = installation_content.map(x => ({ ...x }));
+            _installation_content.forEach(e => {
+                e.descriptions = [...e.descriptions, {
+                    language_code: code,
+                    language_name: name,
+                    title: '', descriptions: ''
+                }];
+            });
+            console.log('_installation_content', _installation_content);
+            dispatch(setInstallationContent(_installation_content));
             setState({ selectedLang: { code: '' } });
         }
     }
 
     const onRemovelangClick = item => () => {
-        const _installation_header = installation_header.filter(e => e.language_code.toLowerCase() != item.language_code.toLowerCase());
         setState({ language: { language_code: '', name: '', title: '', video_url: '' } });
-        dispatch(setLanguages(_installation_header));
         if (item.id) {
             const _deleteds = [...deleted_header, item.id];
             dispatch(setDeletedHeader(_deleteds))
+        } else {
+            const _installation_header = installation_header.filter(e => e.language_code != item.language_code);
+            dispatch(setInstallationHeader(_installation_header));
         }
     }
 
@@ -295,7 +310,7 @@ const InstallationDetailScreen = () => {
         if (language.language_code) {
             const _header = { ...language };
             _header[name] = value;
-            const _installation_header = [...installation_header];
+            const _installation_header = installation_header.map(e => ({ ...e }));
             const i = _installation_header.findIndex(e => e.language_code == _header.language_code);
             _installation_header.splice(i, 1, _header);
             dispatch(setInstallationHeader(_installation_header));
@@ -347,16 +362,16 @@ const InstallationDetailScreen = () => {
                                             <label htmlFor='select-language'>Language</label>
                                             <div className='d-flex justify-content-between'>
                                                 <select id="select-language" name="select-language"
-                                                    {...register('languages', { validate: val => languages.length > 0 || 'Languages is required!' })}
+                                                    {...register('languages', { validate: val => installation_header.length > 0 || 'Languages is required!' })}
                                                     value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange} disabled={isViewOnly}>
                                                     <option value=''>Select language</option>
                                                     {
-                                                        dataLanguages.filter(e => { return languages.map(l => l.language_code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
+                                                        dataLanguages.filter(e => { return installation_header.map(l => l.language_code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
                                                             <option key={`key-item-${i}`} value={item.code.toLowerCase()}> {item.name}</option>
                                                         ))
                                                     }
                                                 </select>
-                                                <button type='button' className='btn btn-sm btn-warning' onClick={onAddLangClick}><i className='fa fa-plus' /> Add</button>
+                                                <button type='button' className='btn btn-sm btn-warning' onClick={onAddLangClick} disabled={isViewOnly}><i className='fa fa-plus' /> Add</button>
                                             </div>
                                             {errors.languages && <span className='text-danger'>{errors.languages.message}</span>}
                                         </div>
@@ -370,7 +385,7 @@ const InstallationDetailScreen = () => {
                                                                 style={{ minWidth: 100 }}>
                                                                 <CountryFlag code={item.language_code} />{item.name}
                                                             </a>
-                                                            <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>
+                                                            {!isViewOnly && <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>}
                                                         </div>
                                                     ))
                                                 }
@@ -378,11 +393,11 @@ const InstallationDetailScreen = () => {
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="header-title">Title</label>
-                                            <input value={language.title} id="header-title" name="title" className="form-control" onChange={onLangValChange} onBlur={onLangBlur} placeholder='Title' />
+                                            <input value={language.title} id="header-title" name="title" className="form-control" disabled={isViewOnly} onChange={onLangValChange} onBlur={onLangBlur} placeholder='Title' />
                                         </div>
                                         <div className="form-group">
                                             <label htmlFor="header-video">Video URL</label>
-                                            <input value={language.video_url} id="header-video" name="video_url" className="form-control" onChange={onLangValChange} onBlur={onLangBlur} placeholder='Video URL' />
+                                            <input value={language.video_url} id="header-video" name="video_url" disabled={isViewOnly} className="form-control" onChange={onLangValChange} onBlur={onLangBlur} placeholder='Video URL' />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='is-active'>Active</label>
@@ -414,7 +429,7 @@ const InstallationDetailScreen = () => {
                                         <div className='form-group'>
                                             <div className='d-flex justify-content-right'>
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100, marginRight: 20 }} onClick={onGoback}><i className='fa fa-reply' /> Back</button>
-                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }}><i className='fa fa-save' /> Save</button>
+                                                <button type='submit' className='btn btn-dark' style={{ width: 100 }} disabled={isViewOnly}><i className='fa fa-save' /> Save</button>
                                             </div>
                                         </div>
                                     </div>

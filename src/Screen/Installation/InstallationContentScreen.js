@@ -4,7 +4,7 @@ import { uploadImage } from '../../Service/InstallationService';
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { useNavigate, useParams } from 'react-router-dom';
-import { setInstallation } from '../../Redux/Action/InstallationAction';
+import { setInstallation, setInstallationContent } from '../../Redux/Action/InstallationAction';
 import CountryFlag from '../../Components/CountryFlag/CountryFlag';
 import { no_image } from '../../Images';
 import Overlay from '../../Components/Overlay/Overlay';
@@ -37,19 +37,8 @@ const InstallationContentScreen = () => {
         setStates({ ...state, ...value });
     }
 
-    const { installation_header, installation } = useSelector(({ installation }) => installation);
+    const { installation, installation_header, installation_content } = useSelector(({ installation }) => installation);
     const dispatch = useDispatch();
-
-    const startProcessing = () => {
-        processingId = setTimeout(() => {
-            setState({ processing: true });
-        }, 150);
-    }
-
-    const stopProcessing = () => {
-        clearTimeout(processingId);
-        setState({ processing: false });
-    }
 
     useEffect(() => {
         console.log('installation', installation);
@@ -61,7 +50,7 @@ const InstallationContentScreen = () => {
                     descriptions: [],
                     image_name: no_image,
                     name: '',
-                    step_order: (installation.contents || []).length + 1,
+                    step_order: (installation_content || []).length + 1,
                 };
                 _content.descriptions = installation_header.map(e => ({
                     id: undefined,
@@ -70,18 +59,21 @@ const InstallationContentScreen = () => {
                     title: '',
                     descriptions: ''
                 }));
-                _data.content = _content;
+                _data.content = { ..._content };
                 break;
             case 'edit':
             case 'view':
-                _data.content = installation.contents.find(c => c.id == contentid);
+                const c = installation_content.find(c => c.id == contentid);
+                const _viewContent = { ...c };
+                _viewContent.descriptions = c.descriptions.map(e => ({ ...e }));
+                _data.content = _viewContent;
                 break;
             default:
                 break;
         }
         if ((_data.content.descriptions || []).length > 0) {
             const [desc] = _data.content.descriptions;
-            _data.description = desc;
+            _data.description = { ...desc };
         }
 
         reset(_data.content);
@@ -93,7 +85,7 @@ const InstallationContentScreen = () => {
         data.descriptions = content.descriptions;
         console.log('state', state);
         console.log('data', data);
-        const _contents = [...installation.contents];
+        const _contents = installation_content.map(e => ({ ...e }));
         if (contentState == 'edit') {
             const i = _contents.findIndex(e => e.id == content.id);
             _contents.splice(i, 1, data);
@@ -101,8 +93,7 @@ const InstallationContentScreen = () => {
             data.id = '_' + parseInt(Math.random() * 1000000000); //get random id
             _contents.push(data);
         }
-        const _installation = { ...installation, contents: _contents };
-        dispatch(setInstallation(_installation));
+        dispatch(setInstallationContent(_contents));
         onGoback();
     }
 
@@ -115,11 +106,9 @@ const InstallationContentScreen = () => {
         const onProgress = e => {
             if (e.total == 0) {
                 console.log('start processing');
-
             }
         };
         uploadImage({ image }, onProgress).then(({ data: { image_name } }) => {
-            console.log('image_name', image_name);
             const _content = { ...content, image_name };
             setState({ content: _content, processing: false });
             setValue('image_name', image_name);
@@ -138,15 +127,19 @@ const InstallationContentScreen = () => {
     const onBrowseImage = () => { $("#image_name").click() }
 
     const onLanguageClick = lang => () => {
-        const i = content.descriptions.findIndex(e => e.language_code == description.language_code);
-        content.descriptions.splice(i, 1, description);
-        const _description = content.descriptions.find(e => e.language_code == lang.language_code) || { title: '', descriptions: '' };
+        let _description = content.descriptions.find(e => e.language_code == lang.language_code);
+
         setState({ content, description: _description });
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
         const _description = { ...description, [name]: value };
         setState({ description: _description });
+    }
+
+    const onLangBlur = () => {
+        const i = content.descriptions.findIndex(e => e.language_code == description.language_code);
+        content.descriptions.splice(i, 1, description);
     }
 
     const { content, descriptions, description } = state;
@@ -226,11 +219,11 @@ const InstallationContentScreen = () => {
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='title'>Title</label>
-                                            <input name="title" value={description.title} className='form-control' onChange={onLangValChange} />
+                                            <input name="title" value={description.title} className='form-control' onChange={onLangValChange} onBlur={onLangBlur} />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='description'>Description</label>
-                                            <textarea name='descriptions' value={description.descriptions} className='form-control' rows={2} onChange={onLangValChange} ></textarea>
+                                            <textarea name='descriptions' value={description.descriptions} className='form-control' rows={2} onChange={onLangValChange} onBlur={onLangBlur}></textarea>
                                         </div>
                                         <div style={{ margin: '30px 0', background: '#ccc', height: 1 }} />
                                         <div className='form-group '>

@@ -32,10 +32,12 @@ const InstallationReducer = (state = init, action) => {
             return { ...state, installation_content }
         case SET_DELETED_HEADER:
             const { deleted_header } = action;
-            return { ...state, deleted_header }
+            const _installation_header = state.installation_header.filter(e => { return deleted_header.indexOf(e.id) == -1 });
+            return { ...state, deleted_header, installation_header: _installation_header }
         case SET_DELETED_CONTENT:
             const { deleted_content } = action;
-            return { ...state, deleted_content }
+            const _installation_content = state.installation_content.filter(e => { return deleted_content.indexOf(e.id) == -1 });
+            return { ...state, deleted_content, installation_content: _installation_content }
         case SET_DRAFT:
             const { isDraft } = action;
             if (!isDraft) {

@@ -27,8 +27,36 @@ const InstallationScreen = () => {
         navigate("edit/" + item.id);
     };
 
+    const removeData = id => {
+        deleteInstallation(id, res => {
+            if (res.status == 200 || res.status == 201) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Delete data success',
+                    text: 'Data has been deleted!'
+                }).then(res => { mTable.current.refresh(); });
+            }
+        }, error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Delete data fail',
+                text: 'Data can not be deleetd!'
+            });
+        });
+    }
+
     const onRemove = item => () => {
-        console.log('You click remove', item);
+        Swal.fire({
+            icon: 'question',
+            title: 'Are you sure?',
+            text: 'Deleted data can not be restored!',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+        }).then(({ isConfirmed }) => {
+            if (isConfirmed) {
+                removeData(item.id);
+            }
+        });
     };
 
     const columns = [
@@ -96,7 +124,7 @@ const InstallationScreen = () => {
         navigate("add/new");
     }
 
-    const propsTable = { columns, getData: getInstallationAll, showIndex: true, showAddButton: true, onAddData };
+    const propsTable = { ref: mTable, columns, getData: getInstallationAll, showIndex: true, showAddButton: true, onAddData };
 
     return (
         <div className="content-wrapper">
