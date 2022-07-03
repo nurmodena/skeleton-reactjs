@@ -63,7 +63,6 @@ const InstallationDetailScreen = () => {
                     if (isDraft) {
                         reset(installation);
                         localState.models = installation.models || [];
-                        console.log('back add', installation);
                         setTimeout(() => {
                             $('.select2').val(localState.models);
                             $('.select2').trigger('change');
@@ -99,7 +98,7 @@ const InstallationDetailScreen = () => {
                     const [_language] = _installation_header;
                     setState({
                         dataLanguages: langs,
-                        language: _language,
+                        language: _language || { language_code: '', name: '', title: '', video_url: '' },
                         models: _models,
                         isViewOnly: _isViewOnly
                     });
