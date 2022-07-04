@@ -27,11 +27,11 @@ const replaceUrl = obj => {
   }
 }
 
-//axios.defaults.baseURL = 'http://192.168.0.41:9502/';
-axios.defaults.baseURL = 'https://scstaging.modena.com/';
+axios.defaults.baseURL = 'http://192.168.0.41:9502/';
+//axios.defaults.baseURL = 'https://scstaging.modena.com/';
 axios.interceptors.response.use(
   res => {
-    replaceUrl(res);
+    //replaceUrl(res);
     return res;
   },
   async error => {

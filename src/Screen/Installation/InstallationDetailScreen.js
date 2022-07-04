@@ -84,7 +84,6 @@ const InstallationDetailScreen = () => {
                         video_url: lang.video_url
                     }));
                     if (!isDraft) {
-                        console.log('_installation', _installation);
                         localState.models = _installation.models.map(m => m.id);
                         _installation.models = localState.models;
                         dispatch(setInstallation(_installation));
@@ -149,7 +148,7 @@ const InstallationDetailScreen = () => {
             if ((e.id + '').indexOf('_') != -1) {
                 delete e.id;
             }
-            e.image_name = e.image_name.replace('https://scstaging.modena.com', 'http://192.168.0.41:8070');
+            // e.image_name = e.image_name.replace('https://scstaging.modena.com', 'http://192.168.0.41:8070');
             return e;
         })
         const payload = {

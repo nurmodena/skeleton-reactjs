@@ -12,13 +12,12 @@ const getTraoubleshootById = (id, onSuccess, onError) => {
 };
 
 const createTraoubleshoot = (payload, onSuccess, onError) => {
-    const response = axios.post(`v2/admin/troubleshoot/create`, payload, getMultipartOptions(axios))
+    const response = axios.post(`v2/admin/troubleshoot/create`, payload)
     return handleResponse(response, onSuccess, onError);
 };
 
-const updateTraoubleshoot = (payload, onSuccess, onError) => {
-    const id = payload.get('id');
-    const response = axios.put(`v2/admin/troubleshoot/update/${id}`, payload, getMultipartOptions(axios));
+const updateTraoubleshoot = (id, payload, onSuccess, onError) => {
+    const response = axios.put(`v2/admin/troubleshoot/update/${id}`, payload);
     return handleResponse(response, onSuccess, onError);
 };
 

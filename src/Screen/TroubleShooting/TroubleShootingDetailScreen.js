@@ -47,6 +47,7 @@ const TroubleShootingDetailScreen = () => {
             templateResult: Select2Checkbox
         }).on('change', e => {
             clearErrors('models');
+            console.log('set by onchange', $('.select2').val());
             localState.models = $('.select2').val();
         })
         console.log('useEffect invoked');
@@ -84,13 +85,14 @@ const TroubleShootingDetailScreen = () => {
                         video_url: lang.video_url
                     }));
                     if (!isDraft) {
-                        console.log('_troubleshoot', _troubleshoot);
                         localState.models = _troubleshoot.models.map(m => m.id);
+                        console.log('1. localState.models', localState.models);
                         _troubleshoot.models = localState.models;
                         dispatch(setTroubleshoot(_troubleshoot));
                         dispatch(setTroubleshootHeader(_troubleshoot_header));
                         dispatch(setTroubleshootContent(_troubleshoot.contents));
                         reset(_troubleshoot);
+                        console.log('_troubleshoot', _troubleshoot);
                     } else {
                         reset(troubleshoot);
                         localState.models = troubleshoot.models || [];
@@ -144,16 +146,16 @@ const TroubleShootingDetailScreen = () => {
     };
 
     const onSubmit = data => {
-        const { name, is_active } = troubleshoot;
+        const { name, error_code, is_active } = troubleshoot;
         const _contents = troubleshoot_content.map(e => ({ ...e })).map(e => {
             if ((e.id + '').indexOf('_') != -1) {
                 delete e.id;
             }
-            e.image_name = e.image_name.replace('https://scstaging.modena.com', 'http://192.168.0.41:8070');
+            //e.image_name = e.image_name.replace('https://scstaging.modena.com', 'http://192.168.0.41:8070');
             return e;
-        })
+        });
         const payload = {
-            troubleshoot: { name, models: localState.models, is_active },
+            troubleshoot: { name, error_code, models: localState.models, is_active },
             troubleshoot_header,
             troubleshoot_content: _contents,
             deleted_content,
@@ -316,8 +318,9 @@ const TroubleShootingDetailScreen = () => {
         }
     }
 
-    const onNameBlur = _ => {
-        const _troubleshoot = { ...troubleshoot, name: getValues('name') };
+    const onBlur = e => {
+        const { name } = e.target;
+        const _troubleshoot = { ...troubleshoot, [name]: getValues(name) };
         dispatch(setTroubleshoot(_troubleshoot));
     }
 
@@ -353,13 +356,13 @@ const TroubleShootingDetailScreen = () => {
                                     <div className='col-md-7'>
                                         <div className='form-group'>
                                             <label htmlFor='troublueshooting-name'>Troublueshooting Name</label>
-                                            <input id="troublueshooting-name" {...register('name', { required: 'Troublueshooting Name is required!', onBlur: onNameBlur })} className='form-control'
+                                            <input id="troublueshooting-name" {...register('name', { required: 'Troublueshooting Name is required!', onBlur: onBlur })} className='form-control'
                                                 placeholder='Troublueshooting Name' disabled={isViewOnly} />
                                             {errors.name && <span className='text-danger'>{errors.name.message}</span>}
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='error-code'>Error Code</label>
-                                            <input id="error-code" {...register('error_code', { required: 'Error code is required!', onBlur: onNameBlur })} className='form-control'
+                                            <input id="error-code" {...register('error_code', { required: 'Error code is required!', onBlur: onBlur })} className='form-control'
                                                 placeholder='Error code' disabled={isViewOnly} />
                                             {errors.error_code && <span className='text-danger'>{errors.error_code.message}</span>}
                                         </div>
