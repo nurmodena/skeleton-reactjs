@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import Overlay from '../../Components/Overlay/Overlay';
 import { getRoleAccessAll } from '../../Service/RoleAccessService';
 import { createUser, getUserById, updateUser } from '../../Service/UserService';
+import { pp_default } from '../../Images'
 
 const { $ } = window;
 const randomPassword = parseInt(Math.random() * 1000000);
@@ -155,7 +156,7 @@ const UserDetailScreen = () => {
                                         <div className='row mt-3 mb-3'>
                                             <div className='col-md-9 d-flex flex-column align-items-center'>
                                                 <div className='mb-4' >
-                                                    <img src={user.image || "../../images/pp_default.jpg"} alt='A' className='img-circle elevation-2' style={{ width: 160, height: 160 }} />
+                                                    <img src={user.image || pp_default} alt='A' className='img-circle elevation-2' style={{ width: 160, height: 160 }} />
                                                 </div>
                                                 <div className='mb-3'>
                                                     <button type='button' className='btn btn-outline-dark' onClick={onSelectImage}>
