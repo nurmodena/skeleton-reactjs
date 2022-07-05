@@ -10,7 +10,7 @@ const { $ } = window;
 const localState = {};
 
 const SubCategoryScreen = () => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm({ defaultValues: { is_active: true } });
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState({});
     const mTable = useRef();

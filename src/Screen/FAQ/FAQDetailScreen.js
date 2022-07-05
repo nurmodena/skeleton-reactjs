@@ -18,7 +18,7 @@ let processingId = -1;
 const FAQDetailScreen = () => {
     const navigate = useNavigate();
     const { pageState, dataid } = useParams();
-    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset } = useForm({ defaultValues: { is_active: true } });
     const [state, setState] = useState({
         faq: { is_active: true, image_name: no_image },
         dataLanguages: [],

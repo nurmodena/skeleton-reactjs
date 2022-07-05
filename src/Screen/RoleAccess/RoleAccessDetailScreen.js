@@ -13,7 +13,7 @@ let procesingId = -1;
 const RoleAccessDetailScreen = () => {
     const navigate = useNavigate();
     const { pageState, roleid } = useParams();
-    const { register, handleSubmit, reset, formState: { errors }, control } = useForm({});
+    const { register, handleSubmit, reset, formState: { errors }, control } = useForm({ defaultValues: { is_active: true } });
     const mTable = useRef();
     const [state, setState] = useState({ role: {} });
 

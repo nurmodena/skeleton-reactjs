@@ -10,7 +10,11 @@ const { $ } = window;
 let processingId = -1;
 
 const BrandScreen = () => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
+        defaultValues: {
+            is_active: true
+        }
+    });
     const [state, setState] = useState({ categories: [], brand: {}, processing: false });
     const mTable = useRef();
     const { categories, brand, processing } = state;

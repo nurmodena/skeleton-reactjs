@@ -19,7 +19,7 @@ const UserDetailScreen = () => {
         processing: false
     });
 
-    const { register, handleSubmit, watch, control, formState: { errors }, reset } = useForm({ defaultValues: { roles_id: -1 } });
+    const { register, handleSubmit, watch, control, formState: { errors }, reset } = useForm({ defaultValues: { roles_id: -1, is_active: true } });
     const password = useRef({});
     password.current = watch("password", "");
 

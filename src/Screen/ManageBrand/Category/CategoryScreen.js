@@ -15,7 +15,7 @@ const CategoryScreen = () => {
             code: '',
             name: '',
             description: '',
-            is_active: undefined,
+            is_active: true,
             image: null
         }
     });

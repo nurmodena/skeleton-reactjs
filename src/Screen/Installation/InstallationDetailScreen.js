@@ -23,7 +23,7 @@ const InstallationDetailScreen = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { pageState, dataid } = useParams();
-    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset, getValues, trigger } = useForm();
+    const { register, handleSubmit, formState: { errors }, control, clearErrors, reset, getValues, trigger } = useForm({ defaultValues: { is_active: true } });
     const [state, setCommonState] = useState({
         dataLanguages: [],
         language: { language_code: '', name: '', title: '', video_url: '' },
