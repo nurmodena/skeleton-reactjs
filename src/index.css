@@ -129,3 +129,13 @@ code {
   border-color: #FFC107 !important;
   color: #FFC107 !important;
 }
+
+@media (max-width: 800px) {
+  .mtable-container {
+    overflow-x: scroll;
+  }
+
+  .mtable-container::-webkit-scrollbar {
+    height: 1;
+  }
+}
