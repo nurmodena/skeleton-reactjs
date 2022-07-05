@@ -9,6 +9,7 @@ import { getSubCategoryAll, getSubCategoryById } from '../../../Service/SubCateg
 import { getBrandAll, getSubcategoriesByBrandId } from '../../../Service/BrandService';
 import axios, { Axios } from 'axios';
 import { InputSwitch } from 'primereact/inputswitch';
+import Overlay from '../../../Components/Overlay/Overlay';
 
 const wrapStyle = { width: 200, height: 160, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative', border: 'solid 1px #ccc', borderRadius: 6 };
 let processingId = -1;
@@ -24,7 +25,8 @@ export default function ModelDetailScreen() {
     subCategories: [],
     files: [],
     isViewOnly: false,
-    deletedContents: []
+    deletedContents: [],
+    processing: false
   });
 
   const { register, handleSubmit, reset, formState: { errors }, control } = useForm({});
@@ -131,9 +133,7 @@ export default function ModelDetailScreen() {
         title: 'Save data error!',
         text: data.message
       });
-    }).finally(() => {
-      stopProcessing();
-    });
+    }).finally(_ => stopProcessing());
   }
 
   const onFileChange = e => {
@@ -142,7 +142,7 @@ export default function ModelDetailScreen() {
     setState({ ...state, files: _files });
   }
 
-  const { model, subctg, brands, subCategories, files, isViewOnly, deletedContents } = state;
+  const { model, subctg, brands, subCategories, files, isViewOnly, deletedContents, processing } = state;
 
   return (
     <div className="content-wrapper">
@@ -165,6 +165,7 @@ export default function ModelDetailScreen() {
         <div className="container-fluid">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card">
+              <Overlay display={processing} />
               <div className="card-header">
                 <h3 className="card-title">
                   <i className="fas fa-globe mr-1" />

@@ -122,7 +122,6 @@ const BrandScreen = () => {
         }
         const response = brand.id ? updateBrand(formData) : createBrand(formData);
         response.then(res => {
-            stopProcessing();
             if (res.status == 200 || res.status == 201) {
                 Swal.fire({
                     icon: 'success',
@@ -131,7 +130,6 @@ const BrandScreen = () => {
                 }).then(r => { mTable.current.refresh(); onReset() })
             }
         }).catch(({ response: { data } }) => {
-            stopProcessing();
             const [key] = Object.keys(data.errors || {});
             const message = data.errors[key];
             if (message) {
@@ -142,10 +140,10 @@ const BrandScreen = () => {
                     text: message[0]
                 });
             }
-        });
+        }).finally(_ => stopProcessing());;
     }
 
-    const onBrowseImage = () => { 
+    const onBrowseImage = () => {
         $("#image-name").click();
 
     }

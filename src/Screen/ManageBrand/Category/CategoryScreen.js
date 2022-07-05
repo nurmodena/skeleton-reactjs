@@ -10,9 +10,29 @@ const { $ } = window;
 let processingId = -1;
 
 const CategoryScreen = () => {
-    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
+        defaultValues: {
+            code: '',
+            name: '',
+            description: '',
+            is_active: undefined,
+            image: null
+        }
+    });
     const mTable = useRef();
-    const [state, setState] = useState({category: {}, processing: false}); 
+    const [state, setState] = useState({
+        category: {
+            code: '',
+            name: '',
+            description: '',
+            is_active: true,
+            image: null
+        }, processing: false
+    });
+
+    useEffect(_ => {
+        // reset();
+    }, []);
 
     const onActiveChange = item => e => { }
 
@@ -70,7 +90,7 @@ const CategoryScreen = () => {
 
     const onEdit = item => () => {
         reset(item);
-        setState({...state, category: item});
+        setState({ ...state, category: item });
         console.log('selected ', item);
     }
 
@@ -94,13 +114,13 @@ const CategoryScreen = () => {
 
     const startProcessing = () => {
         processingId = setTimeout(() => {
-            setState({...state, processing: true});
+            setState({ ...state, processing: true });
         }, 150);
     }
 
     const stopProcessing = () => {
         clearTimeout(processingId);
-        setState({...state, processing: false});
+        setState({ ...state, processing: false });
     }
 
     const onSubmit = (data) => {
@@ -112,24 +132,24 @@ const CategoryScreen = () => {
             formData.append(key, data[key]);
         }
         startProcessing();
-        const response = category.id ? updateCategory(formData) : createCategory(formData);
+        console.log('1. category', category);
+        const response = category.id ? updateCategory(category.id, formData) : createCategory(formData);
         response.then(res => {
             if (res.status == 200 || res.status == 201) {
-                stopProcessing();
                 Swal.fire({
                     icon: 'success',
                     title: 'Save data success',
                     text: 'Data has been saved!'
                 }).then(r => { mTable.current.refresh(); onReset() })
             }
-        }).catch(({respomnse: { data } }) => {
-            stopProcessing();
+        }).catch(({ response: { data } }) => {
+            console.log('2. data', data);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Save data error!'
+                text: data.message
             });
-        }); 
+        }).finally(_ => stopProcessing());
     }
 
     const onBrowseImage = () => {
@@ -147,7 +167,7 @@ const CategoryScreen = () => {
             is_active: true,
             image_name: '',
         });
-        setState({...state, category: {}});
+        setState({ ...state, category: {} });
     }
 
     const onFileChange = (e) => {

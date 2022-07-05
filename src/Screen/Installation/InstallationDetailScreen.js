@@ -176,9 +176,7 @@ const InstallationDetailScreen = () => {
                 title: 'Save data error!',
                 text: data.message
             });
-        }).finally(() => {
-            stopProcessing();
-        });
+        }).finally(_ => stopProcessing());
     }
 
     const onEdit = item => () => {

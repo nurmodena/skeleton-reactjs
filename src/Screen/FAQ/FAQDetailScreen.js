@@ -9,6 +9,7 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getModelAll } from '../../Service/ModelService';
 import { no_image } from '../../Images';
+import Overlay from '../../Components/Overlay/Overlay';
 const { $, setupDigitInput } = window;
 
 const localState = { models: [] };
@@ -140,9 +141,7 @@ const FAQDetailScreen = () => {
                 title: 'Save data error!',
                 text: data.message
             });
-        }).finally(() => {
-            stopProcessing();
-        });
+        }).finally(_ => stopProcessing());
     }
 
     const onGoback = () => {
@@ -194,7 +193,7 @@ const FAQDetailScreen = () => {
         setState({ ...state, language });
     }
 
-    const { faq, languages, language, dataLanguages, selectedLang, models, isViewOnly } = state;
+    const { faq, languages, language, dataLanguages, selectedLang, models, isViewOnly, processing } = state;
 
     return (
         <div className="content-wrapper">
@@ -217,6 +216,7 @@ const FAQDetailScreen = () => {
                 <div className="container-fluid">
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <div className='card'>
+                            <Overlay display={processing} />
                             <div className='card-header'>
                                 <div className='card-title'><i className='fa fa-tools' /> {pageState && pageState.charAt(0).toUpperCase() + pageState.slice(1)} FAQ</div>
                             </div>

@@ -40,7 +40,7 @@ const LanguagesScreen = () => {
     });
   }
 
-  const onRemove = item => () => { 
+  const onRemove = item => () => {
     Swal.fire({
       icon: 'question',
       title: 'Are you sure?',
@@ -141,12 +141,12 @@ const LanguagesScreen = () => {
         });
       }
     },
-      err => {
+      ({ response: { data } }) => {
         //show Info fail Create Language
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Save data error!'
+          text: data.message
         });
         setState({ ...state, processing: false });
       })

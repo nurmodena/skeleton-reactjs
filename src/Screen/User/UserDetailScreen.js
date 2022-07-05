@@ -101,7 +101,6 @@ const UserDetailScreen = () => {
         startProcessing();
         const response = pageState.toLowerCase() == 'add' ? createUser(formData) : updateUser(username, formData);
         response.then(res => {
-            stopProcessing();
             if (res.status == 200 || res.status == 201) {
                 Swal.fire({
                     icon: 'success',
@@ -110,7 +109,6 @@ const UserDetailScreen = () => {
                 }).then(r => { onBack(); })
             }
         }).catch(({ response: { data } }) => {
-            stopProcessing();
             const [key] = Object.keys(data.errors || {});
             const message = data.errors[key];
             if (message) {
@@ -121,7 +119,7 @@ const UserDetailScreen = () => {
                     text: message[0]
                 });
             }
-        });
+        }).finally(_ => stopProcessing());
     }
 
     const { user, roles, processing } = state;

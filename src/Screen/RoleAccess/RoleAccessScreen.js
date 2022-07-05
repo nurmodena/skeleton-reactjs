@@ -10,17 +10,17 @@ const { $ } = window;
 const localState = {};
 
 const RoleAccessScreen = () => {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const mTable = useRef();
 
-    const removeData = item => { 
+    const removeData = item => {
         deleteRoleAccess(item.id).then(
             Swal.fire({
                 icon: 'success',
                 title: 'Delete data success',
                 text: 'Data has been deleted!'
             }).then(r => { mTable.current.refresh(); })
-        ).catch(({ response: { data } }) => { 
+        ).catch(({ response: { data } }) => {
             const [key] = Object.keys(data.errors || {});
             const message = data.errors[key];
             if (message) {
@@ -30,7 +30,7 @@ const RoleAccessScreen = () => {
                     title: 'Error',
                     text: message[0]
                 });
-            } 
+            }
         });
     };
 
@@ -46,11 +46,11 @@ const RoleAccessScreen = () => {
             text: 'Deleted data can not be restored!',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
-          }).then(({ isConfirmed }) => {
+        }).then(({ isConfirmed }) => {
             if (isConfirmed) {
-              removeData(item);
+                removeData(item);
             }
-          });
+        });
     };
 
     const columns = [
@@ -72,27 +72,21 @@ const RoleAccessScreen = () => {
             render: item => {
                 return (
                     <div>
-                        <a
-                            onClick={onEdit(item)}
-                            style={{
-                                cursor: 'pointer',
-                                color: 'green',
-                                display: 'inline-block',
-                                marginRight: 20
-                            }}
-                        >
+                        <a onClick={onEdit(item)} style={{
+                            cursor: 'pointer',
+                            color: 'green',
+                            display: 'inline-block',
+                            marginRight: 20
+                        }} >
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
-                        <a
-                            onClick={onRemove(item)}
-                            style={{
-                                cursor: 'pointer',
-                                color: 'maroon',
-                                display: 'inline-block',
-                                marginRight: 20
-                            }}
-                        >
+                        <a onClick={onRemove(item)} style={{
+                            cursor: 'pointer',
+                            color: 'maroon',
+                            display: 'inline-block',
+                            marginRight: 20
+                        }} >
                             <i className="fas fa-trash" />
                             <span style={{ marginLeft: 10 }}>Delete</span>
                         </a>

@@ -17,8 +17,7 @@ const createCategory = (payload, onSuccess, onError) => {
   return handleResponse(response, onSuccess, onError);
 };
 
-const updateCategory = (payload, onSuccess, onError) => {
-  const id = payload.get('id');
+const updateCategory = (id, payload, onSuccess, onError) => {
   const response = axios.put(`v1/admin/category/update/${id}`, payload, getMultipartOptions(axios));
   return handleResponse(response, onSuccess, onError);
 };

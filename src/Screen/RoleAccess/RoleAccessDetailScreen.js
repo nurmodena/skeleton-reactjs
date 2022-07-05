@@ -20,7 +20,7 @@ const RoleAccessDetailScreen = () => {
     useEffect(() => {
         switch (pageState) {
             case 'add':
-                getMenuAll({perpage: 100}).then(({data}) => {
+                getMenuAll({ perpage: 100 }).then(({ data }) => {
                     const menus = (data.data || []).map(e => {
                         return {
                             menu_id: e.id,
@@ -31,11 +31,11 @@ const RoleAccessDetailScreen = () => {
                         }
                     });
                     setState({ ...state, role: { menus } });
-                }) 
+                })
                 break;
             case 'edit':
-                getRoleAccessById(roleid).then(({ data }) => { 
-                    if (data.menus.length == 0) {}
+                getRoleAccessById(roleid).then(({ data }) => {
+                    if (data.menus.length == 0) { }
                     setState({ ...state, role: data });
                     reset(data);
                 })
@@ -160,7 +160,7 @@ const RoleAccessDetailScreen = () => {
                     text: message[0]
                 });
             }
-        }).finally(() => { stopProcessing(); });
+        }).finally(_ => stopProcessing());
     }
 
     const { role } = state;
