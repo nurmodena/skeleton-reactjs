@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getTraoubleshootAll = (params, onSuccess, onError) => {
+    params.filter = params.filter ? params.filter + ',is_active:1' : 'is_active:1';
     const response = axios.get('v1/admin/troubleshoot/get-all', { params });
     return handleResponse(response, onSuccess, onError);
 };

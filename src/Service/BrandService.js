@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getMultipartOptions, handleResponse } from './HelperService';
 
 const getBrandAll = (params, onSuccess, onError) => {
+  params.filter = params.filter ? params.filter + ',is_active:1' : 'is_active:1';
   const response = axios.get('v1/admin/brand/get-all', { params })
   return handleResponse(response, onSuccess, onError);
 };
@@ -11,12 +12,12 @@ const getBrandById = (id, onSuccess, onError) => {
   return handleResponse(response, onSuccess, onError);
 };
 
-const createBrand = (payload, onSuccess, onError) => { 
+const createBrand = (payload, onSuccess, onError) => {
   const response = axios.post(`v1/admin/brand/create`, payload, getMultipartOptions(axios));
   return handleResponse(response, onSuccess, onError);
 };
 
-const updateBrand = (payload, onSuccess, onError) => {  
+const updateBrand = (payload, onSuccess, onError) => {
   const id = payload.get('id');
   const response = axios.put(`v1/admin/brand/update/${id}`, payload, getMultipartOptions(axios));
   return handleResponse(response, onSuccess, onError);

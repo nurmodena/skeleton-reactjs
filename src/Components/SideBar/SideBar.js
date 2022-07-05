@@ -41,6 +41,12 @@ const SideBar = () => {
                 <nav className="mt-2">
                     <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                         <li className="nav-item ">
+                            <NavLink to="/dashboard" className={getClassName}>
+                                <i className="nav-icon fas fa-th" />
+                                <p>Dashboard</p>
+                            </NavLink>
+                        </li>
+                        <li className="nav-item ">
                             <NavLink to="/language" className={getClassName}>
                                 <i className="nav-icon fas fa-globe" />
                                 <p>Manage Language</p>

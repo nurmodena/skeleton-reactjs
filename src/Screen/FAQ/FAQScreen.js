@@ -1,7 +1,5 @@
 import React, { Component, useEffect, useState, useRef } from 'react';
 import { getFAQAll, getFAQById, createFAQ, updateFAQ, deleteFAQ } from '../../Service/FAQService';
-import { getCategoryAll } from '../../Service/CategoriesService';
-import { useForm, Controller, handleSubmit } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import MTable from '../../Components/MTable/MTable';
 import { InputSwitch } from 'primereact/inputswitch';
@@ -118,14 +116,13 @@ const FAQScreen = () => {
 
     const propsTable = { columns, getData: getFAQAll, showIndex: true, showAddButton: true, onAddData };
 
-
     return (
         <div className="content-wrapper">
             <div className="content-header">
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1 className="m-0">FAQ Screen</h1>
+                            <h1 className="m-0">Manage FAQ</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">

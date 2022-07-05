@@ -28,9 +28,6 @@ const NavBar = () => {
                 <li className="nav-item d-none d-sm-inline-block">
                     <NavLink to="/home" className="nav-link">Home</NavLink>
                 </li>
-                <li className="nav-item d-none d-sm-inline-block">
-                    <a href="#" className="nav-link">Contact</a>
-                </li>
             </ul>
             {/* Right navbar links */}
             <ul className="navbar-nav ml-auto">

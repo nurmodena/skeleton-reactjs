@@ -82,8 +82,7 @@ export default function ModelDetailScreen() {
 
   const onRemoveContent = (item, i) => () => {
     model.content.splice(i, 1);
-    const _deletedContents = [...deletedContents];
-    _deletedContents.push(item);
+    const _deletedContents = [...deletedContents, item.id];
     setState({ ...state, model, deletedContents: _deletedContents });
   }
 
