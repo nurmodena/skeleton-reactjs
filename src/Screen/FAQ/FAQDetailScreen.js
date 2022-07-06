@@ -10,6 +10,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getModelAll } from '../../Service/ModelService';
 import { no_image } from '../../Images';
 import Overlay from '../../Components/Overlay/Overlay';
+import CountryFlag from '../../Components/CountryFlag/CountryFlag';
+
 const { $, setupDigitInput } = window;
 
 const localState = { models: [] };
@@ -23,7 +25,14 @@ const FAQDetailScreen = () => {
         faq: { is_active: true, image_name: no_image },
         dataLanguages: [],
         languages: [],
-        language: {},
+        language: {
+            code: '',
+            name: '',
+            title: '',
+            video_url: '',
+            question: '',
+            solution: ''
+        },
         selectedLang: {},
         models: [],
         isViewOnly: false,
@@ -58,6 +67,8 @@ const FAQDetailScreen = () => {
                     const _languages = faq.descs.map(lang => ({
                         code: lang.language_code,
                         name: lang.language_name,
+                        title: lang.title,
+                        video_url: lang.video_url,
                         question: lang.question,
                         solution: lang.answer
                     }));
@@ -102,9 +113,9 @@ const FAQDetailScreen = () => {
         console.log('data', data);
         const { id } = data;
         const formData = new FormData();
-        for (var key in data) {
-            formData.append(key, data[key]);
-        }
+        formData.append(`name`, data.name);
+        formData.append(`is_active`, data.is_active);
+        formData.append(`status`, data.status);
 
         //set image 
         formData.append(`image`, state.file);
@@ -115,6 +126,8 @@ const FAQDetailScreen = () => {
             console.log('lang', lang);
             formData.append(`descriptions[${i}][language_code]`, lang.code);
             formData.append(`descriptions[${i}][question]`, lang.question);
+            formData.append(`descriptions[${i}][title]`, lang.title);
+            formData.append(`descriptions[${i}][video_url]`, lang.video_url);
             formData.append(`descriptions[${i}][answer]`, lang.solution);
             i++;
         }
@@ -173,7 +186,7 @@ const FAQDetailScreen = () => {
     const onAddLangClick = () => {
         const { code, name } = selectedLang;
         if (code) {
-            const _languages = [...languages, { code, name, question: '', solution: '' }];
+            const _languages = [...languages, { code, name, title: '', video_url: '', question: '', solution: '' }];
             console.log('_languages', _languages);
             setState({ ...state, languages: _languages, selectedLang: { code: '' } });
         }
@@ -183,7 +196,7 @@ const FAQDetailScreen = () => {
         const _languages = languages.filter(e => e.code.toLowerCase() != item.code.toLowerCase());
         const _state = { ...state, languages: _languages };
         if (item.code == language.code) {
-            _state.language = { code: '', name: '', question: '', solution: '' };
+            _state.language = { code: '', name: '', title: '', video_url: '', question: '', solution: '' };
         }
         setState(_state);
     }
@@ -240,7 +253,7 @@ const FAQDetailScreen = () => {
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage} disabled={isViewOnly}><i className='fa fa-image'></i> Browse</button>
                                             </div>
                                         </div>
-                                        <div className='form-group'>
+                                        <div className='form-group d-none'>
                                             <label htmlFor='video-url'>Video Url</label>
                                             <input {...register('video_url')} id="video-url" className='form-control' placeholder='Video url' disabled={isViewOnly} />
                                         </div>
@@ -293,13 +306,21 @@ const FAQDetailScreen = () => {
                                                             <a onClick={onLanguageClick(item)}
                                                                 type='button'
                                                                 style={{ minWidth: 100 }}>
-                                                                {item.name}
+                                                                <CountryFlag code={item.code} />{item.name}
                                                             </a>
                                                             <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>
                                                         </div>
                                                     ))
                                                 }
                                             </div>
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor='title'>Title</label>
+                                            <input name='title' value={language.title} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code || isViewOnly} />
+                                        </div>
+                                        <div className='form-group'>
+                                            <label htmlFor='video_url'>Video Url</label>
+                                            <input name='video_url' value={language.video_url} className='form-control' rows={2} onChange={onLangValChange} disabled={!language.code || isViewOnly} />
                                         </div>
                                         <div className='form-group'>
                                             <label htmlFor='question'>Question</label>

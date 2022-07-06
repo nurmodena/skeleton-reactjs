@@ -10,6 +10,8 @@ import { getBrandAll, getSubcategoriesByBrandId } from '../../../Service/BrandSe
 import axios, { Axios } from 'axios';
 import { InputSwitch } from 'primereact/inputswitch';
 import Overlay from '../../../Components/Overlay/Overlay';
+import { getLanguageAll } from '../../../Service/LanguageService';
+import CountryFlag from '../../../Components/CountryFlag/CountryFlag';
 
 const wrapStyle = { width: 200, height: 160, borderRadius: 4, marginRight: 16, marginBottom: 16, position: 'relative', border: 'solid 1px #ccc', borderRadius: 6 };
 let processingId = -1;
@@ -20,24 +22,30 @@ export default function ModelDetailScreen() {
   const navigate = useNavigate();
   const [state, setState] = useState({
     model: { is_active: true },
+    languages: [],
+    language: {},
+    selectedLang: {},
     brands: [],
     subctg: {},
     subCategories: [],
     files: [],
     isViewOnly: false,
     deletedContents: [],
-    processing: false
+    processing: false,
+    languageList: []
   });
 
-  const { register, handleSubmit, reset, formState: { errors }, control } = useForm({});
+  const { register, handleSubmit, reset, formState: { errors }, control, clearErrors } = useForm({});
 
   useEffect(() => {
     const isViewOnly = pageState == 'view';
+    const reqLang = getLanguageAll({ perpage: 1000 }).then(res => res.data.data);
     const reqBrands = getBrandAll({ perpage: 1000 }).then(res => res.data.data);
     switch (pageState) {
       case 'add':
-        reqBrands.then(data => {
-          setState({ ...state, brands: data });
+        Promise.all([reqBrands, reqLang]).then(results => {
+          const [brands, languageList] = results;
+          setState({ ...state, brands, languageList });
           reset(model);
         });
         break;
@@ -46,14 +54,29 @@ export default function ModelDetailScreen() {
         const reqModel = getModelByCode(modelid).then(res => res.data);
         const reqSubCtg = reqModel.then(res => getSubCategoryById(res.category_sub_id).then(res => res.data));
         const reqSubCtgs = reqSubCtg.then(res => getSubcategoriesByBrandId(res.brand_id).then(res => res.data));
-        Promise.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs]).then(results => {
+        Promise.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs, reqLang]).then(results => {
           console.log('results', results);
-          const [_brands, _model, _subctg, _sucategories] = results;
+          const [_brands, _model, _subctg, _sucategories, languageList] = results;
           _model.length = _model.length == "null" ? null : _model.length;
           _model.width = _model.width == "null" ? null : _model.width;
           _model.height = _model.height == "null" ? null : _model.height;
-
-          setState({ ...state, brands: _brands, subctg: _subctg, subCategories: _sucategories, model: _model, isViewOnly });
+          const _languages = (_model.descriptions || []).map(e => ({
+            code: e.language_code,
+            description: e.description,
+            name: (languageList.find(l => l.code == e.language_code) || {}).name,
+          }));
+          console.log('_languages', _languages);
+          setState({
+            ...state,
+            brands: _brands,
+            subctg: _subctg,
+            subCategories: _sucategories,
+            languageList,
+            languages: _languages,
+            language: _languages.length > 0 ? _languages[0] : language,
+            model: _model,
+            isViewOnly
+          });
           reset(_model);
         }).catch(({ response: { data } }) => {
           Swal.fire({
@@ -117,6 +140,12 @@ export default function ModelDetailScreen() {
     for (let i in deletedContents) {
       formData.append(`deletedContents[${i}]`, deletedContents[i]);
     }
+    let i = 0;
+    for (let lang of languages) {
+      formData.append(`descriptions[${i}][language_code]`, lang.code);
+      formData.append(`descriptions[${i}][description]`, lang.description);
+      i++;
+    }
     const submit = pageState == 'add' ? createModel(formData) : updateModel(id, formData);
     startProcessing();
     submit.then(res => {
@@ -142,7 +171,56 @@ export default function ModelDetailScreen() {
     setState({ ...state, files: _files });
   }
 
-  const { model, subctg, brands, subCategories, files, isViewOnly, deletedContents, processing } = state;
+  const onLanguageClick = lang => () => {
+    console.log('onLanguageClick', lang);
+    setState({ ...state, language: lang });
+  }
+
+  const onSelectedLangChange = e => {
+    clearErrors('languages');
+    const code = e.target.value.toLowerCase();
+    if (code) {
+      const lang = languageList.find(i => i.code.toLowerCase() == code);
+      setState({ ...state, selectedLang: { code, name: lang.name } });
+    }
+  }
+
+  const onAddLangClick = () => {
+    const { code, name } = selectedLang;
+    if (code) {
+      const _languages = [...languages, { code, name, description: '' }];
+      console.log('_languages', _languages);
+      setState({ ...state, languages: _languages, selectedLang: { code: '' } });
+    }
+  }
+
+  const onRemovelangClick = item => () => {
+    const _languages = languages.filter(e => e.code.toLowerCase() != item.code.toLowerCase());
+    const _state = { ...state, languages: _languages };
+    if (item.code == language.code) {
+      _state.language = { code: '', name: '', description: '' };
+    }
+    setState(_state);
+  }
+
+  const onLangValChange = ({ target: { name, value } }) => {
+    language[name] = value;
+    setState({ ...state, language });
+  }
+
+  const {
+    model,
+    subctg,
+    brands,
+    subCategories,
+    files, isViewOnly,
+    deletedContents,
+    processing,
+    languageList,
+    languages,
+    language,
+    selectedLang
+  } = state;
 
   return (
     <div className="content-wrapper">
@@ -212,8 +290,41 @@ export default function ModelDetailScreen() {
                       </div>
                     </div>
                     <div className='form-group'>
+                      <label htmlFor='select-language'>Language</label>
+                      <div className='d-flex justify-content-between'>
+                        <select id="select-language" name="select-language"
+                          {...register('languages', { validate: val => languages.length > 0 || 'Content is required!' })}
+                          value={selectedLang.code} className='form-control flex-1 mr-2' onChange={onSelectedLangChange} disabled={isViewOnly}>
+                          <option value=''>Select language</option>
+                          {
+                            languageList.filter(e => { return languages.map(l => l.code.toLowerCase()).indexOf(e.code.toLowerCase()) < 0 }).map((item, i) => (
+                              <option key={`key-item-${i}`} value={item.code.toLowerCase()} >{item.name}</option>
+                            ))
+                          }
+                        </select>
+                        <button type='button' className='btn btn-sm btn-warning' onClick={onAddLangClick}><i className='fa fa-plus' /> Add</button>
+                      </div>
+                      {errors.languages && <span className='text-danger'>{errors.languages.message}</span>}
+                    </div>
+                    <div className='form-group'>
+                      <div className='d-flex flex-wrap'>
+                        {
+                          languages.map((item, i) => (
+                            <div key={`item-${i}`} className={`btn btn${item.code == language.code ? '-' : '-outline-'}warning btn-sm d-flex mr-2 mb-2`}>
+                              <a onClick={onLanguageClick(item)}
+                                type='button'
+                                style={{ minWidth: 100 }}>
+                                <CountryFlag code={item.code} />{item.name}
+                              </a>
+                              <span className='text-danger' onClick={onRemovelangClick(item)} style={{ cursor: 'pointer' }}><i className='fa fa-times ml-2' /></span>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    <div className='form-group'>
                       <label className='mr-3'>Description</label>
-                      <textarea {...register("description")} className='form-control' rows={4} readOnly={isViewOnly}></textarea>
+                      <textarea name="description" value={language.description} onChange={onLangValChange} className='form-control' rows={4} disabled={isViewOnly || !language.code}></textarea>
                     </div>
                     <div className='form-group'>
                       <label className='mr-3'>Dimension</label>

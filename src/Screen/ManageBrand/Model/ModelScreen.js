@@ -53,11 +53,6 @@ const ModelScreen = () => {
   const columns = [
     { id: 1, title: 'Modela Name', field: 'name', sortable: true },
     {
-      id: 2, title: 'Description', field: 'description', sortable: true, style: { width: '40%' }, render: data => {
-        return (<div style={{ maxHeight: 50, overflow: 'hidden', textOverflow: 'ellipsis' }}>{data.description}</div>)
-      }
-    },
-    {
       title: 'Sub Category',
       field: 'category_sub_name',
       sortable: true,

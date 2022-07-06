@@ -447,38 +447,49 @@ const MTable = forwardRef((props, ref) => {
         </div>
       </div>
       <div className="mb-3 mt-3" style={{ height: 1, background: '#ccc' }} />
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <div style={{ flex: 1, lineHeight: 3 }}>
+      <div className="row">
+        <div className="col-lg-2 col-md-4 col-sm-12">
           {`Showing ${startRow} - ${endRow} of ${total}`}
         </div>
-        <div style={{ lineHeight: 3, width: 150, textAlign: 'center' }}>
-          Rows per page
+        <div className="col-lg-10 col-md-8 col-sm-12">
+          <div className="row">
+            <div className="col-lg-9 col-md-6 col-sm-12">
+              <div className="d-flex justify-content-end">
+                <div style={{ lineHeight: 2.5, width: 150, textAlign: 'center' }}>
+                  Rows per page
+                </div>
+                <div >
+                  <Dropdown
+                    options={[5, 10, 25, 50, 100]}
+                    value={paginator.perpage}
+                    onChange={onPerPageChange}
+                  />
+                </div>
+                <div style={{ lineHeight: 2.5, width: 100, textAlign: 'center' }}>
+                  {`${paginator.page} of ${totalPage}`}
+                </div>
+              </div>
+            </div>
+            <div className="col-lg-3 col-md-6 col-sm-12" >
+              <div className="d-flex justify-content-center" style={{ minHeight: 50 }}>
+                <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
+                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+                </button>
+                <button type='button' className='btn btn-sm ml-2 mr-2' onClick={onPrev} disabled={paginator.page == 1}>
+                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+                </button>
+                <button type='button' className='btn btn-sm mr-2 ml-2' onClick={onNext} disabled={paginator.page == lastPage}>
+                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+                </button>
+                <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
+                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div >
-          <Dropdown
-            options={[5, 10, 25, 50, 100]}
-            value={paginator.perpage}
-            onChange={onPerPageChange}
-          />
-        </div>
-        <div style={{ lineHeight: 3, width: 100, textAlign: 'center' }}>
-          {`${paginator.page} of ${totalPage}`}
-        </div>
-
-        <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
-          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
-          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
-        </button>
-        <button type='button' className='btn btn-sm ml-2 mr-2' onClick={onPrev} disabled={paginator.page == 1}>
-          <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
-        </button>
-        <button type='button' className='btn btn-sm mr-2 ml-2' onClick={onNext} disabled={paginator.page == lastPage}>
-          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-        </button>
-        <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
-          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-          <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-        </button>
       </div>
     </div>
   );
