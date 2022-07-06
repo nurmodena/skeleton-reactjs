@@ -33,7 +33,7 @@ const FAQDetailScreen = () => {
             question: '',
             solution: ''
         },
-        selectedLang: {},
+        selectedLang: { code: '', name: '', },
         models: [],
         isViewOnly: false,
         processing: false,
@@ -68,7 +68,7 @@ const FAQDetailScreen = () => {
                         code: lang.language_code,
                         name: lang.language_name,
                         title: lang.title,
-                        video_url: lang.video_url,
+                        video_url: lang.video_url || '',
                         question: lang.question,
                         solution: lang.answer
                     }));
