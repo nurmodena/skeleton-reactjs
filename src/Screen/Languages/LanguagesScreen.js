@@ -125,9 +125,11 @@ const LanguagesScreen = () => {
 
   const onSubmitData = (data) => {
     processTimeout = setTimeout(() => {
+      console.log('1. start processing');
       setState({ ...state, processing: true });
     }, 150);
     createLanguage(data, ({ data, status }) => {
+      console.log('2. success set processing: false');
       setState({ ...state, processing: false });
       if (status == 200 || status == 201) {
         //show Info success Create Language
@@ -141,13 +143,21 @@ const LanguagesScreen = () => {
         });
       }
     },
-      ({ response: { data } }) => {
+      ({ response: { data: { errors } } }) => {
         //show Info fail Create Language
+        const [key] = Object.keys(errors || {});
+        const message = errors[key];
+        console.log('3. Error set processing: false', data);
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: data.message
+          text: message
         });
+        setState({ ...state, processing: false });
+      }).finally(_ => {
+
+        console.log('4. finally set processing: false');
+        clearTimeout(processTimeout);
         setState({ ...state, processing: false });
       })
 
