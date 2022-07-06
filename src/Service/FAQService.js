@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { getMultipartOptions, handleResponse } from './HelperService';
+import { getMultipartOptions, handleResponse, setIsActiveTrue } from './HelperService';
 
-const getFAQAll = (params, onSuccess, onError) => {
-    params.filter = params.filter ? params.filter + ',is_active:1' : 'is_active:1';
+const getFAQAll = (_params, onSuccess, onError) => {
+    const params = setIsActiveTrue(_params);
     const response = axios.get('v1/admin/faq/get-all', { params });
     return handleResponse(response, onSuccess, onError);
 };

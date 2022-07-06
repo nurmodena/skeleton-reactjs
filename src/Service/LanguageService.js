@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { handleResponse } from './HelperService';
+import { handleResponse, setIsActiveTrue } from './HelperService';
 
-const getLanguageAll = (params, onSuccess, onError) => {
-  params.filter = params.filter ? params.filter + ',is_active:1' : 'is_active:1';
+const getLanguageAll = (_params, onSuccess, onError) => {
+  const params = setIsActiveTrue(_params);
   const response = axios.get('v1/admin/language/get-all', { params });
   return handleResponse(response, onSuccess, onError);
 };

@@ -22,7 +22,7 @@ const MTable = forwardRef((props, ref) => {
     page: 1,
     perpage: 10,
     search: '',
-    filter: '',
+    filterAnd: '',
     order: order ? order : 'id',
     direction: 'asc',
     refresh: false
@@ -123,16 +123,17 @@ const MTable = forwardRef((props, ref) => {
 
   const onApplyFilter = () => {
     const _filter = filters.map(e => `${e.field}:${e.value}`).join();
-    setPaginator({ ...paginator, filter: _filter });
+    setPaginator({ ...paginator, filterAnd: _filter });
   };
 
   const onAddFilter = () => {
     if (filter.field && filter.value) {
+      filter.value = filter.value.trim();
       const _filters = [...filters, filter];
       setState({ filters: _filters, filter: { field: '', value: '', title: '' } });
       //do filtered request
       const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
-      setPaginator({ ...paginator, page: 1, filter: _filter });
+      setPaginator({ ...paginator, page: 1, filterAnd: _filter });
     }
   };
 
@@ -147,7 +148,7 @@ const MTable = forwardRef((props, ref) => {
     setState({ filters: _filters });
     //do filtered request
     const _filter = _filters.map(e => `${e.field}:${e.value}`).join();
-    setPaginator({ ...paginator, filter: _filter });
+    setPaginator({ ...paginator, filterAnd: _filter });
   };
 
   const onFilterFieldChange = e => {
@@ -164,7 +165,7 @@ const MTable = forwardRef((props, ref) => {
 
   const onResetFilter = () => {
     setState({ filters: [] });
-    setPaginator({ ...paginator, filter: '' });
+    setPaginator({ ...paginator, filterAnd: '' });
     closeFilter();
   };
 
