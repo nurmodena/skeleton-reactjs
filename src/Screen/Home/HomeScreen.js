@@ -43,7 +43,7 @@ const HomeScreen = () => {
             <section className="content">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-lg-3 col-6">
+                        <div className="col-lg-3 col-md-6 col-6">
                             <div className="small-box bg-info">
                                 <div className="inner">
                                     <h3>{totalModels}</h3>
@@ -56,7 +56,7 @@ const HomeScreen = () => {
                             </div>
                         </div>
 
-                        <div className="col-lg-3 col-6">
+                        <div className="col-lg-3 col-md-6 col-6">
                             <div className="small-box bg-success">
                                 <div className="inner">
                                     <h3>{totalFaqs}</h3>
@@ -68,7 +68,7 @@ const HomeScreen = () => {
                                 <NavLink to={"/faq"} className="small-box-footer">More Info <i className="fas fa-arrow-circle-right"></i></NavLink>
                             </div>
                         </div>
-                        <div className="col-lg-3 col-6">
+                        <div className="col-lg-3 col-md-6 col-6">
                             <div className="small-box bg-warning">
                                 <div className="inner">
                                     <h3>{totalInstallation}</h3>
@@ -80,7 +80,7 @@ const HomeScreen = () => {
                                 <NavLink to={"/installation"} className="small-box-footer">More Info <i className="fas fa-arrow-circle-right"></i></NavLink>
                             </div>
                         </div>
-                        <div className="col-lg-3 col-6">
+                        <div className="col-lg-3 col-md-6 col-6">
                             <div className="small-box bg-danger">
                                 <div className="inner">
                                     <h3>{totalTroubleshoot}</h3>
@@ -94,7 +94,7 @@ const HomeScreen = () => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-lg-6 col-6">
+                        <div className="col-lg-6 col-md-6 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
                                     <h5><i className="fa fa-tags"></i> New Models</h5>
@@ -122,7 +122,7 @@ const HomeScreen = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-lg-6 col-6">
+                        <div className="col-lg-6 col-md-6 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
                                     <div className="card-title">
@@ -154,7 +154,7 @@ const HomeScreen = () => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-lg-6 col-6">
+                        <div className="col-lg-6 col-md-6 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
                                     <h5><i className="fa fa-download"></i> New Installations</h5>
@@ -182,7 +182,7 @@ const HomeScreen = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-lg-6 col-6">
+                        <div className="col-lg-6 col-md-6 col-sm-12">
                             <div className="card">
                                 <div className="card-header">
                                     <div className="card-title">

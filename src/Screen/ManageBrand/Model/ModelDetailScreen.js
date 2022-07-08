@@ -51,7 +51,7 @@ export default function ModelDetailScreen() {
         break;
       case 'edit':
       case 'view':
-        const reqModel = getModelByCode(modelid).then(res => res.data);
+        const reqModel = getModelById(modelid).then(res => res.data);
         const reqSubCtg = reqModel.then(res => getSubCategoryById(res.category_sub_id).then(res => res.data));
         const reqSubCtgs = reqSubCtg.then(res => getSubcategoriesByBrandId(res.brand_id).then(res => res.data));
         Promise.all([reqBrands, reqModel, reqSubCtg, reqSubCtgs, reqLang]).then(results => {

@@ -29,17 +29,22 @@ const UserScreen = () => {
         Swal.fire({
             icon: 'question',
             title: 'Are you sure',
-            text: 'Reseted password can not be restored'
+            text: 'Reseted password can not be restored',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
         }).then(({ isConfirmed }) => {
             console.log('isConfirmed', isConfirmed);
-            Swal.fire({
-                title: 'Input the new password here!',
-                input: 'text',
-                showCancelButton: true,
-                confirmButtonText: 'Reset'                 
-            }).then(result => {
-                console.log('result', result);
-            })
+            if (isConfirmed) {
+                Swal.fire({
+                    title: 'Input the new password here!',
+                    input: 'text',
+                    showCancelButton: true,
+                    confirmButtonText: 'Reset'
+                }).then(({ value }) => {
+                    console.log('result', value);
+                })
+            }
+
         });
     };
 
@@ -76,18 +81,21 @@ const UserScreen = () => {
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
-                        <a
-                            onClick={onResetPassword(item)}
-                            style={{
-                                cursor: 'pointer',
-                                color: 'maroon',
-                                display: 'inline-block',
-                                marginRight: 20
-                            }}
-                        >
-                            <i className="fas fa-key" />
-                            <span style={{ marginLeft: 10 }}>Reset Password</span>
-                        </a>
+                        {
+                            ((item.email || '').indexOf('@modena.com') == -1) && (<a
+                                onClick={onResetPassword(item)}
+                                style={{
+                                    cursor: 'pointer',
+                                    color: 'maroon',
+                                    display: 'inline-block',
+                                    marginRight: 20
+                                }}
+                            >
+                                <i className="fas fa-key" />
+                                <span style={{ marginLeft: 10 }}>Reset Password</span>
+                            </a>)
+                        }
+
                     </div>
                 );
             },

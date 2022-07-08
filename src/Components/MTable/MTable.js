@@ -32,12 +32,21 @@ const MTable = forwardRef((props, ref) => {
     setCurrentState({ ...state, ...value });
   }
 
+  useEffect(_ => {
+
+  }, []);
+
   useEffect(
     () => {
       loadTimeout = setTimeout(() => {
         setState({ processing: true });
       }, 150);
-      getData && getData(paginator).then(res => {
+      const _paginatpr = { ...paginator };
+      if (!_paginatpr.filterAnd) {
+        delete _paginatpr.filterAnd;
+      }
+      delete _paginatpr.refresh;
+      getData && getData(_paginatpr).then(res => {
         clearTimeout(loadTimeout);
         const { data: { data, total } } = res;
         setState({ data, total, processing: false });
@@ -362,15 +371,12 @@ const MTable = forwardRef((props, ref) => {
           </div>
           {
             !hideFilter && (
-              <div style={{ width: 120 }}>
+              <div id="buttonFilter" style={{ width: 120 }}>
                 <button
                   type="button"
                   className="btn btn-block btn-outline-dark"
-                  onClick={openFilter}
-                >
-                  <i className="fa fa-filter" />
-                  {` Filter `}
-                  {filters.length > 0 &&
+                  onClick={openFilter} >
+                  <i className="fa fa-filter" /> Filter {filters.length > 0 &&
                     <span className="badge badge-danger">{filters.length}</span>}
                 </button>
               </div>
@@ -448,12 +454,12 @@ const MTable = forwardRef((props, ref) => {
       </div>
       <div className="mb-3 mt-3" style={{ height: 1, background: '#ccc' }} />
       <div className="row">
-        <div className="col-lg-2 col-md-4 col-sm-12">
-          {`Showing ${startRow} - ${endRow} of ${total}`}
+        <div className="col-lg-2 col-md-3 col-sm-12" >
+          <div className='mt-2' style={{ minWidth: 180 }}>{`Showing ${startRow} - ${endRow} of ${total}`}</div>
         </div>
-        <div className="col-lg-10 col-md-8 col-sm-12">
-          <div className="row">
-            <div className="col-lg-9 col-md-6 col-sm-12">
+        <div className="col-lg-10 col-md-9 col-sm-12">
+          <div className="row justify-content-end" style={{}}>
+            <div className="" >
               <div className="d-flex justify-content-end">
                 <div style={{ lineHeight: 2.5, width: 150, textAlign: 'center' }}>
                   Rows per page
@@ -470,8 +476,8 @@ const MTable = forwardRef((props, ref) => {
                 </div>
               </div>
             </div>
-            <div className="col-lg-3 col-md-6 col-sm-12" >
-              <div className="d-flex justify-content-center" style={{ minHeight: 50 }}>
+            <div className="" >
+              <div className="d-flex justify-content-end" style={{ minHeight: 50 }}>
                 <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
                   <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
                   <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
@@ -496,3 +502,15 @@ const MTable = forwardRef((props, ref) => {
 });
 
 export default MTable;
+
+
+const onCLick = e => {
+  const filterButton = document.getElementById('buttonFilter');
+  const filterContainer = document.getElementById(`${MTableId}_filter`);
+  if ((filterButton && filterButton.contains(e.target)) || (filterContainer && filterContainer.contains(e.target))) { } else {
+    $(`#${MTableId}_filter`).animate({ height: 0, opacity: 0, }, 100);
+  }
+}
+const root = document.getElementById('root');
+root.removeEventListener('click', onCLick);
+root.addEventListener('click', onCLick); 
