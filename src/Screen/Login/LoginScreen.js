@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { ACTION_LOGIN, login } from '../../Redux/Action/AuthAction';
 import { bg_login } from '../../Images'
 
@@ -10,7 +10,6 @@ const LoginScreen = () => {
   const [pswState, setPswState] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: { username: '', password: '' } });
-
 
   const onPasswordStateChange = () => {
     setPswState(!pswState);

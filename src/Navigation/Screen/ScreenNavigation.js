@@ -22,10 +22,11 @@ import TroubleShootingContentScreen from '../../Screen/TroubleShooting/TroubleSh
 import InstallationDetailScreen from '../../Screen/Installation/InstallationDetailScreen';
 import InstallationContentScreen from '../../Screen/Installation/InstallationContentScreen';
 import FAQDetailScreen from '../../Screen/FAQ/FAQDetailScreen';
+import { useSelector } from 'react-redux';
 
 const ToHome = () => {
-  console.log('To Home invoked');
-  return <Navigate to="/home" replace={true} />;
+  const refreshPath = useSelector(({ auth: { refreshPath } }) => refreshPath);
+  return <Navigate to={refreshPath.replace('login', 'dashboard')} replace={true} />;
 };
 
 const ScreenNavigation = () => {
@@ -35,6 +36,7 @@ const ScreenNavigation = () => {
         <Route path="/" element={<LayoutScreen />}>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/home" element={<HomeScreen />} />
+          <Route path="/dashboard" element={<HomeScreen />} />
           <Route path="/language" element={<LanguagesScreen />} />
           <Route path="/brand" element={<BrandScreen />} />
           <Route path="/category" element={<CategoryScreen />} />

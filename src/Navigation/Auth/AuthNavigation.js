@@ -1,13 +1,15 @@
-import React, {Component} from 'react';
-import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
+import React, { Component, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LoginScreen from '../../Screen/Login/LoginScreen';
 import SelectLanguageScreen from '../../Screen/Login/SelectLanguageScreen';
+
 
 const ToLogin = () => {
   return <Navigate to="/login" replace={true} />;
 };
 
 const AuthNavigation = () => {
+
   return (
     <BrowserRouter>
       <Routes>
