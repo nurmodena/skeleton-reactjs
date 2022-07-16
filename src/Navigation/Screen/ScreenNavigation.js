@@ -26,7 +26,8 @@ import { useSelector } from 'react-redux';
 
 const ToHome = () => {
   const refreshPath = useSelector(({ auth: { refreshPath } }) => refreshPath);
-  return <Navigate to={refreshPath.replace('login', 'dashboard')} replace={true} />;
+  const path = refreshPath.replace('login', 'dashboard').split('/').slice(0, 4).join('/');
+  return <Navigate to={path} replace={true} />;
 };
 
 const ScreenNavigation = () => {

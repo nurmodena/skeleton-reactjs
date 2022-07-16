@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { logout } from '../../Redux/Action/AuthAction';
+import { avatar5 } from '../../Images';
 
 const NavBar = () => {
 
@@ -66,7 +67,7 @@ const NavBar = () => {
                     <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                         <div className='d-flex flex-column align-items-center mt-2 mb-2' >
                             <div className='mt-3 mb-3'>
-                                <img src="dist/img/avatar5.png" alt='A' className='img-circle elevation-2' style={{ width: 80, height: 80 }} />
+                                <img src={avatar5} alt='A' className='img-circle elevation-2' style={{ width: 80, height: 80 }} />
                             </div>
                             <div style={{ fontWeight: 600 }}>{userInfo && userInfo.fullname}</div>
                             <div style={{ fontSize: 12, margin: '0 24px', textAlign: 'center' }}>{userInfo.role}</div>

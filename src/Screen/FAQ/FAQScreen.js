@@ -67,7 +67,7 @@ const FAQScreen = () => {
             title: 'Action',
             render: item => {
                 return (
-                    <div>
+                    <div style={{ minWidth: 250 }}>
                         <a
                             onClick={onView(item)}
                             style={{
@@ -75,8 +75,7 @@ const FAQScreen = () => {
                                 color: 'orange',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-eye" />
                             <span style={{ marginLeft: 10 }}>View</span>
                         </a>
@@ -87,8 +86,7 @@ const FAQScreen = () => {
                                 color: 'green',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
@@ -99,8 +97,7 @@ const FAQScreen = () => {
                                 color: 'maroon',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-trash" />
                             <span style={{ marginLeft: 10 }}>Delete</span>
                         </a>

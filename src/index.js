@@ -11,28 +11,28 @@ import Swal from 'sweetalert2';
 
 const REFRESH_URL = 'v1/refresh';
 const LOGIN_URL = 'v1/login';
-// const replaceUrl = obj => {
-//   for (let key in obj) {
-//     if (Array.isArray(obj[key])) {
-//       for (let a of obj[key]) {
-//         replaceUrl(a);
-//       }
-//     } else if (typeof obj[key] == 'object') {
-//       replaceUrl(obj[key]);
-//     } else {
-//       if (key == 'image_name') {
-//         obj[key] = obj[key].replace('http://192.168.0.41:8070', 'https://scstaging.modena.com');
-//       }
-//     }
-//   }
-// }
+const replaceUrl = obj => {
+  for (let key in obj) {
+    if (Array.isArray(obj[key])) {
+      for (let a of obj[key]) {
+        replaceUrl(a);
+      }
+    } else if (typeof obj[key] == 'object') {
+      replaceUrl(obj[key]);
+    } else {
+      if (key == 'image_name') {
+        obj[key] = obj[key].replace('tsm.modena.com', 'scstaging.modena.com');
+      }
+    }
+  }
+}
 
 // axios.defaults.baseURL = 'http://192.168.0.41:9502/';
-axios.defaults.baseURL = 'https://tsm.modena.com/api/';
-// axios.defaults.baseURL = 'https://scstaging.modena.com/';
+// axios.defaults.baseURL = 'https://tsm.modena.com/api/';
+axios.defaults.baseURL = 'https://scstaging.modena.com/api/';
 axios.interceptors.response.use(
   res => {
-    //replaceUrl(res);
+    replaceUrl(res);
     return res;
   },
   async error => {

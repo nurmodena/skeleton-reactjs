@@ -21,7 +21,8 @@
     "redux": "^4.2.0",
     "redux-thunk": "^2.4.1",
     "sweetalert2": "^11.4.17",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yarn": "^1.22.19"
   },
   "scripts": {
     "start": "react-scripts start",

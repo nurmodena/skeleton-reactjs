@@ -7,6 +7,7 @@ import {
     NavLink
 } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
+import { avatar5, logo } from '../../Images';
 
 const getClassName = ({ isActive }) => {
     return isActive ? "nav-link active" : "nav-link";
@@ -23,7 +24,7 @@ const SideBar = () => {
         <aside className="main-sidebar  elevation-4 sidebar-light-navy">
             {/* Brand Logo */}
             <a href="#" className="brand-link" >
-                <img src="dist/img/logo.png" alt="AdminLTE Logo" className="brand-image img-circle elevation-3" style={{ opacity: '.8', background: 'white', padding: 2 }} />
+                <img src={logo} alt="AdminLTE Logo" className="brand-image img-circle elevation-3" style={{ opacity: '.8', background: 'white', padding: 2 }} />
                 <span className="brand-text font-weight-light"><strong style={{ color: 'orange', fontWeight: 700 }}>TSM</strong> Modena</span>
             </a>
             {/* Sidebar */}
@@ -31,7 +32,7 @@ const SideBar = () => {
                 {/* Sidebar user panel (optional) */}
                 <div className="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div className="image">
-                        <img src="dist/img/avatar5.png" className="img-circle elevation-2" alt="User Image" />
+                        <img src={avatar5} className="img-circle elevation-2" alt="User Image" />
                     </div>
                     <div className="info">
                         <a href="#" className="d-block">{userInfo.fullname}</a>

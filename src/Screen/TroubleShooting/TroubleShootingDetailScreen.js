@@ -47,7 +47,6 @@ const TroubleShootingDetailScreen = () => {
             templateResult: Select2Checkbox
         }).on('change', e => {
             clearErrors('models');
-            console.log('set by onchange', $('.select2').val());
             localState.models = $('.select2').val();
         })
         console.log('useEffect invoked');
@@ -67,7 +66,7 @@ const TroubleShootingDetailScreen = () => {
                         setTimeout(() => {
                             $('.select2').val(localState.models);
                             $('.select2').trigger('change');
-                        }, 10);
+                        }, 0);
                     }
                 });
 
@@ -86,13 +85,11 @@ const TroubleShootingDetailScreen = () => {
                     }));
                     if (!isDraft) {
                         localState.models = _troubleshoot.models.map(m => m.id);
-                        console.log('1. localState.models', localState.models);
                         _troubleshoot.models = localState.models;
                         dispatch(setTroubleshoot(_troubleshoot));
                         dispatch(setTroubleshootHeader(_troubleshoot_header));
                         dispatch(setTroubleshootContent(_troubleshoot.contents));
                         reset(_troubleshoot);
-                        console.log('_troubleshoot', _troubleshoot);
                     } else {
                         reset(troubleshoot);
                         localState.models = troubleshoot.models || [];
@@ -107,7 +104,7 @@ const TroubleShootingDetailScreen = () => {
                     setTimeout(() => {
                         $('.select2').val(localState.models);
                         $('.select2').trigger('change');
-                    }, 10);
+                    }, 0);
                     mTable.current.refresh();
                 })
                 break;

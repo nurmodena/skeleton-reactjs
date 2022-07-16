@@ -87,7 +87,7 @@ const FAQDetailScreen = () => {
                     setTimeout(() => {
                         $('.select2').val(localState.models);
                         $('.select2').trigger('change');
-                    }, 10)
+                    }, 0)
                 })
                 break;
             default:

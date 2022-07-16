@@ -77,7 +77,7 @@ const InstallationScreen = () => {
             title: 'Action',
             render: item => {
                 return (
-                    <div>
+                    <div style={{ minWidth: 250 }}>
                         <a
                             onClick={onView(item)}
                             style={{
@@ -85,8 +85,7 @@ const InstallationScreen = () => {
                                 color: 'orange',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-eye" />
                             <span style={{ marginLeft: 10 }}>View</span>
                         </a>
@@ -97,8 +96,7 @@ const InstallationScreen = () => {
                                 color: 'green',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-edit" />
                             <span style={{ marginLeft: 10 }}>Edit</span>
                         </a>
@@ -109,8 +107,7 @@ const InstallationScreen = () => {
                                 color: 'maroon',
                                 display: 'inline-block',
                                 marginRight: 20
-                            }}
-                        >
+                            }} >
                             <i className="fas fa-trash" />
                             <span style={{ marginLeft: 10 }}>Delete</span>
                         </a>

@@ -132,8 +132,9 @@ const TroubleShootingContentScreen = () => {
 
     const onLanguageClick = lang => () => {
         let _description = content.descriptions.find(e => e.language_code == lang.language_code);
-
-        setState({ content, description: _description });
+        if (_description) {
+            setState({ content, description: _description });
+        }
     }
 
     const onLangValChange = ({ target: { name, value } }) => {
