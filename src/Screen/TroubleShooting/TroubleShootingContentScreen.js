@@ -87,8 +87,8 @@ const TroubleShootingContentScreen = () => {
 
     const onSubmit = data => {
         data.descriptions = content.descriptions;
-        console.log('state', state);
-        console.log('data', data);
+        // console.log('state', state);
+        // console.log('data', data);
         const _contents = troubleshoot_content.map(e => ({ ...e }));
         if (contentState == 'edit') {
             const i = _contents.findIndex(e => e.id == content.id);
@@ -122,9 +122,7 @@ const TroubleShootingContentScreen = () => {
                 title: 'Upload Image Error',
                 text: 'Please check the image you uploaded!'
             });
-        }).finally(_ => {
-
-        });
+        }).finally(_ => { });
 
     }
 

@@ -2,6 +2,12 @@ import React, { Component, useEffect, useState, forwardRef, useRef, useImperativ
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import Overlay from '../Overlay/Overlay'
+import NavPagination from './NavPagination';
+import PagingInfo from './PagingInfo';
+import Search from './Search';
+import Filter from './Filter';
+import TableData from './TableData';
+import AddButton from './AddButton';
 
 const $ = window.$;
 const MTableId = `id_mtable_${parseInt(Math.random() * 10000)}`;
@@ -63,13 +69,6 @@ const MTable = forwardRef((props, ref) => {
       setPaginator({ ...paginator, refresh: !paginator.refresh });
     }
   }));
-
-  const { data, total, filters, filter, search, processing } = state;
-  const totalPage = Math.ceil(total / paginator.perpage);
-  const lastPage = totalPage >= 15 ? 15 : totalPage;
-  const startRow = (paginator.page - 1) * paginator.perpage + 1;
-  const _endRow = paginator.page * paginator.perpage;
-  const endRow = _endRow >= total ? total : _endRow;
 
   const onPerPageChange = e => {
     setPaginator({ ...paginator, perpage: e.value, page: 1 });
@@ -184,301 +183,45 @@ const MTable = forwardRef((props, ref) => {
     }
   }
 
+  const { data, total, filters, filter, search, processing } = state;
+  const totalPage = Math.ceil(total / paginator.perpage);
+  const lastPage = totalPage >= 15 ? 15 : totalPage;
+  const startRow = (paginator.page - 1) * paginator.perpage + 1;
+  const _endRow = paginator.page * paginator.perpage;
+  const endRow = _endRow >= total ? total : _endRow;
+
+  const tableProps = { showIndex, columns, data, paginator, startRow, onSort };
+  const filterProps = {
+    MTableId, filter, filters, hideFilter, columns,
+    openFilter, closeFilter, onAddFilter, onFilterFieldChange,
+    onFilterValueChange, onRemoveFilter, onResetFilter, onValueEnter
+  };
+  const navPaginationProps = { paginator, lastPage, totalPage, onPrev, onNext, onFirst, onLast };
+
   return (
     <div className="" id={MTableId}>
       <Overlay display={processing} />
       <div className="row">
-        <div className="col-md-3">
-          <div className="form-group">
-            <div className="input-group">
-              <input
-                id="search"
-                name="search"
-                placeholder="Search"
-                className="form-control searchField"
-                value={search}
-                onChange={onSearchChange}
-                style={{ borderRightWidth: 0 }}
-              />
-              <div className="input-group-append">
-                <button
-                  className={
-                    search
-                      ? 'btn btn-outline-danger btn-search'
-                      : 'btn btn-outline-dark btn-search'
-                  }
-                  type="button"
-                  style={{
-                    borderWidth: 0.5,
-                    borderColor: '#ccc',
-                    borderLeftWidth: 0,
-                  }}
-                  onClick={onClear} >
-                  <i className={search ? 'fa fa-times' : 'fa fa-search'} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-2">
-          <div id={`${MTableId}_filter`} className="filterContainer">
-            <div className="card" style={{ height: '100%' }}>
-              <div className="card-header" style={{ height: 40, paddingTop: 7 }}>
-                <div
-                  className="card-title"
-                  style={{ fontSize: 16 }} >
-                  <i className="fa fa-filter" /> Filter
-                </div>
-                <div className="card-tools" style={{ marginTop: -7 }}>
-                  <button
-                    type="button"
-                    className="btn btn-outline"
-                    onClick={closeFilter} >
-                    <i className="fa fa-times" />
-                  </button>
-                </div>
-              </div>
-              <div className="card-body">
-                <div
-                  className="d-flex"
-                  style={{ justifyContent: 'space-between' }} >
-                  <div style={{ flex: 1 }}>
-                    <select
-                      className="form-control rounded-0"
-                      name="filter_field"
-                      value={filter.field}
-                      onChange={onFilterFieldChange} >
-                      <option value={''}>Select field</option>
-                      {columns
-                        .filter(item => item.field)
-                        .filter(
-                          e =>
-                            filters
-                              .map(d => d.field)
-                              .join()
-                              .indexOf(e.field) == -1
-                        )
-                        .map((col, i) => (
-                          <option key={`key-option-${i}`} value={col.field}>
-                            {col.title}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  <div style={{ width: 10 }} />
-                  <div style={{ flex: 1 }}>
-                    <input
-                      name="filter_value"
-                      className="form-control"
-                      placeholder="Filter value"
-                      value={filter.value}
-                      onChange={onFilterValueChange}
-                      onKeyDown={onValueEnter}
-                    />
-                  </div>
-                  <div style={{ width: 10 }} />
-                  <div>
-                    <button
-                      type="button"
-                      className="btn  btn-outline-warning"
-                      onClick={onAddFilter} >
-                      <i className="fa fa-plus" />
-                    </button>
-                  </div>
-                </div>
-                <div
-                  style={{ height: 1, background: '#ccc', margin: '10px 0' }}
-                />
-                <div
-                  className="hideScrollbar"
-                  style={{
-                    height: 220,
-                    overflowY: 'scroll',
-                    border: 'solid 0px #ccc',
-                  }} >
-                  <div className="d-flex" style={{ flexDirection: 'column' }}>
-
-                    <div>
-                      {filters.map((item, i) => (
-                        <div
-                          key={`item_filter_${i}`}
-                          className="d-flex"
-                          style={{ flexDirection: 'column' }}
-                        >
-                          <div
-                            key={`key-item-filter-${i}`}
-                            className="d-flex"
-                            style={{
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }} >
-                            <div style={{ flex: 1 }}>{item.title}</div>
-                            <div style={{ margin: '0 10px', color: 'orangered' }}>
-                              contains
-                            </div>
-                            <div
-                              style={{
-                                flex: 1,
-                                color: 'darkblue',
-                                fontStyle: 'italic',
-                              }} >
-                              {item.value}
-                            </div>
-                            <div>
-                              <button
-                                type="button"
-                                className="btn btn-outline"
-                                onClick={onRemoveFilter(item)} >
-                                <i className="fa fa-times" style={{ color: 'red' }} />
-                              </button>
-                            </div>
-                          </div>
-                          <div
-                            style={{
-                              height: 1,
-                              background: '#ccc',
-                              margin: '6px 0',
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <div className="d-flex mt-3" style={{ justifyContent: 'center' }}>
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={onResetFilter}
-                    style={{ width: 100 }} >
-                    <i className="fa fa-times" /> Reset
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          {
-            !hideFilter && (
-              <div id="buttonFilter" style={{ width: 120 }}>
-                <button
-                  type="button"
-                  className="btn btn-block btn-outline-dark"
-                  onClick={openFilter} >
-                  <i className="fa fa-filter" /> Filter {filters.length > 0 &&
-                    <span className="badge badge-danger">{filters.length}</span>}
-                </button>
-              </div>
-            )
-          }
-
-        </div>
+        <Search search={search} onClear={onClear} onSearchChange={onSearchChange} />
+        <Filter {...filterProps} />
         <div className="col-md-5" />
         {showAddButton && (
-          <div className="col-md-2">
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <div style={{ width: 150 }}>
-                <button
-                  type="button"
-                  className="btn btn-block btn-outline-warning"
-                  onClick={onAddDataClick}
-                >
-                  <i className="fa fa-plus" /> Add
-                </button>
-              </div>
-            </div>
-          </div>
+          <AddButton onAddDataClick={onAddDataClick} />
         )}
       </div>
-      <div className="row">
-        <div className="col-lg-12 col-md-12 col-12 mtable-container">
-          <table className="table" style={{ marginTop: 16 }}>
-            <thead>
-              <tr>
-                {showIndex && (<th style={{ width: 60 }}>No</th>)}
-                {columns.map((item, i) => {
-                  return item.sortable
-                    ? <th key={'key-' + i} style={item.style || {}}>
-                      <div
-                        className="d-flex"
-                        style={{
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          cursor: 'pointer',
-                        }}
-                        onClick={onSort(item.field)} >
-                        <span className="d-block mr-2 flex-1">{item.title}</span>
-                        {paginator.order == item.field &&
-                          <i
-                            className={
-                              paginator.direction == 'asc'
-                                ? 'fa fa-arrow-down'
-                                : 'fa fa-arrow-up'
-                            }
-                          />}
-                      </div>
-                    </th>
-                    : <th key={'key-' + i} style={item.style || {}}>{item.title}</th>;
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, i) => (
-                <tr key={'key-' + i}>
-                  {showIndex && (<td>{i + startRow}</td>)}
-                  {columns.map((col, j) => {
-                    return (
-                      <td key={'key_col' + j} style={col.style ? col.style : {}}>
-                        {col.render ? col.render(item) : item[col.field]}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/**Table data component, display data  */}
+      <TableData {...tableProps} />
       <div className="mb-3 mt-3" style={{ height: 1, background: '#ccc' }} />
       <div className="row">
         <div className="col-lg-2 col-md-3 col-sm-12" >
           <div className='mt-2' style={{ minWidth: 180 }}>{`Showing ${startRow} - ${endRow} of ${total}`}</div>
         </div>
         <div className="col-lg-10 col-md-9 col-sm-12">
-          <div className="row justify-content-end" style={{}}>
-            <div className="" >
-              <div className="d-flex justify-content-end">
-                <div style={{ lineHeight: 2.5, width: 150, textAlign: 'center' }}>
-                  Rows per page
-                </div>
-                <div >
-                  <Dropdown
-                    options={[5, 10, 25, 50, 100]}
-                    value={paginator.perpage}
-                    onChange={onPerPageChange}
-                  />
-                </div>
-                <div style={{ lineHeight: 2.5, width: 100, textAlign: 'center' }}>
-                  {`Page ${paginator.page} of ${totalPage}`}
-                </div>
-              </div>
-            </div>
-            <div className="" >
-              <div className="d-flex justify-content-end" style={{ minHeight: 50 }}>
-                <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
-                  <i className='material-icons' style={{ fontSize: 30 }} >first_page</i>
-                </button>
-                <button type='button' className='btn btn-sm' onClick={onPrev} disabled={paginator.page == 1}>
-                  <i className='material-icons' style={{ fontSize: 30 }} >navigate_before</i>
-                </button>
-                <button type='button' className='btn btn-sm' onClick={onNext} disabled={paginator.page == lastPage}>
-                  <i className='material-icons' style={{ fontSize: 30 }} >navigate_next</i>
-                </button>
-                <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
-                  <i className='material-icons' style={{ fontSize: 30 }} >last_page</i>
-                </button>
-              </div>
-            </div>
+          <div className="row justify-content-end" >
+            {/**Paging info, display paging info and do the onchange page */}
+            <PagingInfo paginator={paginator} onPerPageChange={onPerPageChange} totalPage={totalPage} />
+            {/**Paging navigation compoennt, render paging navigation button */}
+            <NavPagination {...navPaginationProps} />
           </div>
         </div>
       </div>

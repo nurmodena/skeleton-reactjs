@@ -121,7 +121,7 @@ const InstallationScreen = () => {
         navigate("add/new");
     }
 
-    const propsTable = { ref: mTable, columns, getData: getInstallationAll, showIndex: true, showAddButton: true, onAddData };
+    const propsTable = { ref: mTable, columns, showIndex: true, showAddButton: true, getData: getInstallationAll, onAddData };
 
     return (
         <div className="content-wrapper">

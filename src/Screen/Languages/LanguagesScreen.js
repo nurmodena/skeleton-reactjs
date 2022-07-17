@@ -6,6 +6,7 @@ import { createLanguage, deleteLanguage, getLanguageAll, updateLanguage } from '
 import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import Overlay from '../../Components/Overlay/Overlay';
+import LanguageDetail from './LanguageDetail';
 
 const { $ } = window;
 let processTimeout = 0;
@@ -17,6 +18,7 @@ const LanguagesScreen = () => {
     defaultValues: {
       name: '',
       code: '',
+      image_name: '',
       is_default: false,
       is_active: true
     }
@@ -64,55 +66,11 @@ const LanguagesScreen = () => {
     updateLanguage(item, res => { mTable.current.refresh(); });
   }
 
-  const columns = [
-    { id: 1, title: 'ID', field: 'id', sortable: true },
-    { id: 2, title: 'Language', field: 'name', sortable: true },
-    { id: 3, title: 'Language Code', field: 'code', sortable: true },
-    {
-      id: 4,
-      title: 'Active',
-      field: 'is_active',
-      sortable: true,
-      render: item => {
-        return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)} />;
-      },
-    },
-    {
-      id: 5,
-      title: 'Is Default',
-      field: 'is_default',
-      sortable: true,
-      render: item => {
-        return <RadioButton checked={item.is_default} onChange={onDefaultChange(item)} />;
-      },
-    },
-    {
-      id: 6,
-      title: 'Action',
-      render: item => {
-        return (
-          <a
-            onClick={onRemove(item)}
-            style={{
-              cursor: 'pointer',
-              color: 'maroon',
-              display: 'inline-block',
-            }}
-          >
-            <i className="fas fa-trash" />
-            <span style={{ marginLeft: 10 }}>Delete</span>
-          </a>
-        );
-      },
-    },
-  ];
-
-  const propsTable = { columns, getData: getLanguageAll };
-
   const onAddData = () => {
     reset({
       name: '',
       code: '',
+      image_name: '',
       is_default: false,
       is_active: true
     });
@@ -163,7 +121,50 @@ const LanguagesScreen = () => {
 
   }
 
+  const columns = [
+    { id: 2, title: 'Language', field: 'name', sortable: true },
+    { id: 3, title: 'Language Code', field: 'code', sortable: true },
+    {
+      id: 4,
+      title: 'Active',
+      field: 'is_active',
+      sortable: true,
+      render: item => {
+        return <InputSwitch checked={item.is_active} onChange={onActiveChange(item)} />;
+      },
+    },
+    {
+      id: 5,
+      title: 'Is Default',
+      field: 'is_default',
+      sortable: true,
+      render: item => {
+        return <RadioButton checked={item.is_default} onChange={onDefaultChange(item)} />;
+      },
+    },
+    {
+      id: 6,
+      title: 'Action',
+      render: item => {
+        return (
+          <a
+            onClick={onRemove(item)}
+            style={{
+              cursor: 'pointer',
+              color: 'maroon',
+              display: 'inline-block',
+            }}
+          >
+            <i className="fas fa-trash" />
+            <span style={{ marginLeft: 10 }}>Delete</span>
+          </a>
+        );
+      },
+    },
+  ];
   const { processing } = state;
+  const propsTable = { columns, getData: getLanguageAll, showIndex: true };
+  const propsDetail = { processing, errors, control, register, onSubmit: handleSubmit(onSubmitData), };
 
   return (
     <div className="content-wrapper">
@@ -204,50 +205,7 @@ const LanguagesScreen = () => {
 
       {/**Modal Detal */}
       <div id="modal-detail" className='modal fade'>
-        <form name="form-detail" onSubmit={handleSubmit(onSubmitData)}>
-          <div className='modal-dialog modal-dialog-centered'>
-            <div className='modal-content'>
-              <Overlay display={processing} />
-              <div className='modal-header'>
-                <h5 className="modal-title"><i className='fa fa-globe'></i> Add Language</h5>
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-
-              </div>
-              <div className='modal-body'>
-                <div className='form-group'>
-                  <label>Language</label>
-                  <input {...register("name", { required: { value: true, message: 'Language is required!' } })} className='form-control' placeholder='Language' />
-                  <span className='text-danger' style={{ fontSize: 14 }}>{errors.name && errors.name.message}</span>
-                </div>
-                <div className='form-group'>
-                  <label>Language Code</label>
-                  <input maxLength={2} {...register("code", { required: { value: true, message: 'Language code is required' }, maxLength: 2 })} className='form-control' placeholder='Language Code' />
-                  <span className='text-danger' style={{ fontSize: 14 }}>{errors.code && errors.code.message}</span>
-                </div>
-                <div className='form-group'>
-                  <div className='d-flex flex-direction-row'>
-                    <div className='flex-1'>
-                      <label>Active</label>
-                      <div>
-                        <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} />
-                      </div>
-                    </div>
-                    <div className='flex-2'>
-                      <label>Default</label>
-                      <div><Controller name="is_default" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} /></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className='modal-footer d-flex justify-content-center'>
-                <button type='button' className='btn btn-outline-dark' data-dismiss="modal"><i className='fa fa-times' ></i> Close</button>
-                <button type='submit' className='btn btn-dark' ><i className='fa fa-save' ></i> Save</button>
-              </div>
-            </div>
-          </div>
-        </form>
+        <LanguageDetail {...propsDetail} />
       </div> {/**EndModal Detal */}
 
     </div>
