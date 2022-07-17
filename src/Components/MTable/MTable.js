@@ -213,8 +213,7 @@ const MTable = forwardRef((props, ref) => {
                     borderColor: '#ccc',
                     borderLeftWidth: 0,
                   }}
-                  onClick={onClear}
-                >
+                  onClick={onClear} >
                   <i className={search ? 'fa fa-times' : 'fa fa-search'} />
                 </button>
               </div>
@@ -227,16 +226,14 @@ const MTable = forwardRef((props, ref) => {
               <div className="card-header" style={{ height: 40, paddingTop: 7 }}>
                 <div
                   className="card-title"
-                  style={{ fontSize: 16 }}
-                >
+                  style={{ fontSize: 16 }} >
                   <i className="fa fa-filter" /> Filter
                 </div>
                 <div className="card-tools" style={{ marginTop: -7 }}>
                   <button
                     type="button"
                     className="btn btn-outline"
-                    onClick={closeFilter}
-                  >
+                    onClick={closeFilter} >
                     <i className="fa fa-times" />
                   </button>
                 </div>
@@ -284,8 +281,7 @@ const MTable = forwardRef((props, ref) => {
                     <button
                       type="button"
                       className="btn  btn-outline-warning"
-                      onClick={onAddFilter}
-                    >
+                      onClick={onAddFilter} >
                       <i className="fa fa-plus" />
                     </button>
                   </div>
@@ -299,8 +295,7 @@ const MTable = forwardRef((props, ref) => {
                     height: 220,
                     overflowY: 'scroll',
                     border: 'solid 0px #ccc',
-                  }}
-                >
+                  }} >
                   <div className="d-flex" style={{ flexDirection: 'column' }}>
 
                     <div>
@@ -316,8 +311,7 @@ const MTable = forwardRef((props, ref) => {
                             style={{
                               justifyContent: 'space-between',
                               alignItems: 'center',
-                            }}
-                          >
+                            }} >
                             <div style={{ flex: 1 }}>{item.title}</div>
                             <div style={{ margin: '0 10px', color: 'orangered' }}>
                               contains
@@ -327,20 +321,15 @@ const MTable = forwardRef((props, ref) => {
                                 flex: 1,
                                 color: 'darkblue',
                                 fontStyle: 'italic',
-                              }}
-                            >
+                              }} >
                               {item.value}
                             </div>
                             <div>
                               <button
                                 type="button"
                                 className="btn btn-outline"
-                                onClick={onRemoveFilter(item)}
-                              >
-                                <i
-                                  className="fa fa-times"
-                                  style={{ color: 'red' }}
-                                />
+                                onClick={onRemoveFilter(item)} >
+                                <i className="fa fa-times" style={{ color: 'red' }} />
                               </button>
                             </div>
                           </div>
@@ -361,8 +350,7 @@ const MTable = forwardRef((props, ref) => {
                     type="button"
                     className="btn btn-sm btn-outline-danger"
                     onClick={onResetFilter}
-                    style={{ width: 100 }}
-                  >
+                    style={{ width: 100 }} >
                     <i className="fa fa-times" /> Reset
                   </button>
                 </div>
@@ -417,8 +405,7 @@ const MTable = forwardRef((props, ref) => {
                           alignItems: 'center',
                           cursor: 'pointer',
                         }}
-                        onClick={onSort(item.field)}
-                      >
+                        onClick={onSort(item.field)} >
                         <span className="d-block mr-2 flex-1">{item.title}</span>
                         {paginator.order == item.field &&
                           <i
@@ -472,25 +459,23 @@ const MTable = forwardRef((props, ref) => {
                   />
                 </div>
                 <div style={{ lineHeight: 2.5, width: 100, textAlign: 'center' }}>
-                  {`${paginator.page} of ${totalPage}`}
+                  {`Page ${paginator.page} of ${totalPage}`}
                 </div>
               </div>
             </div>
             <div className="" >
               <div className="d-flex justify-content-end" style={{ minHeight: 50 }}>
                 <button type='button' className='btn btn-sm' onClick={onFirst} style={{ minWidth: 60 }}>
-                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
-                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+                  <i className='material-icons' style={{ fontSize: 30 }} >first_page</i>
                 </button>
-                <button type='button' className='btn btn-sm ml-2 mr-2' onClick={onPrev} disabled={paginator.page == 1}>
-                  <i className='fa fa-chevron-left' style={{ fontSize: 20 }} />
+                <button type='button' className='btn btn-sm' onClick={onPrev} disabled={paginator.page == 1}>
+                  <i className='material-icons' style={{ fontSize: 30 }} >navigate_before</i>
                 </button>
-                <button type='button' className='btn btn-sm mr-2 ml-2' onClick={onNext} disabled={paginator.page == lastPage}>
-                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+                <button type='button' className='btn btn-sm' onClick={onNext} disabled={paginator.page == lastPage}>
+                  <i className='material-icons' style={{ fontSize: 30 }} >navigate_next</i>
                 </button>
                 <button type='button' className='btn btn-sm' onClick={onLast} style={{ minWidth: 60 }}>
-                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
-                  <i className='fa fa-chevron-right' style={{ fontSize: 20 }} />
+                  <i className='material-icons' style={{ fontSize: 30 }} >last_page</i>
                 </button>
               </div>
             </div>
