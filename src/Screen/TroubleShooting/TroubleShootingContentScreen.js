@@ -200,12 +200,6 @@ const TroubleShootingContentScreen = () => {
                                                 <button type='button' className='btn btn-outline-dark' style={{ width: 100 }} onClick={onBrowseImage}><i className='fa fa-image'></i> Browse</button>
                                             </div>
                                         </div>
-                                        <div className='form-group'>
-                                            <label htmlFor='is-active'>Active</label>
-                                            <div>
-                                                <Controller name="is_active" control={control} render={({ field }) => { return (<InputSwitch {...field} checked={field.value} />) }} />
-                                            </div>
-                                        </div>
                                     </div>
                                     <div className='col-md-1'></div>
                                     <div className='col-md-5'>
