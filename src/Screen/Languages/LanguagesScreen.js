@@ -7,13 +7,16 @@ import { useForm, Controller } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import Overlay from '../../Components/Overlay/Overlay';
 import LanguageDetail from './LanguageDetail';
+import { getBrandAll } from '../../Service/BrandService';
 
 const { $ } = window;
 let processTimeout = 0;
+console.log('Mtable imported');
 
 const LanguagesScreen = () => {
   const mTable = useRef();
-  const [state, setState] = useState({ processing: false });
+  const mTable2 = useRef();
+  const [state, setState] = useState({ processing: false, showTable: false });
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
     defaultValues: {
       name: '',
@@ -23,6 +26,12 @@ const LanguagesScreen = () => {
       is_active: true
     }
   });
+
+  useEffect(() => {
+    setTimeout(() => {
+      setState({ ...state, showTable: true })
+    }, 100);
+  }, [])
 
   const removeData = id => {
     deleteLanguage(id, res => {
@@ -162,9 +171,15 @@ const LanguagesScreen = () => {
       },
     },
   ];
-  const { processing } = state;
+
+  const columns1 = [
+    { id: 1, title: 'Brand Code', field: 'code', sortable: true },
+    { id: 2, title: 'Brand Name', field: 'name', sortable: true },
+  ];
+  const { processing, showTable } = state;
   const propsTable = { columns, getData: getLanguageAll, showIndex: true };
   const propsDetail = { processing, errors, control, register, onSubmit: handleSubmit(onSubmitData), };
+  const propsTable2 = { columns: columns1, getData: getBrandAll };
 
   return (
     <div className="content-wrapper">
@@ -196,6 +211,7 @@ const LanguagesScreen = () => {
                 </div>
                 <div className="card-body">
                   <MTable ref={mTable} {...propsTable} onAddData={onAddData} showAddButton={true} />
+                  <MTable ref={mTable2} {...propsTable2} onAddData={onAddData} showAddButton={true} />
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Filter = ({
-    MTableId,
+    mTableId,
     closeFilter,
     filter,
     filters,
@@ -17,7 +17,7 @@ const Filter = ({
 }) => {
     return (
         <div className="col-md-2">
-            <div id={`${MTableId}_filter`} className="filterContainer">
+            <div id={`${mTableId}_filter`} className="filterContainer">
                 <div className="card" style={{ height: '100%' }}>
                     <div className="card-header" style={{ height: 40, paddingTop: 7 }}>
                         <div
@@ -153,7 +153,7 @@ const Filter = ({
             </div>
             {
                 !hideFilter && (
-                    <div id="buttonFilter" style={{ width: 120 }}>
+                    <div id={`buttonFilter_${mTableId}`} style={{ width: 120 }}>
                         <button
                             type="button"
                             className="btn btn-block btn-outline-dark"

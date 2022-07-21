@@ -10,19 +10,17 @@ import TableData from './TableData';
 import AddButton from './AddButton';
 
 const $ = window.$;
-const MTableId = `id_mtable_${parseInt(Math.random() * 10000)}`;
 let timeoutId = 0;
-let loadTimeout = 0;
 
-const MTable = forwardRef((props, ref) => {
-  const { columns, onAddData, showIndex, showAddButton, order, getData, hideFilter } = props;
+const MTable = forwardRef(({ columns, onAddData, showIndex, showAddButton, order, getData, hideFilter, id }, ref) => {
   const [state, setCurrentState] = useState({
     data: [],
     total: 0,
     filters: [],
     filter: { field: '', value: '', title: '' },
     search: '',
-    processing: false
+    processing: false,
+    mTableId: id || `mTableId_${parseInt(Math.random() * 10000000)}`
   });
   const [paginator, setPaginator] = useState({
     page: 1,
@@ -38,13 +36,9 @@ const MTable = forwardRef((props, ref) => {
     setCurrentState({ ...state, ...value });
   }
 
-  useEffect(_ => {
-
-  }, []);
-
   useEffect(
     () => {
-      loadTimeout = setTimeout(() => {
+      let loadTimeout = setTimeout(() => {
         setState({ processing: true });
       }, 150);
       const _paginatpr = { ...paginator };
@@ -60,6 +54,8 @@ const MTable = forwardRef((props, ref) => {
         clearTimeout(loadTimeout);
         setState({ processing: false, data: [], total: 0 });
       });
+
+      attachDocumentCLick(mTableId);
     },
     [paginator]
   );
@@ -110,7 +106,8 @@ const MTable = forwardRef((props, ref) => {
   };
 
   const openFilter = () => {
-    $(`#${MTableId}_filter`).animate(
+    console.log('mTableId', mTableId);
+    $(`#${mTableId}_filter`).animate(
       {
         height: 400,
         opacity: 1,
@@ -120,7 +117,7 @@ const MTable = forwardRef((props, ref) => {
   };
 
   const closeFilter = () => {
-    $(`#${MTableId}_filter`).animate(
+    $(`#${mTableId}_filter`).animate(
       {
         height: 0,
         opacity: 0,
@@ -183,7 +180,23 @@ const MTable = forwardRef((props, ref) => {
     }
   }
 
-  const { data, total, filters, filter, search, processing } = state;
+  const attachDocumentCLick = (id) => {
+    console.log('attachDocumentCLick ', id);
+    const onCLick = e => {
+      const filterButton = document.getElementById('buttonFilter_' + id);
+      const filterContainer = document.getElementById(`${id}_filter`);
+      if ((filterButton && filterButton.contains(e.target)) || (filterContainer && filterContainer.contains(e.target))) { } else {
+        if ($(`#${id}_filter`).css('opacity') == '1') {
+          $(`#${id}_filter`).animate({ height: 0, opacity: 0, }, 100);
+        }
+      }
+    }
+    const root = document.getElementById('root');
+    root.removeEventListener('click', onCLick);
+    root.addEventListener('click', onCLick);
+  }
+
+  const { data, total, filters, filter, search, processing, mTableId } = state;
   const totalPage = Math.ceil(total / paginator.perpage);
   const lastPage = totalPage >= 15 ? 15 : totalPage;
   const startRow = (paginator.page - 1) * paginator.perpage + 1;
@@ -192,14 +205,14 @@ const MTable = forwardRef((props, ref) => {
 
   const tableProps = { showIndex, columns, data, paginator, startRow, onSort };
   const filterProps = {
-    MTableId, filter, filters, hideFilter, columns,
+    mTableId, filter, filters, hideFilter, columns,
     openFilter, closeFilter, onAddFilter, onFilterFieldChange,
     onFilterValueChange, onRemoveFilter, onResetFilter, onValueEnter
   };
   const navPaginationProps = { paginator, lastPage, totalPage, onPrev, onNext, onFirst, onLast };
 
   return (
-    <div className="" id={MTableId}>
+    <div className="" id={mTableId}>
       <Overlay display={processing} />
       <div className="row">
         <Search search={search} onClear={onClear} onSearchChange={onSearchChange} />
@@ -230,15 +243,3 @@ const MTable = forwardRef((props, ref) => {
 });
 
 export default MTable;
-
-
-const onCLick = e => {
-  const filterButton = document.getElementById('buttonFilter');
-  const filterContainer = document.getElementById(`${MTableId}_filter`);
-  if ((filterButton && filterButton.contains(e.target)) || (filterContainer && filterContainer.contains(e.target))) { } else {
-    $(`#${MTableId}_filter`).animate({ height: 0, opacity: 0, }, 100);
-  }
-}
-const root = document.getElementById('root');
-root.removeEventListener('click', onCLick);
-root.addEventListener('click', onCLick); 
