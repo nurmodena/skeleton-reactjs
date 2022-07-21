@@ -106,7 +106,6 @@ const MTable = forwardRef(({ columns, onAddData, showIndex, showAddButton, order
   };
 
   const openFilter = () => {
-    console.log('mTableId', mTableId);
     $(`#${mTableId}_filter`).animate(
       {
         height: 400,
@@ -181,7 +180,6 @@ const MTable = forwardRef(({ columns, onAddData, showIndex, showAddButton, order
   }
 
   const attachDocumentCLick = (id) => {
-    console.log('attachDocumentCLick ', id);
     const onCLick = e => {
       const filterButton = document.getElementById('buttonFilter_' + id);
       const filterContainer = document.getElementById(`${id}_filter`);
