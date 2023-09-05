@@ -27,9 +27,7 @@ const replaceUrl = obj => {
   }
 }
 
-// axios.defaults.baseURL = 'http://192.168.0.41:9502/';
-// axios.defaults.baseURL = 'https://tsm.modena.com/api/';
-axios.defaults.baseURL = 'https://scstaging.modena.com/api/';
+axios.defaults.baseURL = 'http://192.168.0.41:9502/';
 axios.interceptors.response.use(
   res => {
     replaceUrl(res);
